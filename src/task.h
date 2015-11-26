@@ -71,8 +71,8 @@
 #ifndef INC_TASK_H
 #define INC_TASK_H
 
-#ifndef INC__FREERTOS_H
-	#error "include _FreeRTOS.h must appear in source files before include task.h"
+#ifndef INC_ARDUINO_FREERTOS_H
+	#error "include Arduino_FreeRTOS.h must appear in source files before include task.h"
 #endif
 
 #include "list.h"

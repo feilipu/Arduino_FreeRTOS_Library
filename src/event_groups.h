@@ -70,8 +70,8 @@
 #ifndef EVENT_GROUPS_H
 #define EVENT_GROUPS_H
 
-#ifndef INC__FREERTOS_H
-	#error "include _FreeRTOS.h" must appear in source files before "include event_groups.h"
+#ifndef INC_ARDUINO_FREERTOS_H
+	#error "include Arduino_FreeRTOS.h" must appear in source files before "include event_groups.h"
 #endif
 
 #include "timers.h"

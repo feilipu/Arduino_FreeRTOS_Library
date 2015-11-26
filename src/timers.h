@@ -71,8 +71,8 @@
 #ifndef TIMERS_H
 #define TIMERS_H
 
-#ifndef INC__FREERTOS_H
-	#error "include _FreeRTOS.h must appear in source files before include timers.h"
+#ifndef INC_ARDUINO_FREERTOS_H
+	#error "include Arduino_FreeRTOS.h must appear in source files before include timers.h"
 #endif
 
 #include "task.h"

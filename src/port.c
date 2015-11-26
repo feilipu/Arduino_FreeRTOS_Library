@@ -72,7 +72,7 @@
 #include <avr/interrupt.h>
 #include <avr/wdt.h>
 
-#include "_FreeRTOS.h"
+#include "Arduino_FreeRTOS.h"
 #include "task.h"
 
 /*-----------------------------------------------------------

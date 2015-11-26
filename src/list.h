@@ -95,8 +95,8 @@
  * \ingroup FreeRTOSIntro
  */
 
-#ifndef INC__FREERTOS_H
-	#error _FreeRTOS.h must be included before list.h
+#ifndef INC_ARDUINO_FREERTOS_H
+	#error Arduino_FreeRTOS.h must be included before list.h
 #endif
 
 #ifndef LIST_H

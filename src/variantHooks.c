@@ -69,14 +69,15 @@
 #include <util/delay.h>
 
 /* FreeRTOS includes. */
-#include "_FreeRTOS.h"
+#include "Arduino_FreeRTOS.h"
 #include "task.h"
 #include "timers.h"
 #include "StackMacros.h"
 
 extern void setup(void);
 extern void loop(void);
-extern void serialEventRun(void);
+
+void serialEventRun(void) __attribute(( weak ));
 
 /*-----------------------------------------------------------*/
 /*
@@ -98,6 +99,9 @@ void initVariant(void)
 /*-----------------------------------------------------------*/
 #if ( configUSE_IDLE_HOOK == 1 )
 
+void serialEventRun(void)
+	{}
+
 /*
  * Call the user defined loop() function from within the idle task.
  * This allows the application designer to add background functionality
@@ -109,7 +113,7 @@ void initVariant(void)
 void vApplicationIdleHook( void )
 {
 	loop();
-	if (serialEventRun) serialEventRun();
+	serialEventRun();
 }
 
 #endif /* configUSE_IDLE_HOOK == 1 */

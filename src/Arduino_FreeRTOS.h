@@ -67,8 +67,8 @@
     1 tab == 4 spaces!
 */
 
-#ifndef INC__FREERTOS_H
-#define INC__FREERTOS_H
+#ifndef INC_ARDUINO_FREERTOS_H
+#define INC_ARDUINO_FREERTOS_H
 
 /*
  * Include the generic headers required for the FreeRTOS port being used.
@@ -835,5 +835,5 @@ point support. */
 }
 #endif
 
-#endif /* INC__FREERTOS_H */
+#endif /* INC_ARDUINO_FREERTOS_H */
 

@@ -76,7 +76,7 @@ task.h is included from an application file. */
 #define MPU_WRAPPERS_INCLUDED_FROM_API_FILE
 
 /* FreeRTOS includes. */
-#include "_FreeRTOS.h"
+#include "Arduino_FreeRTOS.h"
 #include "task.h"
 #include "timers.h"
 #include "event_groups.h"
