@@ -95,8 +95,8 @@
  * \ingroup FreeRTOSIntro
  */
 
-#ifndef INC_FREERTOS_H
-	#error FreeRTOS.h must be included before list.h
+#ifndef INC__FREERTOS_H
+	#error _FreeRTOS.h must be included before list.h
 #endif
 
 #ifndef LIST_H

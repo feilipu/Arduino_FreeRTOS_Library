@@ -16,7 +16,7 @@ extern "C" {
 #include <avr/io.h>
 #include <avr/wdt.h>
 
-#include "FreeRTOS.h"
+#include "_FreeRTOS.h"
 #include "task.h"
 
 // System Tick - Scheduler timer
