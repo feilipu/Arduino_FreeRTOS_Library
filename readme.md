@@ -3,6 +3,14 @@ This is a fork of Richard Berry's freeRTOS, optimised for the AVR devices.
 It has been created to provide access to FreeRTOS capabilities, with full compatibility to the Arduino environment.
 It does this by keeping hands off everything, and only touching the minimum of hardware to be successful.
 
+## Further Reading
+
+The canonical source for information is the [FreeRTOS Web Site](http://www.freertos.org/ "FreeRTOS").
+Within this site, the [Getting Started](http://www.freertos.org/FreeRTOS-quick-start-guide.html "Quick Start Guide") page is very useful.
+It is worth having a view from a user, and [manicbug](https://maniacbug.wordpress.com/2012/01/31/freertos/) has some interesting examples.
+My other [AVRfreeRTOS Repository](https://sourceforge.net/projects/avrfreertos/) has plenty of examples,
+ranging from [blink](https://sourceforge.net/projects/avrfreertos/files/MegaBlink/) through to a [synthesiser](https://sourceforge.net/projects/avrfreertos/files/GA_Synth/).
+
 ## General
 
 FreeRTOS has a multitude of configuration options, which can be specified from within the FreeRTOSConfig.h file.
