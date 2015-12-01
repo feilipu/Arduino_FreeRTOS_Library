@@ -44,6 +44,10 @@ Other heap allocation schemes are supported by FreeRTOS, and they can used with 
 * Stack Overflow: If any stack (for the loop() or) for any Task overflows, there will be a slow LED blink, with 4 second cycle.
 * Heap Overflow: If any Task tries to allocate memory and that allocation fails, there will be a fast LED blink, with 100 millisecond cycle.
 
+## Errata
+
+Testing with the Software Serial library shows some incompatibilities at low baud rates (9600), due to the extended time this library disables the global interrupt. Working on characterising and resolving the problem currently.
+
 ## Compatibility
 
   * ATmega328 @ 16MHz : Arduino UNO, Arduino Duemilanove, Arduino Diecimila, etc.
