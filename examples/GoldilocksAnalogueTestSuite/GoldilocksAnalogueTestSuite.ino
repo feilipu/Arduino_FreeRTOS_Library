@@ -175,10 +175,7 @@ void setup() {
     ,  NULL ); // */
 
   // Start the task scheduler, which takes over control of scheduling individual tasks.
-  vTaskStartScheduler();
-  // We should never return to here.
-
-  Serial.println(F("\n\n\nGoodbye... no space for idle task!"));  // Doh, so we're dead...
+  // The scheduler is started in initVariant() found in variantHooks.c
 }
 
 /*--------------------------------------------------*/
