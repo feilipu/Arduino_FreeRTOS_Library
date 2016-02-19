@@ -53,6 +53,8 @@ Sd2Card card;
 SdVolume volume;
 SdFile root;
 
+static uint8_t * Buff = NULL; /* Put a working buffer on heap later (with pvPortMalloc). */
+
 // change this to match your SD shield or module;
 // GoldilocksAnalogue SD shield: pin 14
 uint8_t const chipSelect = 14;
@@ -61,8 +63,13 @@ uint8_t const chipSelect = 14;
 SemaphoreHandle_t xSerialSemaphore;
 
 // define two tasks to operate this test suite.
-static void TaskReport(void *pvParameters); // Report on the status reguarly using USART.
-static void TaskAnalogue(void *pvParameters);   // Manage Analogue set-up, then sleep.
+static void TaskReport( void *pvParameters ); // Report on the status reguarly using USART.
+static void TaskAnalogue( void *pvParameters );   // Manage Analogue set-up, then sleep.
+
+// Test the SPI EEPROM device, prior to building the SPI SRAM Delay loop.
+static int8_t testSPIEEPROM( uint_farptr_t p1, uint16_t p2 );
+// p1 = address of the SPI memory to be tested
+// p2 = number of bytes to be tested (allocates a RAM buffer of this size too)
 
 /*--------------------------------------------------*/
 /*-------------------- Set Up ----------------------*/
@@ -72,6 +79,8 @@ void setup() {
   // put your setup code here, to run once:
   // Open serial communications and wait for port to open:
   Serial.begin(38400);
+
+  Serial.println(F("Hello World!\n"));
 
   setup_RTC_interrupt();
 
@@ -98,16 +107,28 @@ void setup() {
       xSemaphoreGive( ( xSerialSemaphore ) );  // make the Serial Port available
   }
 
+  SPI.begin(); // warm up the SPI interface, so it can be used for the SPI RAM testing.
+
+  Serial.print(F("SPI SRAM Memory Testing: "));
+  if (testSPIEEPROM(RAM0_ADDR + 17, CMD_BUFFER_SIZE))
+    Serial.println(F("*** FAILED ***"));
+  else
+    Serial.println(F("PASSED"));
+
+  Serial.print(F("SPI EEPROM Memory Testing: "));
+  if (testSPIEEPROM(RAM1_ADDR + 17, CMD_BUFFER_SIZE))
+    Serial.println(F("*** FAILED ***\n"));
+  else
+    Serial.println(F("PASSED\n"));
+
   // we'll use the SD Card initialization code from the utility libraries
   // since we're just testing if the card is working!
-  Serial.print(F("\nInitializing SD card..."));
+  Serial.print(F("\nInitializing SD card... "));
   if (!card.init(SPI_HALF_SPEED, chipSelect)) {
-    Serial.println(F("initialization failed. Things to check:"));
-    Serial.println(F("* is a card inserted?"));
-    Serial.println(F("* is your wiring correct?"));
-    Serial.println(F("* did you change the chipSelect pin to match your shield or module?"));
+    Serial.println(F("initialization failed."));
+    Serial.println(F("Is a card inserted? You must insert a formatted SD Card to proceed."));
   } else {
-    Serial.println(F("Wiring is correct and a card is present."));
+    Serial.println(F("wiring is correct and a SD card is present."));
   }
 
   // print the type of card
@@ -160,10 +181,10 @@ void setup() {
   // Now set up two tasks to help us with testing.
   xTaskCreate(
     TaskReport
-    ,  (const portCHAR *)"RedLED" // report reguarly on the status of memory, and the tick values.
+    ,  (const portCHAR *)"RedLED" // report reguarly on the status of its stack and the tick values.
     ,  256        // Stack size
     ,  NULL
-    ,  1          // priority
+    ,  2          // priority
     ,  NULL ); // */
 
   xTaskCreate(
@@ -195,31 +216,42 @@ static void TaskAnalogue(void *pvParameters) // Prepare the DAC
   // Create the SPI SRAM ring-buffer used by audio delay loop.
   SPIRAM_ringBuffer_InitBuffer( &SRAM_delayBuffer, (uint_farptr_t)(RAM0_ADDR), sizeof(uint8_t) * DELAY);
 
-  Serial.print(F("DAC_Codec_init "));
-  // initialise the USART 1 MSPIM bus specifically for DAC use, with the post-latch configuration.
-  // pre-latch for audio or AC signals (FALSE), or post-latch for single value setting or DC values (TRUE).
-  DAC_init(FALSE);
+  // See if we can obtain the Serial Semaphore.
+  // If the semaphore is not available, wait 5 ticks to see if it becomes free.
+  if ( xSemaphoreTake( xSerialSemaphore, ( TickType_t ) 5 ) == pdTRUE )
+  {
+    // We were able to obtain the semaphore and can now access the shared resource.
+    // We want to have the Serial Port for us alone, as it takes some time to print,
+    // so we don't want it getting stolen during the middle of a conversion.
 
-  Serial.print(F("will "));
-  // Initialise the sample interrupt timer.
-  // set up the sampling Timer3 to 48000Hz (or lower), runs at audio sampling rate in Hz.
-  DAC_Timer3_init(SAMPLE_RATE);
+    Serial.print(F("DAC_Codec_init "));
+    // initialise the USART 1 MSPIM bus specifically for DAC use, with the post-latch configuration.
+    // pre-latch for audio or AC signals (FALSE), or post-latch for single value setting or DC values (TRUE).
+    DAC_init(FALSE);
 
-  Serial.print(F("very "));
-  // Initialise the filter to be a Low Pass Filter.
-  tx_filter.cutoff = 0xc000;          // set filter to 3/8 of sample frequency.
-  setIIRFilterLPF( &tx_filter );      // initialise transmit sample filter
+    Serial.print(F("will "));
+    // Initialise the sample interrupt timer.
+    // set up the sampling Timer3 to 48000Hz (or lower), runs at audio sampling rate in Hz.
+    DAC_Timer3_init(SAMPLE_RATE);
 
-  Serial.print(F("soon "));
-  // set up ADC sampling on the ADC7 (Microphone).
-  AudioCodec_ADC_init();
-  
-  Serial.print (F("be "));
-  // Set the call back function to do the audio processing.
-  // Done this way so that we can change the audio handling depending on what we want to achieve.
-  DAC_setHandler(audioCodec_dsp, &ch_A_out, &ch_B_out);
+    Serial.print(F("very "));
+    // Initialise the filter to be a Low Pass Filter.
+    tx_filter.cutoff = 0xc000;          // set filter to 3/8 of sample frequency.
+    setIIRFilterLPF( &tx_filter );      // initialise transmit sample filter
 
-  Serial.println(F("done."));
+    Serial.print(F("soon "));
+    // set up ADC sampling on the ADC7 (Microphone).
+    AudioCodec_ADC_init();
+
+    Serial.print (F("be "));
+    // Set the call back function to do the audio processing.
+    // Done this way so that we can change the audio handling depending on what we want to achieve.
+    DAC_setHandler(audioCodec_dsp, &ch_A_out, &ch_B_out);
+
+    Serial.println(F("done."));
+
+    xSemaphoreGive( xSerialSemaphore ); // Now free the Serial Port for others.
+  }
 
   //  vTaskSuspend(NULL);           // Well, we're pretty much done here. Let's suspend the Task.
   //  vTaskEndScheduler();          // Or just kill the FreeRTOS scheduler. Rely on Timer3 Interrupt for regular output.
@@ -281,6 +313,65 @@ static void TaskReport(void *pvParameters) // report on the status of the device
 /*--------------------------------------------------*/
 /*-------------------- Functions -------------------*/
 /*--------------------------------------------------*/
+
+
+static int8_t testSPIEEPROM( uint_farptr_t p1, uint16_t p2 )
+{
+  int8_t ReturnCode;
+
+  if (Buff == NULL) // if there is no Buff buffer allocated (pointer is NULL), then allocate buffer.
+    if ( !(Buff = (uint8_t *) pvPortMalloc( sizeof(uint8_t) * CMD_BUFFER_SIZE )))
+    {
+      Serial.println(F("pvPortMalloc for *Buff fail..!"));
+      return SPIRAM_ERROR;
+    }
+
+  if (p2 >= CMD_BUFFER_SIZE) p2 = CMD_BUFFER_SIZE;
+
+  srand( p1 % 42 ); // create a random seed, based on 42.
+
+  for ( uint16_t i = 0; i < p2; ++i)
+  {
+    Buff[i] = (uint8_t) rand();  // fill the Buff with some pseudo random numbers.
+  }
+
+  Serial.print(F("Testing at 0x"));
+  Serial.print( (uint32_t)p1, HEX);
+  Serial.print(F(" for "));
+  Serial.print( p2, DEC);
+  Serial.println(F(" bytes."));
+
+  ReturnCode = SPIRAM_begin();
+  if (ReturnCode) return ReturnCode; // problem with opening the EEPROM / SRAM
+
+  uint_farptr_t FarAddress = p1;
+
+  ReturnCode = SPIRAM_write( FarAddress, Buff, (size_t)p2);
+  if (ReturnCode) return ReturnCode;   /* error or disk full */
+
+  for (uint16_t i = 0; i < p2; ++i)
+  {
+    uint8_t read_result;
+
+    ReturnCode = SPIRAM_read( &read_result, (uint_farptr_t)(FarAddress + i), (size_t)1);
+    if (ReturnCode) return ReturnCode;   /* error or disk full */
+
+    // Serial.print(F("Written 0x"));
+    // Serial.print( Buff[i], HEX);
+    // Serial.print(F(" Read 0x"));
+    // Serial.println( read_result, HEX);
+
+    if ( Buff[i] != read_result)
+    {
+      Serial.print(F("Error at Address 0x"));
+      Serial.print( (uint_farptr_t)(FarAddress + i), HEX);
+      Serial.print(F(" with 0x"));
+      Serial.println( read_result, HEX);
+      return SPIRAM_ERROR;
+    }
+  }
+  return SPIRAM_SUCCESS;
+}
 
 void audioCodec_dsp( uint16_t * ch_A,  uint16_t * ch_B)
 {

@@ -14,6 +14,9 @@ extern "C" {
 #define SAMPLE_RATE   16000   // samples per second
 #define DELAY         128000  // bytes of delay
 
+/* Working buffer */
+#define CMD_BUFFER_SIZE 8192  // size of working buffer (on heap)
+
 /*--------------------------------------------------*/
 /*---------------Public Functions-------------------*/
 /*--------------------------------------------------*/
