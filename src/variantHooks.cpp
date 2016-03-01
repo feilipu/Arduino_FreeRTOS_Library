@@ -68,6 +68,8 @@
 
 #include <util/delay.h>
 
+#include <Arduino.h>
+
 /* FreeRTOS includes. */
 #include "Arduino_FreeRTOS.h"
 #include "task.h"
@@ -76,8 +78,6 @@
 
 extern void setup(void);
 extern void loop(void);
-
-void serialEventRun(void) __attribute(( weak ));
 
 /*-----------------------------------------------------------*/
 /*
