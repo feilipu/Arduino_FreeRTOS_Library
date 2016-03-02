@@ -78,18 +78,16 @@
 extern void setup(void);
 extern void loop(void);
 
-void initVariant(void) __attribute__ ((OS_main));
-
 /*-----------------------------------------------------------*/
-/*
- */
+
+void initVariant(void) __attribute__ ((flatten, OS_main));
 void initVariant(void)
 {
 #if defined(USBCON)
 	USBDevice.attach();
 #endif
 
-	setup();
+	setup();		// the normal Arduino setup() function is run here.
 
 	vTaskStartScheduler(); // initialise and run the freeRTOS scheduler. Execution should never return here.
 
@@ -109,7 +107,7 @@ void initVariant(void)
  */
 void vApplicationIdleHook( void )
 {
-	loop();
+	loop();		// the normal Arduino loop() function is run here.
 	if (serialEventRun) serialEventRun();
 }
 
