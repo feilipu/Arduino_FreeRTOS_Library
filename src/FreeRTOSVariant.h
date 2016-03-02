@@ -9,15 +9,15 @@
 #ifndef freeRTOSVariant_h
 #define freeRTOSVariant_h
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <avr/io.h>
 #include <avr/wdt.h>
 
 #include "Arduino_FreeRTOS.h"
 #include "task.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // System Tick - Scheduler timer
 // Use the Watchdog timer, and choose the rate at which scheduler interrupts will occur.
