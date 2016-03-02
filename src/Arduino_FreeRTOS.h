@@ -90,10 +90,6 @@
  */
 #include <stdint.h> /* READ COMMENT ABOVE. */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* Application specific configuration options. */
 #include "FreeRTOSConfig.h"
 
@@ -106,6 +102,10 @@ extern "C" {
 
 /* Variant (AVR) specific configuration options. */
 #include "FreeRTOSVariant.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
  * Check all the required application specific macros have been defined.
