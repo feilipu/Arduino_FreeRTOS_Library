@@ -78,6 +78,8 @@
 extern void setup(void);
 extern void loop(void);
 
+void initVariant(void) __attribute__ ((OS_main));
+
 /*-----------------------------------------------------------*/
 /*
  */
