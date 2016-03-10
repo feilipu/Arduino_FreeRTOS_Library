@@ -16,7 +16,7 @@ ranging from [blink](https://sourceforge.net/projects/avrfreertos/files/MegaBlin
 FreeRTOS has a multitude of configuration options, which can be specified from within the FreeRTOSConfig.h file.
 To keep commonality with all of the Arduino hardware options, some sensible defaults have been selected.
 
-The AVR Watchdog Timer is used with to generate 15ms time slices, but Tasks that finish before their allocated time will hand execution back to the Scheduler.
+The AVR Watchdog Timer is used to generate 15ms time slices, but Tasks that finish before their allocated time will hand execution back to the Scheduler.
 This does not affect the use of any of the normal Timer functions in Arduino.
 
 Time slices can be selected from 15ms up to 500ms. Slower time slicing can allow the Arduino MCU to sleep for longer, without the complexity of a Tickless idle.
