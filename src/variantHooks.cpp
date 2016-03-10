@@ -105,6 +105,8 @@ void initVariant(void)
  * NOTE: vApplicationIdleHook() MUST NOT, UNDER ANY CIRCUMSTANCES, CALL A FUNCTION THAT MIGHT BLOCK.
  *
  */
+void vApplicationIdleHook( void ) __attribute__((weak));
+
 void vApplicationIdleHook( void )
 {
 	loop();		// the normal Arduino loop() function is run here.
@@ -131,6 +133,8 @@ Notes:
    This routine will never return.
    This routine is referenced in the task.c file of FreeRTOS as an extern.
 \*---------------------------------------------------------------------------*/
+void vApplicationMallocFailedHook( void ) __attribute__((weak));
+
 void vApplicationMallocFailedHook( void )
 {
 #if defined(__AVR_ATmega640__) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega1281__) || defined(__AVR_ATmega2560__) || defined(__AVR_ATmega2561__) // Arduino Mega with 2560
@@ -192,7 +196,9 @@ Notes:
    This routine will never return.
    This routine is referenced in the task.c file of FreeRTOS as an extern.
 \*---------------------------------------------------------------------------*/
-void vApplicationStackOverflowHook( TaskHandle_t xTask __attribute__((unused)), portCHAR *pcTaskName __attribute__((unused)) )
+void vApplicationStackOverflowHook( TaskHandle_t xTask __attribute__((unused)), portCHAR *pcTaskName __attribute__((unused)) ) __attribute__((weak));
+
+void vApplicationStackOverflowHook( TaskHandle_t xTask, portCHAR *pcTaskName )
 {
 #if defined(__AVR_ATmega640__) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega1281__) || defined(__AVR_ATmega2560__) || defined(__AVR_ATmega2561__)  // Arduino Mega with 2560
 	DDRB  |= _BV(DDB7);
