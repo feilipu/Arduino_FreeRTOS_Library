@@ -833,8 +833,6 @@ Queue_t * const pxQueue = ( Queue_t * ) xQueue;
 			{
 				traceQUEUE_SEND( pxQueue );
 
-				++( pxQueue->uxMessagesWaiting );
-
 				#if ( configUSE_MUTEXES == 1 )
 				{
 					if( pxQueue->uxQueueType == queueQUEUE_IS_MUTEX )
@@ -849,6 +847,8 @@ Queue_t * const pxQueue = ( Queue_t * ) xQueue;
 					}
 				}
 				#endif /* configUSE_MUTEXES */
+				
+				++( pxQueue->uxMessagesWaiting );
 
 				#if ( configUSE_QUEUE_SETS == 1 )
 				{
