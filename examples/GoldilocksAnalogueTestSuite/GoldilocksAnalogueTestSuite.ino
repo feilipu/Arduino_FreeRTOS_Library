@@ -102,7 +102,7 @@ void setup() {
   // But they should only be used whilst the scheduler is running.
   if ( xSerialSemaphore == NULL )          // Check to see if the Serial Semaphore has not been created.
   {
-    xSerialSemaphore = xSemaphoreCreateBinary(); // binary semaphore for Serial Port
+    xSerialSemaphore = xSemaphoreCreateMutex(); // mutex semaphore for Serial Port
     if ( ( xSerialSemaphore ) != NULL )
       xSemaphoreGive( ( xSerialSemaphore ) );  // make the Serial Port available
   }
