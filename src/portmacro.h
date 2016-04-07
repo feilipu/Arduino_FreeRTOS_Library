@@ -202,6 +202,8 @@ typedef unsigned char	UBaseType_t;
 #define portBYTE_ALIGNMENT		1
 #define portNOP()			__asm__ __volatile__ ( "nop" );
 
+#define sleep_reset()			do { _SLEEP_CONTROL_REG = 0; } while(0) // reset all sleep_mode() configurations.
+
 /* Timing for the scheduler.
  * Watchdog Timer is 128kHz nominal,
  * but 120 kHz at 5V DC and 25 degrees is actually more accurate,
