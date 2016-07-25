@@ -180,7 +180,7 @@ void vApplicationMallocFailedHook( void )
 /*-----------------------------------------------------------*/
 
 
-#if ( configCHECK_FOR_STACK_OVERFLOW == 1 )
+#if ( configCHECK_FOR_STACK_OVERFLOW >= 1 )
 /*---------------------------------------------------------------------------*\
 Usage:
    called by task system when a stack overflow is noticed
