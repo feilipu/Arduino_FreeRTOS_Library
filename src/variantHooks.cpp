@@ -239,5 +239,5 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask __attribute__((unused)), 
 	}
 }
 
-#endif /* configCHECK_FOR_STACK_OVERFLOW == 1 */
+#endif /* configCHECK_FOR_STACK_OVERFLOW >= 1 */
 /*-----------------------------------------------------------*/
