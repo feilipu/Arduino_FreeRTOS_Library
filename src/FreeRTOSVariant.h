@@ -36,9 +36,9 @@ extern "C" {
 
 /*-----------------------------------------------------------*/
 
-void initVariant(void) __attribute__((flatten));
+void initVariant(void);
 
-void vApplicationIdleHook( void ) __attribute__((flatten));
+void vApplicationIdleHook( void );
 
 void vApplicationMallocFailedHook( void );
 void vApplicationStackOverflowHook( TaskHandle_t xTask, portCHAR *pcTaskName );
