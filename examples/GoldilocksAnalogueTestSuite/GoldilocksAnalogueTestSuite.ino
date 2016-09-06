@@ -24,6 +24,7 @@
 #include <timers.h>
 
 // From Library: AVR Standard C Time Library
+#include <ephemera_common.h>
 #include <time.h>
 
 // From Library: Goldilocks Analogue DAC Library
