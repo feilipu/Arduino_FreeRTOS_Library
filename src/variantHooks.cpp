@@ -80,7 +80,7 @@ extern void loop(void);
 
 /*-----------------------------------------------------------*/
 
-void initVariant(void) __attribute__ ((flatten, OS_main));
+void initVariant(void) __attribute__ ((OS_main));
 void initVariant(void)
 {
 #if defined(USBCON)
