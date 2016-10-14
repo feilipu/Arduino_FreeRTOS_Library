@@ -12,7 +12,6 @@
 #include <avr/io.h>
 #include <avr/wdt.h>
 
-#include "Arduino_FreeRTOS.h"
 #include "task.h"
 
 #ifdef __cplusplus
