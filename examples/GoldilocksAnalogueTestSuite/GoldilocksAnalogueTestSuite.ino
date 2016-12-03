@@ -17,11 +17,7 @@
 
 // From Library: FreeRTOS
 #include <Arduino_FreeRTOS.h>
-#include <list.h>
-#include <queue.h>
 #include <semphr.h>
-#include <task.h>
-#include <timers.h>
 
 // From Library: AVR Standard C Time Library
 #include <ephemera_common.h>
