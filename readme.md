@@ -31,7 +31,7 @@ Watchdog period options:
 							
 Note that Timer resolution is affected by integer math division and the time slice selected. Trying to measure 100ms, using a 60ms time slice for example, won't work.
 
-Stack for the loop() function has been set at 128 bytes. This can be configured by adjusting the configIDLE_STACK_SIZE parameter.
+Stack for the loop() function has been set at 192 bytes. This can be configured by adjusting the configIDLE_STACK_SIZE parameter.
 It should not be less than the configMINIMAL_STACK_SIZE. If you have stack overflow issues, just increase it.
 Users should prefer to allocate larger structures, arrays, or buffers using pvPortMalloc(), rather than defining them locally on the stack.
 

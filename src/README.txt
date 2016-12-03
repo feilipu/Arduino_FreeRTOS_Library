@@ -1,4 +1,153 @@
+
 Documentation and download available at http://www.FreeRTOS.org/
+
+Changes since FreeRTOS V9.0.0:
+
+	+ Ensure the Cortex-M SysTick count is cleared to zero before starting the
+	  first task.
+	+ Add configASSERT() into ARM Cortex-M ports to check the number of priority
+	  bit settings.
+	+ Clear the 'control' register before starting ARM Cortex-M4F ports in case
+	  the FPU is used before the scheduler is started.  This just saves a few
+	  bytes on the main stack as it prevents space being left for a later save
+	  of FPU registers.
+	+ Added xSemaphoreGetMutexHolderFromISR().
+	+ Corrected use of portNVIC_PENDSVSET to portNVIC_PENDSVSET_BIT in MPU ports.
+
+Changes between FreeRTOS V9.0.0 and FreeRTOS V9.0.0rc2 released May 25 2016:
+
+	See http://www.FreeRTOS.org/FreeRTOS-V9.html
+
+	RTOS kernel updates:
+
+	+ The prototype of the new xTaskCreateStatic() API function was modified to
+	  remove a parameter and improve compatibility with other new
+	  "CreateStatic()" API functions.  The stack size parameter in
+	  xTaskCreateStatic() is now uint32_t, which changes the prototype of the
+	  callback functions.  See the following URL:
+	  http://www.freertos.org/xTaskCreateStatic.html
+	+ GCC ARM Cortex-A port:  Introduced the configUSE_TASK_FPU_SUPPORT
+	  constant.  When configUSE_TASK_FPU_SUPPORT is set to 2 every task is
+	  automatically given a floating point (FPU) context.
+	+ GCC ARM Cortex-A port:  It is now possible to automatically save and
+	  restore all floating point (FPU) registers on entry to each potentially
+	  nested interrupt by defining vApplicationFPUSafeIRQHandler() instead of
+	  vApplicationIRQHandler().
+	+ All ARM Cortex-M3/4F/7 ports:  Clear the least significant bit of the task
+	  entry address placed onto the stack of a task when the task is created for
+	  strict compliance with the ARM Cortex-M3/4/7 architecture documentation
+	  (no noticeable effect unless using the QMEU emulator).
+	+ Added GCC and Keil ARM Cortex-M4F MPU ports - previously the MPU was only
+	  supported on ARM Cortex-M3.
+	+ ARM Cortex-M3/4F MPU ports:  Update to fully support the FreeRTOS V9.0.0
+	  API (other than static object creation) and added the
+	  FreeRTOS/Demo/CORTEX_MPU_Simulator_Keil_GCC demo application to
+	  demonstrate how to use the updated MPU port.
+	+ All ARM Cortex-M3/4F/7 ports:  Add additional barrier instructions to the
+	  default low power tickless implementation.
+	+ All ARM Cortex-M0 ports:  Prevent an item being left on the stack of the
+	  first task that executes.
+	+ Win32 ports:  Reduce the amount of stack used and change the way Windows
+	  threads are deleted to increase the maximum execution time.
+	+ Add an ARM Cortex-M4F port for the MikroC compiler.  Ensure to read the
+	  documentation page for this port before use.
+	+ MPS430X IAR port:  Update to be compatible with the latest EW430 tools
+	  release.
+	+ IAR32 GCC port:  Correct vPortExitCritical() when
+	  configMAX_API_CALL_INTERRUPT_PRIORITY == portMAX_PRIORITY.
+	+ For consistency vTaskGetTaskInfo() now has the alias vTaskGetInfo(),
+	  xTaskGetTaskHandle() now has the alias xTaskGetHandle() and
+	  pcQueueGetQueueName() now has an alias pcQueueGetName().
+	+ Fix various errors in comments and compiler warnings.
+
+	Demo application updates:
+
+	+ Update Atmel Studio projects to use Atmel Studio 7.
+	+ Update Xilinx SDK projects to use the 2016.1 version of the SDK.
+	+ Remove dependency on legacy IO libraries from the PIC32 demos.
+	+ Move the Xilinx UltraScale Cortex-R5 demo into the main distribution.
+	+ Update the MSP432 libraries to the latest version.
+	+ Add Microchip CEC1302 (ARM Cortex-M4F) demos for GCC, Keil and MikroC
+	  compilers.
+	+ Move the Atmel SAMA5D2 demo into the main distribution.
+
+Changes between FreeRTOS V9.0.0rc1 and FreeRTOS V9.0.0rc2 (release candidate 2)
+released March 30 2016:
+
+	NOTE - See http://www.FreeRTOS.org/FreeRTOS-V9.html for details
+
+	+ The functions that create RTOS objects using static memory allocation have
+	  been simplified and will not revert to using dynamic allocation if a
+	  buffer is passed into a function as NULL.
+	+ Introduced the configSUPPORT_DYNAMIC_ALLOCATION configuration constant to
+	  allow a FreeRTOS application to be built without a heap even being being
+	  defined. The Win32 example located in the
+	  /FreeRTOS/demo/WIN32-MSVC-Static-Allocation-Only directory is provided as
+	  a reference for projects that do not include a FreeRTOS heap.
+	+ Minor run-time optimisations.
+	+ Two new low power tickless implementations that target Silicon Labs EFM32
+	  microcontrollers.
+	+ Addition of the xTimerGetPeriod() and xTimerGetExpireTime() API functions.
+
+Changes between FreeRTOS V8.2.3 and FreeRTOS V9.0.0rc1 (release candidate 1)
+released February 19 2016:
+
+	RTOS Kernel Updates:
+
+	+ Major new feature - tasks, semaphores, queues, timers and event groups can
+	  now be created using statically allocated memory, so without any calls to
+	  pvPortMalloc().
+	+ Major new features - Added the xTaskAbortDelay() API function which allows
+	  one task to force another task to immediately leave the Blocked state,
+	  even if the event the blocked task is waiting for has not occurred, or the
+	  blocked task's timeout has not expired.
+	+ Updates necessary to allow FreeRTOS to run on 64-bit architectures.
+	+ Added vApplicationDaemonTaskStartupHook() which executes when the RTOS
+	  daemon task (which used to be called the timer service task) starts
+	  running.  This is useful if the application includes initialisation code
+	  that would benefit from executing after the scheduler has been started.
+	+ Added the xTaskGetTaskHandle() API function, which obtains a task handle
+	  from the task's name.  xTaskGetTaskHandle() uses multiple string compare
+	  operations, so it is recommended that it is called only once per task.
+	  The handle returned by xTaskGetTaskHandle() can then be stored locally for
+	  later re-use.
+	+ Added the pcQueueGetQueueName() API function, which obtains the name of
+	  a queue from the queue's handle.
+	+ Tickless idling (for low power applications) can now also be used when
+	  configUSE_PREEMPTION is 0.
+	+ If one task deletes another task, then the stack and TCB of the deleted
+	  task is now freed immediately.  If a task deletes itself, then the stack
+	  and TCB of the deleted task are freed by the Idle task as before.
+	+ If a task notification is used to unblock a task from an ISR, but the
+	  xHigherPriorityTaskWoken parameter is not used, then pend a context switch
+	  that will then occur during the next tick interrupt.
+	+ Heap_1.c and Heap_2.c now use the configAPPLICATION_ALLOCATED_HEAP
+	  settings, which previously was only used by heap_4.c.
+	  configAPPLICATION_ALLOCATED_HEAP allows the application writer to declare
+	  the array that will be used as the FreeRTOS heap, and in-so-doing, place
+	  the heap at a specific memory location.
+	+ TaskStatus_t structures are used to obtain details of a task.
+	  TaskStatus_t now includes the bae address of the task's stack.
+	+ Added the vTaskGetTaskInfo() API function, which returns a TaskStatus_t
+	  structure that contains information about a single task.  Previously this
+	  information could only be obtained for all the tasks at once, as an array
+	  of TaskStatus_t structures.
+	+ Added the uxSemaphoreGetCount() API function.
+	+ Replicate previous Cortex-M4F and Cortex-M7 optimisations in some
+	  Cortex-M3 port layers.
+
+	Demo Application Updates:
+
+	Further demo applications will be added prior to the final FreeRTOS V9
+	release.
+
+	+ Updated SAM4L Atmel Studio project to use Atmel Studio 7.
+	+ Added ARM Cortex-A53 64-bit port.
+	+ Added a port and demo for the ARM Cortex-A53 64-bit cores on the Xilinx
+	  Ultrascale MPSoC.
+	+ Added Cortex-M7 SAME70 GCC demo.
+	+ Added EFM32 Giant and Wonder Gecko demos.
+
 
 Changes between V8.2.2 and V8.2.3 released October 16, 2015
 
@@ -294,7 +443,7 @@ Changes between V8.0.0 and V8.0.1 released 2nd May 2014
 	+ Updated the XMC4200 IAR project so it links with version 7.x of the IAR
 	  tools.
 	+ Add RL78L1C demo.
-	+ Add pcTimerGetTimerName() API function.
+	+ Add pcTimerGetName() API function.
 	+ Call _reclaim_reent() when a task is deleted if configUSE_NEWLIB_REENTRANT
 	  is defined.
 

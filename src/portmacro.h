@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V8.2.3 - Copyright (C) 2015 Real Time Engineers Ltd.
+    FreeRTOS V9.0.0 - Copyright (C) 2016 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -92,13 +92,17 @@ extern "C" {
  */
 
 /* Type definitions. */
-#define portCHAR		char
+#define portCHAR	char
+#define portFLOAT	float
+#define portDOUBLE	double
+#define portLONG	long
+#define portSHORT	int
 #define portSTACK_TYPE	uint8_t
-#define portBASE_TYPE	char
+#define portBASE_TYPE	uint8_t
 
-typedef portSTACK_TYPE	StackType_t;
-typedef signed char		BaseType_t;
-typedef unsigned char	UBaseType_t;
+typedef portSTACK_TYPE StackType_t;
+typedef signed char BaseType_t;
+typedef unsigned char UBaseType_t;
 
 #if( configUSE_16_BIT_TICKS == 1 )
 	typedef uint16_t TickType_t;
@@ -111,23 +115,23 @@ typedef unsigned char	UBaseType_t;
 
 /* Critical section management. */
 
-#define portENTER_CRITICAL()	__asm__ __volatile__ (					\
-					"in __tmp_reg__, __SREG__"		"\n\t"	\
-					"cli" 					"\n\t"	\
-					"push __tmp_reg__"			"\n\t"	\
-					::: "memory"					\
-					)
+#define portENTER_CRITICAL()    __asm__ __volatile__ (					\
+                                        "in __tmp_reg__, __SREG__"		"\n\t"	\
+                                        "cli" 					"\n\t"	\
+                                        "push __tmp_reg__"			"\n\t"	\
+                                        ::: "memory"					\
+                                        )
 
 
-#define portEXIT_CRITICAL()	__asm__ __volatile__ (					\
-					"pop __tmp_reg__"			"\n\t"	\
-					"out __SREG__, __tmp_reg__" 		"\n\t"	\
-					::: "memory"					\
-					)
+#define portEXIT_CRITICAL()     __asm__ __volatile__ (					\
+                                        "pop __tmp_reg__"			"\n\t"	\
+                                        "out __SREG__, __tmp_reg__" 		"\n\t"	\
+                                        ::: "memory"					\
+                                        )
 
 
-#define portDISABLE_INTERRUPTS()		__asm__ __volatile__ ( "cli" ::: "memory")
-#define portENABLE_INTERRUPTS() 		__asm__ __volatile__ ( "sei" ::: "memory")
+#define portDISABLE_INTERRUPTS()        __asm__ __volatile__ ( "cli" ::: "memory")
+#define portENABLE_INTERRUPTS()         __asm__ __volatile__ ( "sei" ::: "memory")
 
 /*-----------------------------------------------------------*/
 /**
@@ -144,20 +148,20 @@ typedef unsigned char	UBaseType_t;
 	See also the symbolic constants WDTO_15MS et al.
 */
 #define wdt_interrupt_enable(value)						\
-				__asm__ __volatile__ (				\
-					"in __tmp_reg__,__SREG__" "\n\t"        \
-					"cli" "\n\t"                            \
-					"wdr" "\n\t"                            \
-					"sts %0,%1" "\n\t"                      \
-					"out __SREG__,__tmp_reg__" "\n\t"       \
-					"sts %0,%2" "\n\t"                      \
-					: /* no outputs */                      \
-					: "M" (_SFR_MEM_ADDR(_WD_CONTROL_REG)), \
-					"r" (_BV(_WD_CHANGE_BIT) | _BV(WDE)),   \
-					"r" ((uint8_t) ((value & 0x08 ? _WD_PS3_MASK : 0x00) |   \
-                                       	_BV(WDIF) | _BV(WDIE) | (value & 0x07)) )                \
-					: "r0"                                  \
-					)
+                                        __asm__ __volatile__ (				\
+                                        "in __tmp_reg__,__SREG__" "\n\t"        \
+                                        "cli" "\n\t"                            \
+                                        "wdr" "\n\t"                            \
+                                        "sts %0,%1" "\n\t"                      \
+                                        "out __SREG__,__tmp_reg__" "\n\t"       \
+                                        "sts %0,%2" "\n\t"                      \
+                                        : /* no outputs */                      \
+                                        : "M" (_SFR_MEM_ADDR(_WD_CONTROL_REG)), \
+                                        "r" (_BV(_WD_CHANGE_BIT) | _BV(WDE)),   \
+                                        "r" ((uint8_t) ((value & 0x08 ? _WD_PS3_MASK : 0x00) |   \
+                                        _BV(WDIF) | _BV(WDIE) | (value & 0x07)) )                \
+                                        : "r0"                                  \
+                                        )
 
 /*-----------------------------------------------------------*/
 /**
@@ -198,25 +202,25 @@ typedef unsigned char	UBaseType_t;
 /*-----------------------------------------------------------*/
 
 /* Architecture specifics. */
-#define portSTACK_GROWTH		( -1 )
-#define portBYTE_ALIGNMENT		1
-#define portNOP()			__asm__ __volatile__ ( "nop" );
+#define portSTACK_GROWTH                ( -1 )
+#define portBYTE_ALIGNMENT              1
+#define portNOP()                       __asm__ __volatile__ ( "nop" );
 
-#define sleep_reset()			do { _SLEEP_CONTROL_REG = 0; } while(0) // reset all sleep_mode() configurations.
+#define sleep_reset()                   do { _SLEEP_CONTROL_REG = 0; } while(0) // reset all sleep_mode() configurations.
 
 /* Timing for the scheduler.
  * Watchdog Timer is 128kHz nominal,
  * but 120 kHz at 5V DC and 25 degrees is actually more accurate,
  * from data sheet.
  */
-#define portTICK_PERIOD_MS		( (TickType_t) _BV( portUSE_WDTO + 4 ) )	// Inaccurately assuming 128 kHz Watchdog Timer.
-// #define portTICK_PERIOD_MS		( (TickType_t)( (uint32_t) _BV( portUSE_WDTO + 11 ) / 128 ) )	// If you want accuracy, read datasheet.
+#define portTICK_PERIOD_MS              ( (TickType_t) _BV( portUSE_WDTO + 4 ) )	// Inaccurately assuming 128 kHz Watchdog Timer.
+// #define portTICK_PERIOD_MS           ( (TickType_t)( (uint32_t) _BV( portUSE_WDTO + 11 ) / 128 ) )	// If you want accuracy, read datasheet.
 
 /*-----------------------------------------------------------*/
 
 /* Kernel utilities. */
-extern void vPortYield( void )			__attribute__ ( ( naked ) );
-#define portYIELD()				vPortYield()
+extern void vPortYield( void )          __attribute__ ( ( naked ) );
+#define portYIELD()                     vPortYield()
 
 /*-----------------------------------------------------------*/
 
