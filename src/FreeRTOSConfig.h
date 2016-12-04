@@ -108,7 +108,6 @@
 
 #define configSUPPORT_DYNAMIC_ALLOCATION    1
 
-
 /* Timer definitions. */
 #define configUSE_TIMERS                    1
 #define configTIMER_TASK_PRIORITY           ( ( UBaseType_t ) 3 )
@@ -128,7 +127,7 @@ to exclude the API function. */
 #define INCLUDE_vTaskPrioritySet                1
 #define INCLUDE_uxTaskPriorityGet               1
 #define INCLUDE_vTaskDelete                     1
-#define INCLUDE_vTaskCleanUpResources           0
+#define INCLUDE_vTaskCleanUpResources           1
 #define INCLUDE_vTaskSuspend                    1
 #define INCLUDE_vResumeFromISR                  1
 #define INCLUDE_vTaskDelayUntil                 1
