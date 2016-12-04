@@ -46,7 +46,7 @@ Other heap allocation schemes are supported by FreeRTOS, and they can used with 
 
 ## Errata
 
-Testing with the Software Serial library shows some incompatibilities at low baud rates (9600), due to the extended time this library disables the global interrupt. Working on characterising and resolving the problem currently.
+Testing with the Software Serial library shows some incompatibilities at low baud rates (9600), due to the extended time this library disables the global interrupt.
 
 ## Compatibility
 
