@@ -42,6 +42,13 @@ void vApplicationIdleHook( void );
 void vApplicationMallocFailedHook( void );
 void vApplicationStackOverflowHook( TaskHandle_t xTask, portCHAR *pcTaskName );
 
+void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer,
+                                    StackType_t **ppxIdleTaskStackBuffer,
+                                    uint32_t *pulIdleTaskStackSize );
+void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer,
+                                     StackType_t **ppxTimerTaskStackBuffer,
+                                     uint32_t *pulTimerTaskStackSize );
+
 /*-----------------------------------------------------------*/
 
 #ifdef __cplusplus
