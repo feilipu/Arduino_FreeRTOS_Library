@@ -68,5 +68,6 @@ Testing with the Software Serial library shows some incompatibilities at low bau
 * FreeRTOSConfig.h : Contains a multitude of API and environment configurations.
 * FreeRTOSVariant.h : Contains the AVR specific configurations for this port of freeRTOS.
 * heap_3.c : Contains the heap allocation scheme based on malloc(). Other schemes are available, but depend on user configuration for specific MCU choice.
+* To use static Task creation, see Pull Request #19 for details.
 
 
