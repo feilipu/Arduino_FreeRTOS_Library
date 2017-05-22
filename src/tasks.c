@@ -374,7 +374,7 @@ typedef tskTCB TCB_t;
 /*lint -e956 A manual analysis and inspection has been used to determine which
 static variables must be declared volatile. */
 
-PRIVILEGED_DATA TCB_t * volatile pxCurrentTCB = NULL;
+PRIVILEGED_DATA TCB_t * volatile pxCurrentTCB __attribute__((used)) = NULL;
 
 /* Lists for ready and blocked tasks. --------------------*/
 PRIVILEGED_DATA static List_t pxReadyTasksLists[ configMAX_PRIORITIES ];/*< Prioritised ready tasks. */
