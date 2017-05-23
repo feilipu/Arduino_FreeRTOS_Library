@@ -100,9 +100,6 @@
 #include "portmacro.h"
 #include "portable.h"
 
-/* Variant (AVR) specific configuration options. */
-#include "FreeRTOSVariant.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -1066,6 +1063,9 @@ typedef struct xSTATIC_TIMER
 #ifdef __cplusplus
 }
 #endif
+
+/* Variant (AVR) specific configuration options. */
+#include "FreeRTOSVariant.h"
 
 #endif /* INC_ARDUINO_FREERTOS_H */
 
