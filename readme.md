@@ -7,8 +7,8 @@ It does this by keeping hands off almost everything, and only touching the minim
 
 The canonical source for information is the [FreeRTOS Web Site](http://www.freertos.org/ "FreeRTOS").
 Within this site, the [Getting Started](http://www.freertos.org/FreeRTOS-quick-start-guide.html "Quick Start Guide") page is very useful.
-It is worth having a view from a user, and [manicbug](https://maniacbug.wordpress.com/2012/01/31/freertos/) has some interesting examples.
-My other [AVRfreeRTOS Repository](https://sourceforge.net/projects/avrfreertos/) has plenty of examples,
+
+My other [AVRfreeRTOS Sourceforge Repository](https://sourceforge.net/projects/avrfreertos/) or [AVRfreeRTOS Github](https://github.com/feilipu/avrfreertos) has plenty of examples,
 ranging from [blink](https://sourceforge.net/projects/avrfreertos/files/MegaBlink/) through to a [synthesiser](https://sourceforge.net/projects/avrfreertos/files/GA_Synth/).
 
 ## General
@@ -39,6 +39,11 @@ Memory for the heap is allocated by the normal malloc() function, wrapped by pvP
 This option has been selected because it is automatically adjusted to use the capabilities of each device.
 Other heap allocation schemes are supported by FreeRTOS, and they can used with additional configuration.
 
+## Upgrading
+
+* [Upgrading to FreeRTOS-9](http://www.freertos.org/FreeRTOS-V9.html)
+* [Upgrading to FreeRTOS-10](http://www.freertos.org/FreeRTOS-V10.html)
+
 ## Errors
 
 * Stack Overflow: If any stack (for the loop() or) for any Task overflows, there will be a slow LED blink, with 4 second cycle.
@@ -68,6 +73,5 @@ Testing with the Software Serial library shows some incompatibilities at low bau
 * FreeRTOSConfig.h : Contains a multitude of API and environment configurations.
 * FreeRTOSVariant.h : Contains the AVR specific configurations for this port of freeRTOS.
 * heap_3.c : Contains the heap allocation scheme based on malloc(). Other schemes are available, but depend on user configuration for specific MCU choice.
-* To use static Task creation, see Pull Request #19 for details.
 
 

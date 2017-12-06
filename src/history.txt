@@ -1,8 +1,91 @@
 
+
 Documentation and download available at http://www.FreeRTOS.org/
+
+Changes since FreeRTOS V9.0.1:
+
+	New Features and components:
+
+	+ Stream Buffers - see http://www.FreeRTOS.org/RTOS-stream-buffer-example.html
+	+ Message Buffers - see http://www.FreeRTOS.org//RTOS-message-buffer-example.html
+	+ Move FreeRTOS+TCP into the main repository, along with the basic Win32
+	  TCP demo FreeRTOS_Plus_TCP_Minimal_Windows_Simulator.
+
+	New ports or demos:
+
+	+ Added demo for TI SimpleLink CC3220 MCU.
+	+ Added MPU and non MPU projects for Microchip CEC and MEC 17xx and 51xx
+	  MCUs.
+	+ Added CORTEX_MPU_Static_Simulator_Keil_GCC demo to test static allocation
+	  in the MPU port.
+
+	Fixes or enhancements:
+
+	+ Cortex-M ports push additional register prior to calling
+	  vTaskSwitchContext to ensure 8-byte alignment is maintained.  Only
+	  important if a user defined tick hook function performs an operation that
+	  requires 8-byte alignment.
+	+ Optimisations to the implementation of the standard tickless idle mode on
+	  Cortex-M devices.
+	+ Improvements to the Win32 port including using higher priority threads.
+	+ Ensure interrupt stack alignment on PIC32 ports.
+	+ Updated GCC TriCore port to build with later compiler versions.
+	+ Update mpu_wrappers.c to support static allocation.
+	+ The uxNumberOfItems member of List_t is now volatile - solving an issue
+	  when the IAR compiler was used with maximum optimization.
+	+ Introduced configRECORD_STACK_HIGH_ADDRESS.  When set to 1 the stack start
+	  address is saved into each task's TCB (assuming stack grows down).
+	+ Introduced configINCLUDE_FREERTOS_TASK_C_ADDITIONS_H to allow user defined
+	  functionality, and user defined initialisation, to be added to FreeRTOS's
+	  tasks.c source file.  When configINCLUDE_FREERTOS_TASK_C_ADDITIONS_H is
+	  set to 1 a user provided header file called freertos_task_c_additions.h
+	  will be included at the bottom of tasks.c.  Functions defined in that
+	  header file can call freertos_tasks_c_additions_init(), which in turn
+	  calls a macro called FREERTOS_TASKS_C_ADDITIONS_INIT(), if it is defined.
+	  FREERTOS_TASKS_C_ADDITIONS_INIT() can be defined in FreeRTOSConfig.h.
+	+ Introduced configPRE_SUPPRESS_TICKS_AND_SLEEP_PROCESSING( x ) which can be
+	  defined by a user in FreeRTOSConfig.h.  The macro is called before
+	  assessing whether to enter tickless idle mode or not.  If the macro sets
+	  x to zero then tickless idle mode will not be entered.  This allows users
+	  to abort tickless idle mode entry before the tickless idle function is
+	  even called - previously it was only possible to abort from within the
+	  tickless idle function itself.
+	+ Added configPRINTF(), which can be defined by users to allow all libraries
+	  to use the same print formatter.
+	+ Introduced configMAX() and configMIN() macros which default to standard
+	  max( x, y ) and min( x, y ) macro behaviour, but can be overridden if the
+	  application writer defines the same macros in FreeRTOSConfig.h.
+	+ Corrected the definition of StaticTask_t in the case where
+	  INCLUDE_xTaskAbortDelay is set to 1.
+	+ Introduced configTIMER_SERVICE_TASK_NAME and configIDLE_TASK_NAME, both of
+	  which can be defined to strings in FreeRTOSConfig.h to change the default
+	  names of the timer service and idle tasks respectively.
+	+ Only fill the stack of a newly created task with a known value if stack
+	  checking, or high water mark checking/viewing, is in use - removing the
+	  dependency on memset() in other cases.
+	+ Introduced xTaskCreateRestrictedStatic() so static allocation can be used
+	  with the MPU.
+	+ Ensure suspended tasks cannot be unsuspended by a received task
+	  notification.
+	+ Fix race condition in vTaskSetTimeOutState().
+	+ Updated trace recorder files to the latest version.
 
 Changes since FreeRTOS V9.0.0:
 
+	+ Priority dis-inheritance behaviour has been enhanced in the case where a
+	  task that attempted to take a mutex that was held by a lower priority task
+	  timed out before it was able to obtain the mutex (causing the task that
+	  holds the mutex to have its priority raised, then lowered again, in
+	  accordance with the priority inheritance protocol).
+	+ Split the overloaded xQueueGenericReceive() function into three separate
+	  dedicated functions.
+	+ Allow the default human readable text names given to the Idle and Timer
+	  tasks to be overridden by defining the configIDLE_TASK_NAME and
+	  configTIMER_SERVICE_TASK_NAME definitions respectively in FreeRTOSConfig.h.
+	+ Introduced configINITIAL_TICK_COUNT to allow the tick count to take a
+	  value of than than 0 when the system boots.  This can be useful for
+	  testing purposes - although setting configUSE_16_BIT_TICKS to 1 can also
+	  be used to test frequent tick overflows.
 	+ Ensure the Cortex-M SysTick count is cleared to zero before starting the
 	  first task.
 	+ Add configASSERT() into ARM Cortex-M ports to check the number of priority
@@ -13,6 +96,16 @@ Changes since FreeRTOS V9.0.0:
 	  of FPU registers.
 	+ Added xSemaphoreGetMutexHolderFromISR().
 	+ Corrected use of portNVIC_PENDSVSET to portNVIC_PENDSVSET_BIT in MPU ports.
+	+ Introduced configSTACK_DEPTH_TYPE to allow users to change the type used
+	  to specify the stack size when using xTaskCreate().  For historic reasons,
+	  when FreeRTOS was only used on small MCUs, the type was set to uint16_t,
+	  but that can be too restrictive when FreeRTOS is used on larger
+	  processors.  configSTACK_DEPTH_TYPE defaults to uint16_t.
+	  xTaskCreateStatic(), being a newer function, used a uint32_t.
+	+ Increase the priority of the Windows threads used by the Win32 port.  As
+	  all the threads run on the same core, and the threads run with very high
+	  priority, there is a risk that the host will become unresponsive, so also
+	  prevent the Windows port executing on single core hosts.
 
 Changes between FreeRTOS V9.0.0 and FreeRTOS V9.0.0rc2 released May 25 2016:
 
@@ -2455,6 +2548,7 @@ Changes between V1.00 and V1.01
 	+ Prevent the call to kbhit() in main.c for debug builds as the debugger
 	  seems to have problems stepping over the call.  This if for the PC port
 	  only.
+
 
 
 
