@@ -71,14 +71,14 @@
 #define configUSE_TIMERS                    1
 #define configTIMER_TASK_PRIORITY           ( ( UBaseType_t ) 3 )
 #define configTIMER_QUEUE_LENGTH            ( ( UBaseType_t ) 10 )
-#define configTIMER_TASK_STACK_DEPTH        configMINIMAL_STACK_SIZE
+#define configTIMER_TASK_STACK_DEPTH        ( ( UBaseType_t ) 85 )
 
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES               0
 #define configMAX_CO_ROUTINE_PRIORITIES     ( (UBaseType_t ) 2 )
 
 /* Set the stack pointer type to be uint16_t, otherwise it defaults to unsigned long */
-#define portPOINTER_SIZE_TYPE			uint16_t
+#define portPOINTER_SIZE_TYPE               uint16_t
 
 /* Set the following definitions to 1 to include the API function, or zero
 to exclude the API function. */

@@ -40,9 +40,9 @@
  *----------------------------------------------------------*/
 
 /* Start tasks with interrupts enabled. */
-#define portFLAGS_INT_ENABLED                   ( (StackType_t) 0x80 )
+#define portFLAGS_INT_ENABLED           ( (StackType_t) 0x80 )
 
-#define	portSCHEDULER_ISR                       WDT_vect
+#define	portSCHEDULER_ISR               WDT_vect
 
 /*-----------------------------------------------------------*/
 
@@ -68,25 +68,27 @@ static void prvSetupTimerInterrupt( void );
  * pushed the registers onto the stack - causing the 32 registers to be on the
  * stack twice.
  *
- * r1 is set to zero as the compiler expects it to be thus, however some
- * of the math routines make use of R1.
+ * r1 is set to zero (__zero_reg__) as the compiler expects it to be thus, however
+ * some of the math routines make use of R1.
+ *
+ * r0 is set to __tmp_reg__ as the compiler expects it to be thus.
  *
  * The interrupts will have been disabled during the call to portSAVE_CONTEXT()
  * so we need not worry about reading/writing to the stack pointer.
  */
 #if defined(__AVR_ATmega2560__) || defined(__AVR_ATmega2561__)
 /* 3-Byte PC Save */
-#define portSAVE_CONTEXT()                                                      \
-        __asm__ __volatile__ (  "push   r0                                      \n\t"   \
-                                "in		r0, __SREG__                    \n\t"   \
+#define portSAVE_CONTEXT()                                                              \
+        __asm__ __volatile__ (  "push   __tmp_reg__                             \n\t"   \
+                                "in		__tmp_reg__, __SREG__                   \n\t"   \
                                 "cli                                            \n\t"   \
-                                "push	r0                                      \n\t"   \
-                                "in     r0, 0x3b                                \n\t"   \
-                                "push   r0                                      \n\t"   \
-                                "in     r0, 0x3c                                \n\t"   \
-                                "push   r0                                      \n\t"   \
-                                "push   r1                                      \n\t"   \
-                                "clr    r1                                      \n\t"   \
+                                "push	__tmp_reg__                             \n\t"   \
+                                "in     __tmp_reg__, __RAMPZ__                  \n\t"   \
+                                "push   __tmp_reg__                             \n\t"   \
+                                "in     __tmp_reg__, __EIND__                   \n\t"   \
+                                "push   __tmp_reg__                             \n\t"   \
+                                "push   __zero_reg__                            \n\t"   \
+                                "clr    __zero_reg__                            \n\t"   \
                                 "push   r2                                      \n\t"   \
                                 "push   r3                                      \n\t"   \
                                 "push   r4                                      \n\t"   \
@@ -119,20 +121,20 @@ static void prvSetupTimerInterrupt( void );
                                 "push   r31                                     \n\t"   \
                                 "lds    r26, pxCurrentTCB                       \n\t"   \
                                 "lds    r27, pxCurrentTCB + 1                   \n\t"   \
-                                "in     r0, 0x3d                                \n\t"   \
-                                "st     x+, r0                                  \n\t"   \
-                                "in     r0, 0x3e                                \n\t"   \
-                                "st     x+, r0                                  \n\t"   \
+                                "in     __tmp_reg__, __SP_L__                   \n\t"   \
+                                "st     x+, __tmp_reg__                         \n\t"   \
+                                "in     __tmp_reg__, __SP_H__                   \n\t"   \
+                                "st     x+, __tmp_reg__                         \n\t"   \
                              );
 #else
 /* 2-Byte PC Save */
 #define portSAVE_CONTEXT()                                                              \
-        __asm__ __volatile__ (  "push   r0                                      \n\t"   \
-                                "in     r0, __SREG__                            \n\t"   \
+        __asm__ __volatile__ (  "push   __tmp_reg__                             \n\t"   \
+                                "in     __tmp_reg__, __SREG__                   \n\t"   \
                                 "cli                                            \n\t"   \
-                                "push   r0                                      \n\t"   \
-                                "push   r1                                      \n\t"   \
-                                "clr    r1                                      \n\t"   \
+                                "push   __tmp_reg__                             \n\t"   \
+                                "push   __zero_reg__                            \n\t"   \
+                                "clr    __zero_reg__                            \n\t"   \
                                 "push   r2                                      \n\t"   \
                                 "push   r3                                      \n\t"   \
                                 "push   r4                                      \n\t"   \
@@ -165,10 +167,10 @@ static void prvSetupTimerInterrupt( void );
                                 "push   r31                                     \n\t"   \
                                 "lds    r26, pxCurrentTCB                       \n\t"   \
                                 "lds    r27, pxCurrentTCB + 1                   \n\t"   \
-                                "in     r0, 0x3d                                \n\t"   \
-                                "st     x+, r0                                  \n\t"   \
-                                "in     r0, 0x3e                                \n\t"   \
-                                "st     x+, r0                                  \n\t"   \
+                                "in     __tmp_reg__, __SP_L__                   \n\t"   \
+                                "st     x+, __tmp_reg__                         \n\t"   \
+                                "in     __tmp_reg__, __SP_H__                   \n\t"   \
+                                "st     x+, __tmp_reg__                         \n\t"   \
                              );
 #endif
 
@@ -215,14 +217,14 @@ static void prvSetupTimerInterrupt( void );
                                 "pop    r4                                      \n\t"   \
                                 "pop    r3                                      \n\t"   \
                                 "pop    r2                                      \n\t"   \
-                                "pop    r1                                      \n\t"   \
-                                "pop    r0                                      \n\t"   \
-                                "out    0x3c, r0                                \n\t"   \
-                                "pop    r0                                      \n\t"   \
-                                "out    0x3b, r0                                \n\t"   \
-                                "pop    r0                                      \n\t"   \
-                                "out    __SREG__, r0                            \n\t"   \
-                                "pop    r0                                      \n\t"   \
+                                "pop    __zero_reg__                            \n\t"   \
+                                "pop    __tmp_reg__                             \n\t"   \
+                                "out    __EIND__, __tmp_reg__                   \n\t"   \
+                                "pop    __tmp_reg__                             \n\t"   \
+                                "out    __RAMPZ__, __tmp_reg__                  \n\t"   \
+                                "pop    __tmp_reg__                             \n\t"   \
+                                "out    __SREG__, __tmp_reg__                   \n\t"   \
+                                "pop    __tmp_reg__                             \n\t"   \
                              );
 #else
 /* 2-Byte PC Restore */
@@ -263,10 +265,10 @@ static void prvSetupTimerInterrupt( void );
                                 "pop    r4                                      \n\t"   \
                                 "pop    r3                                      \n\t"   \
                                 "pop    r2                                      \n\t"   \
-                                "pop    r1                                      \n\t"   \
-                                "pop    r0                                      \n\t"   \
-                                "out    __SREG__, r0                            \n\t"   \
-                                "pop    r0                                      \n\t"   \
+                                "pop    __zero_reg__                            \n\t"   \
+                                "pop    __tmp_reg__                             \n\t"   \
+                                "out    __SREG__, __tmp_reg__                   \n\t"   \
+                                "pop    __tmp_reg__                             \n\t"   \
                              );
 #endif
 /*-----------------------------------------------------------*/
@@ -474,7 +476,7 @@ void vPortYieldFromTick( void ) __attribute__ ( ( hot, flatten, naked ) );
 void vPortYieldFromTick( void )
 {
 	portSAVE_CONTEXT();
-	
+
 	sleep_reset();		//	 reset the sleep_mode() faster than sleep_disable();
 
 	if( xTaskIncrementTick() != pdFALSE )
