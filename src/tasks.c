@@ -3642,11 +3642,11 @@ static void prvCheckTasksWaitingTermination( void )
 
 #if ( INCLUDE_uxTaskGetStackHighWaterMark == 1 )
 
-	UBaseType_t uxTaskGetStackHighWaterMark( TaskHandle_t xTask )
+	uint16_t uxTaskGetStackHighWaterMark( TaskHandle_t xTask )
 	{
 	TCB_t *pxTCB;
 	uint8_t *pucEndOfStack;
-	UBaseType_t uxReturn;
+	uint16_t uxReturn;
 
 		pxTCB = prvGetTCBFromHandle( xTask );
 
@@ -3660,7 +3660,7 @@ static void prvCheckTasksWaitingTermination( void )
 		}
 		#endif
 
-		uxReturn = ( UBaseType_t ) prvTaskCheckFreeStackSpace( pucEndOfStack );
+		uxReturn = prvTaskCheckFreeStackSpace( pucEndOfStack );
 
 		return uxReturn;
 	}
