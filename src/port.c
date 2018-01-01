@@ -518,10 +518,8 @@ void prvSetupTimerInterrupt( void )
 	 * the context is saved at the start of vPortYieldFromTick().  The tick
 	 * count is incremented after the context is saved.
 	 *
-	 * use ISR_NOBLOCK where there is an important timer running, that should preempt the scheduler.
-	 *
 	 */
-//	ISR(portSCHEDULER_ISR, ISR_NAKED ISR_NOBLOCK) __attribute__ ((hot, flatten));
+
 	ISR(portSCHEDULER_ISR, ISR_NAKED) __attribute__ ((hot, flatten));
 	ISR(portSCHEDULER_ISR)
 	{
@@ -535,9 +533,7 @@ void prvSetupTimerInterrupt( void )
 	 * tick count.  We don't need to switch context, this can only be done by
 	 * manual calls to taskYIELD();
 	 *
-	 * use ISR_NOBLOCK where there is an important timer running, that should preempt the scheduler.
 	 */
-//	ISR(portSCHEDULER_ISR, ISR_NOBLOCK) __attribute__ ((hot, flatten));
 	ISR(portSCHEDULER_ISR) __attribute__ ((hot, flatten));
 	ISR(portSCHEDULER_ISR)
 	{
