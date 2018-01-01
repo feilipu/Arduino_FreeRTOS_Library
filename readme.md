@@ -1,4 +1,4 @@
-This is a fork of Richard Berry's freeRTOS, optimised for the Arduino AVR devices.
+This is a fork of Richard Barry's freeRTOS, optimised for the Arduino AVR devices.
 
 It has been created to provide access to FreeRTOS capabilities, with full compatibility to the Arduino environment.
 It does this by keeping hands off almost everything, and only touching the minimum of hardware to be successful.
