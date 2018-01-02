@@ -77,15 +77,6 @@ static void prvSetupTimerInterrupt( void );
  * so we need not worry about reading/writing to the stack pointer.
  */
 #if defined(__AVR_ATmega2560__) || defined(__AVR_ATmega2561__)
-
-#ifndef __RAMPZ__
-#define __RAMPZ__ 0x3B
-#endif
-
-#ifndef __EIND__
-#define __EIND__  0x3C
-#endif
-
 /* 3-Byte PC Save */
 #define portSAVE_CONTEXT()                                                              \
         __asm__ __volatile__ (  "push   __tmp_reg__                             \n\t"   \

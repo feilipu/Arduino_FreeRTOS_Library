@@ -166,6 +166,15 @@ typedef unsigned char UBaseType_t;
 #define portBYTE_ALIGNMENT              1
 #define portNOP()                       __asm__ __volatile__ ( "nop" );
 
+#if defined(__AVR_ATmega2560__) || defined(__AVR_ATmega2561__)
+#ifndef __RAMPZ__
+#define __RAMPZ__ 0x3B
+#endif
+#ifndef __EIND__
+#define __EIND__  0x3C
+#endif
+#endif
+
 #define sleep_reset()                   do { _SLEEP_CONTROL_REG = 0; } while(0) // reset all sleep_mode() configurations.
 
 /* Timing for the scheduler.
