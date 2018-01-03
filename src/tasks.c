@@ -658,7 +658,7 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB ) PRIVILEGED_FUNCTION;
 
 			prvInitialiseNewTask(	pxTaskDefinition->pvTaskCode,
 									pxTaskDefinition->pcName,
-									( uint32_t ) pxTaskDefinition->usStackDepth,
+									pxTaskDefinition->usStackDepth,
 									pxTaskDefinition->pvParameters,
 									pxTaskDefinition->uxPriority,
 									pxCreatedTask, pxNewTCB,
@@ -706,7 +706,7 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB ) PRIVILEGED_FUNCTION;
 
 				prvInitialiseNewTask(	pxTaskDefinition->pvTaskCode,
 										pxTaskDefinition->pcName,
-										( uint32_t ) pxTaskDefinition->usStackDepth,
+										pxTaskDefinition->usStackDepth,
 										pxTaskDefinition->pvParameters,
 										pxTaskDefinition->uxPriority,
 										pxCreatedTask, pxNewTCB,
