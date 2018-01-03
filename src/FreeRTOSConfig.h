@@ -77,11 +77,11 @@
 #define configUSE_CO_ROUTINES               0
 #define configMAX_CO_ROUTINE_PRIORITIES     ( (UBaseType_t ) 2 )
 
-/* Set the stack pointer type to be uint16_t, otherwise it defaults to unsigned long */
-#define portPOINTER_SIZE_TYPE               uint16_t
-
 /* Set the stack depth type to be uint16_t. */
 #define configSTACK_DEPTH_TYPE              uint16_t
+
+/* Set the stack pointer type to be uint16_t, otherwise it defaults to unsigned long */
+#define portPOINTER_SIZE_TYPE               uint16_t
 
 /* Set the following definitions to 1 to include the API function, or zero
 to exclude the API function. */

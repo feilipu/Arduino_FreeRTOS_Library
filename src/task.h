@@ -437,7 +437,7 @@ is used in assert() statements. */
 #if( configSUPPORT_STATIC_ALLOCATION == 1 )
 	TaskHandle_t xTaskCreateStatic(	TaskFunction_t pxTaskCode,
 									const char * const pcName,
-									const uint32_t ulStackDepth,
+									const configSTACK_DEPTH_TYPE ulStackDepth,
 									void * const pvParameters,
 									UBaseType_t uxPriority,
 									StackType_t * const puxStackBuffer,
@@ -1420,7 +1420,11 @@ TaskHandle_t xTaskGetHandle( const char *pcNameToQuery ) PRIVILEGED_FUNCTION; /*
  * actual spaces on the stack rather than bytes) since the task referenced by
  * xTask was created.
  */
+#if configENABLE_BACKWARD_COMPATIBILITY == 1
+UBaseType_t uxTaskGetStackHighWaterMark( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
+#else
 configSTACK_DEPTH_TYPE uxTaskGetStackHighWaterMark( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
+#endif /* configENABLE_BACKWARD_COMPATIBILITY */
 
 /* When using trace macros it is sometimes necessary to include task.h before
 FreeRTOS.h.  When this is done TaskHookFunction_t will not yet have been defined,

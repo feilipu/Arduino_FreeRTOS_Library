@@ -3642,6 +3642,33 @@ static void prvCheckTasksWaitingTermination( void )
 
 #if ( INCLUDE_uxTaskGetStackHighWaterMark == 1 )
 
+#if configENABLE_BACKWARD_COMPATIBILITY == 1
+
+	UBaseType_t uxTaskGetStackHighWaterMark( TaskHandle_t xTask )
+	{
+	TCB_t *pxTCB;
+	uint8_t *pucEndOfStack;
+	UBaseType_t uxReturn;
+
+		pxTCB = prvGetTCBFromHandle( xTask );
+
+		#if portSTACK_GROWTH < 0
+		{
+			pucEndOfStack = ( uint8_t * ) pxTCB->pxStack;
+		}
+		#else
+		{
+			pucEndOfStack = ( uint8_t * ) pxTCB->pxEndOfStack;
+		}
+		#endif
+
+		uxReturn = ( UBaseType_t ) prvTaskCheckFreeStackSpace( pucEndOfStack );
+
+		return uxReturn;
+	}
+
+#else
+
 	configSTACK_DEPTH_TYPE uxTaskGetStackHighWaterMark( TaskHandle_t xTask )
 	{
 	TCB_t *pxTCB;
@@ -3664,6 +3691,8 @@ static void prvCheckTasksWaitingTermination( void )
 
 		return uxReturn;
 	}
+
+#endif /* configENABLE_BACKWARD_COMPATIBILITY */
 
 #endif /* INCLUDE_uxTaskGetStackHighWaterMark */
 /*-----------------------------------------------------------*/
