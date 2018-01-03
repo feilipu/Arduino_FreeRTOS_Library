@@ -658,7 +658,7 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB ) PRIVILEGED_FUNCTION;
 
 			prvInitialiseNewTask(	pxTaskDefinition->pvTaskCode,
 									pxTaskDefinition->pcName,
-									( uint32_t ) pxTaskDefinition->usStackDepth,
+									pxTaskDefinition->usStackDepth,
 									pxTaskDefinition->pvParameters,
 									pxTaskDefinition->uxPriority,
 									pxCreatedTask, pxNewTCB,
@@ -706,7 +706,7 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB ) PRIVILEGED_FUNCTION;
 
 				prvInitialiseNewTask(	pxTaskDefinition->pvTaskCode,
 										pxTaskDefinition->pcName,
-										( uint32_t ) pxTaskDefinition->usStackDepth,
+										pxTaskDefinition->usStackDepth,
 										pxTaskDefinition->pvParameters,
 										pxTaskDefinition->uxPriority,
 										pxCreatedTask, pxNewTCB,
@@ -3622,7 +3622,7 @@ static void prvCheckTasksWaitingTermination( void )
 
 #if ( ( configUSE_TRACE_FACILITY == 1 ) || ( INCLUDE_uxTaskGetStackHighWaterMark == 1 ) )
 
-	static uint16_t prvTaskCheckFreeStackSpace( const uint8_t * pucStackByte )
+	static configSTACK_DEPTH_TYPE prvTaskCheckFreeStackSpace( const uint8_t * pucStackByte )
 	{
 	uint32_t ulCount = 0U;
 
@@ -3634,7 +3634,7 @@ static void prvCheckTasksWaitingTermination( void )
 
 		ulCount /= ( uint32_t ) sizeof( StackType_t ); /*lint !e961 Casting is not redundant on smaller architectures. */
 
-		return ( uint16_t ) ulCount;
+		return ( configSTACK_DEPTH_TYPE ) ulCount;
 	}
 
 #endif /* ( ( configUSE_TRACE_FACILITY == 1 ) || ( INCLUDE_uxTaskGetStackHighWaterMark == 1 ) ) */
@@ -3642,11 +3642,11 @@ static void prvCheckTasksWaitingTermination( void )
 
 #if ( INCLUDE_uxTaskGetStackHighWaterMark == 1 )
 
-	UBaseType_t uxTaskGetStackHighWaterMark( TaskHandle_t xTask )
+	configSTACK_DEPTH_TYPE uxTaskGetStackHighWaterMark( TaskHandle_t xTask )
 	{
 	TCB_t *pxTCB;
 	uint8_t *pucEndOfStack;
-	UBaseType_t uxReturn;
+	configSTACK_DEPTH_TYPE uxReturn;
 
 		pxTCB = prvGetTCBFromHandle( xTask );
 
@@ -3660,7 +3660,7 @@ static void prvCheckTasksWaitingTermination( void )
 		}
 		#endif
 
-		uxReturn = ( UBaseType_t ) prvTaskCheckFreeStackSpace( pucEndOfStack );
+		uxReturn = prvTaskCheckFreeStackSpace( pucEndOfStack );
 
 		return uxReturn;
 	}
