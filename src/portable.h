@@ -89,6 +89,131 @@ must be set in the compiler's include path. */
 extern "C" {
 #endif
 
+/*-----------------------------------------------------------*/
+
+#include <avr/wdt.h>
+
+/**
+    Enable the watchdog timer, configuring it for expire after
+    (value) timeout (which is a combination of the WDP0
+    through WDP3 bits).
+
+    This function is derived from <avr/wdt.h> but enables only
+    the interrupt bit (WDIE), rather than the reset bit (WDE).
+
+    Can't find it documented but the WDT, once enabled,
+    rolls over and fires a new interrupt each time.
+
+    See also the symbolic constants WDTO_15MS et al.
+
+    Updated to match avr-libc 2.0.0
+*/
+
+static __inline__
+__attribute__ ((__always_inline__))
+void wdt_interrupt_enable (const uint8_t value)
+{
+    if (_SFR_IO_REG_P (_WD_CONTROL_REG))
+    {
+        __asm__ __volatile__ (
+                "in __tmp_reg__,__SREG__"   "\n\t"
+                "cli"                       "\n\t"
+                "wdr"                       "\n\t"
+                "out %0, %1"                "\n\t"
+                "out __SREG__,__tmp_reg__"  "\n\t"
+                "out %0, %2"                "\n\t"
+                : /* no outputs */
+                : "I" (_SFR_IO_ADDR(_WD_CONTROL_REG)),
+                "r" ((uint8_t)(_BV(_WD_CHANGE_BIT) | _BV(WDE))),
+                "r" ((uint8_t) ((value & 0x08 ? _WD_PS3_MASK : 0x00) |
+                        _BV(WDIF) | _BV(WDIE) | (value & 0x07)) )
+                : "r0"
+        );
+    }
+    else
+    {
+        __asm__ __volatile__ (
+                "in __tmp_reg__,__SREG__"   "\n\t"
+                "cli"                       "\n\t"
+                "wdr"                       "\n\t"
+                "sts %0, %1"                "\n\t"
+                "out __SREG__,__tmp_reg__"  "\n\t"
+                "sts %0, %2"                "\n\t"
+                : /* no outputs */
+                : "n" (_SFR_MEM_ADDR(_WD_CONTROL_REG)),
+                "r" ((uint8_t)(_BV(_WD_CHANGE_BIT) | _BV(WDE))),
+                "r" ((uint8_t) ((value & 0x08 ? _WD_PS3_MASK : 0x00) |
+                        _BV(WDIF) | _BV(WDIE) | (value & 0x07)) )
+                : "r0"
+        );
+    }
+}
+
+/*-----------------------------------------------------------*/
+/**
+    Enable the watchdog timer, configuring it for expire after
+    (value) timeout (which is a combination of the WDP0
+    through WDP3 bits).
+
+    This function is derived from <avr/wdt.h> but enables both
+    the reset bit (WDE), and the interrupt bit (WDIE).
+
+    This will ensure that if the interrupt is not serviced
+    before the second timeout, the AVR will reset.
+
+    Servicing the interrupt automatically clears it,
+    and ensures the AVR does not reset.
+
+    Can't find it documented but the WDT, once enabled,
+    rolls over and fires a new interrupt each time.
+
+    See also the symbolic constants WDTO_15MS et al.
+
+    Updated to match avr-libc 2.0.0
+*/
+
+static __inline__
+__attribute__ ((__always_inline__))
+void wdt_interrupt_reset_enable (const uint8_t value)
+{
+    if (_SFR_IO_REG_P (_WD_CONTROL_REG))
+    {
+        __asm__ __volatile__ (
+                "in __tmp_reg__,__SREG__"   "\n\t"
+                "cli"                       "\n\t"
+                "wdr"                       "\n\t"
+                "out %0, %1"                "\n\t"
+                "out __SREG__,__tmp_reg__"  "\n\t"
+                "out %0, %2"                "\n\t"
+                : /* no outputs */
+                : "I" (_SFR_IO_ADDR(_WD_CONTROL_REG)),
+                "r" ((uint8_t)(_BV(_WD_CHANGE_BIT) | _BV(WDE))),
+                "r" ((uint8_t) ((value & 0x08 ? _WD_PS3_MASK : 0x00) |
+                        _BV(WDIF) | _BV(WDIE) | _BV(WDE) | (value & 0x07)) )
+                : "r0"
+        );
+    }
+    else
+    {
+        __asm__ __volatile__ (
+                "in __tmp_reg__,__SREG__"   "\n\t"
+                "cli"                       "\n\t"
+                "wdr"                       "\n\t"
+                "sts %0, %1"                "\n\t"
+                "out __SREG__,__tmp_reg__"  "\n\t"
+                "sts %0, %2"                "\n\t"
+                : /* no outputs */
+                : "n" (_SFR_MEM_ADDR(_WD_CONTROL_REG)),
+                "r" ((uint8_t)(_BV(_WD_CHANGE_BIT) | _BV(WDE))),
+                "r" ((uint8_t) ((value & 0x08 ? _WD_PS3_MASK : 0x00) |
+                        _BV(WDIF) | _BV(WDIE) | _BV(WDE) | (value & 0x07)) )
+                : "r0"
+        );
+    }
+}
+
+/*-----------------------------------------------------------*/
+
 #include "mpu_wrappers.h"
 
 /*
