@@ -63,10 +63,10 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask, portCHAR *pcTaskName );
 
 void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer,
                                     StackType_t **ppxIdleTaskStackBuffer,
-                                    uint32_t *pulIdleTaskStackSize );
+                                    configSTACK_DEPTH_TYPE *pulIdleTaskStackSize );
 void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer,
                                      StackType_t **ppxTimerTaskStackBuffer,
-                                     uint32_t *pulTimerTaskStackSize );
+                                     configSTACK_DEPTH_TYPE *pulTimerTaskStackSize );
 
 /*-----------------------------------------------------------*/
 
