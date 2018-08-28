@@ -5,8 +5,8 @@ It does this by keeping hands off almost everything, and only touching the minim
 
 ## Further Reading
 
-The canonical source for information is the [FreeRTOS Web Site](http://www.freertos.org/ "FreeRTOS").
-Within this site, the [Getting Started](http://www.freertos.org/FreeRTOS-quick-start-guide.html "Quick Start Guide") page is very useful.
+The canonical source for information is the [FreeRTOS Web Site](https://www.freertos.org/ "FreeRTOS").
+Within this site, the [Getting Started](https://www.freertos.org/FreeRTOS-quick-start-guide.html "Quick Start Guide") page is very useful.
 
 I have a short blog post on [Arduino FreeRTOS](https://feilipu.me/2015/11/24/arduino_freertos/), and another much older post on using [FreeRTOS with AVR](https://feilipu.me/2011/09/22/freertos-and-libraries-for-avr-atmega/), which may be useful to read too. There are some further posts I've written on [Hackster.IO](https://www.hackster.io/feilipu), but they're essentially the same content.
 
@@ -42,8 +42,8 @@ Other heap allocation schemes are supported by FreeRTOS, and they can used with 
 
 ## Upgrading
 
-* [Upgrading to FreeRTOS-9](http://www.freertos.org/FreeRTOS-V9.html)
-* [Upgrading to FreeRTOS-10](http://www.freertos.org/FreeRTOS-V10.html)
+* [Upgrading to FreeRTOS-9](https://www.freertos.org/FreeRTOS-V9.html)
+* [Upgrading to FreeRTOS-10](https://www.freertos.org/FreeRTOS-V10.html)
 
 ## Errors
 

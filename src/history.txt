@@ -1,6 +1,48 @@
-
-
 Documentation and download available at http://www.FreeRTOS.org/
+
+Changes between FreeRTOS V10.0.1 and FreeRTOS V10.1.0 released 22 August 2018
+
+	FreeRTOS Kernel Changes:
+
+	+ Update lint checked MISRA compliance to use the latest MISRA standard, was
+	  previously using the original MISRA standard.
+	+ Updated all object handles (TaskHandle_t, QueueHandle_t, etc.) to be
+	  unique types instead of void pointers, improving type safety.  (this was
+	  attempted some years back but had to be backed out due to bugs in some
+	  debuggers).  Note this required the pvContainer member of a ListItem_t
+	  struct to be renamed - set configENABLE_BACKWARD_COMPATIBILITY to 1 if
+	  this causes an issue.
+	+ Added configUSE_POSIX_ERRNO to enable per task POSIX style errno
+	  functionality in a more user friendly way - previously the generic thread
+	  local storage feature was used for this purpose.
+	+ Added Xtensa port and demo application for the XCC compiler.
+	+ Changed the implementation of vPortEndScheduler() for the Win32 port to
+	  simply call exit( 0 ).
+	+ Bug fix in vPortEnableInterrupt() for the GCC Microblaze port to protect
+	  the read modify write access to an internal Microblaze register.
+	+ Fix minor niggles when the MPU is used with regards to prototype
+	  differences, static struct size differences, etc.
+	+ The usStackHighWaterMark member of the TaskStatus_t structure now has type
+	  configSTACK_DEPTH_TYPE in place of uint16_t - that change should have been
+	  made when the configSTACK_DEPTH_TYPE type (which gets around the previous
+	  16-bit limit on stack size specifications) was introduced.
+	+ Added the xMessageBufferNextLengthBytes() API function and likewise stream
+	  buffer equivalent.
+	+ Introduce configMESSAGE_BUFFER_LENGTH_TYPE to allow the number of bytes
+	  used to hold the length of a message in the message buffer to be reduced.
+	  configMESSAGE_BUFFER_LENGTH_TYPE default to size_t, but if, for example,
+	  messages can never be more than 255 bytes it could be set to uint8_t,
+	  saving 3 bytes each time a message is written into the message buffer
+	  (assuming sizeof( size_t ) is 4).
+	+ Updated the StaticTimer_t structure to ensure it matches the size of the
+	  Timer_t structure when the size of TaskFunction_t does not equal the size
+	  of void *.
+	+ Update various Xilinx demos to use 2018.1 version of the SDK tools.
+	+ Various updates to demo tasks to maintain test coverage.
+	+ FreeRTOS+UDP was removed in FreeRTOS V10.1.0 as it was replaced by
+	  FreeRTOS+TCP, which was brought into the main download in FreeRTOS
+	  V10.0.0.  FreeRTOS+TCP can be configured as a UDP only stack, and
+	  FreeRTOS+UDP does not contain the patches applied to FreeRTOS+TCP.
 
 Changes since FreeRTOS V9.0.1:
 
