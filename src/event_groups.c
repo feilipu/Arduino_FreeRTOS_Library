@@ -43,7 +43,7 @@ task.h is included from an application file. */
 MPU ports require MPU_WRAPPERS_INCLUDED_FROM_API_FILE to be defined for the
 header files above, but not in this file, in order to generate the correct
 privileged Vs unprivileged linkage and placement. */
-#undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE /*lint !e961 !e750. */
+#undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE
 
 /* The following bit fields convey control information in a task's event list
 item value.  It is important they don't clash with the
@@ -108,7 +108,7 @@ static BaseType_t prvTestWaitCondition( const EventBits_t uxCurrentEventBits, co
         #endif /* configASSERT_DEFINED */
 
         /* The user has provided a statically allocated event group - use it. */
-        pxEventBits = ( EventGroup_t * ) pxEventGroupBuffer; /*lint !e740 EventGroup_t and StaticEventGroup_t are guaranteed to have the same size and alignment requirement - checked by configASSERT(). */
+		pxEventBits = ( EventGroup_t * ) pxEventGroupBuffer;
 
         if( pxEventBits != NULL )
         {
@@ -134,7 +134,7 @@ static BaseType_t prvTestWaitCondition( const EventBits_t uxCurrentEventBits, co
             traceEVENT_GROUP_CREATE_FAILED();
         }
 
-        return ( EventGroupHandle_t ) pxEventBits;
+		return pxEventBits;
     }
 
 #endif /* configSUPPORT_STATIC_ALLOCATION */
@@ -182,7 +182,7 @@ static BaseType_t prvTestWaitCondition( const EventBits_t uxCurrentEventBits, co
             traceEVENT_GROUP_CREATE_FAILED();
         }
 
-        return ( EventGroupHandle_t ) pxEventBits;
+		return pxEventBits;
     }
 
 #endif /* configSUPPORT_DYNAMIC_ALLOCATION */
@@ -191,7 +191,7 @@ static BaseType_t prvTestWaitCondition( const EventBits_t uxCurrentEventBits, co
 EventBits_t xEventGroupSync( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToSet, const EventBits_t uxBitsToWaitFor, TickType_t xTicksToWait )
 {
 EventBits_t uxOriginalBitValue, uxReturn;
-EventGroup_t *pxEventBits = ( EventGroup_t * ) xEventGroup;
+EventGroup_t *pxEventBits = xEventGroup;
 BaseType_t xAlreadyYielded;
 BaseType_t xTimeoutOccurred = pdFALSE;
 
@@ -310,7 +310,7 @@ BaseType_t xTimeoutOccurred = pdFALSE;
 
 EventBits_t xEventGroupWaitBits( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToWaitFor, const BaseType_t xClearOnExit, const BaseType_t xWaitForAllBits, TickType_t xTicksToWait )
 {
-EventGroup_t *pxEventBits = ( EventGroup_t * ) xEventGroup;
+EventGroup_t *pxEventBits = xEventGroup;
 EventBits_t uxReturn, uxControlBits = 0;
 BaseType_t xWaitConditionMet, xAlreadyYielded;
 BaseType_t xTimeoutOccurred = pdFALSE;
@@ -460,7 +460,7 @@ BaseType_t xTimeoutOccurred = pdFALSE;
 
 EventBits_t xEventGroupClearBits( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToClear )
 {
-EventGroup_t *pxEventBits = ( EventGroup_t * ) xEventGroup;
+EventGroup_t *pxEventBits = xEventGroup;
 EventBits_t uxReturn;
 
     /* Check the user is not attempting to clear the bits used by the kernel
@@ -503,7 +503,7 @@ EventBits_t uxReturn;
 EventBits_t xEventGroupGetBitsFromISR( EventGroupHandle_t xEventGroup )
 {
 UBaseType_t uxSavedInterruptStatus;
-EventGroup_t const * const pxEventBits = ( EventGroup_t * ) xEventGroup;
+EventGroup_t const * const pxEventBits = xEventGroup;
 EventBits_t uxReturn;
 
     uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
@@ -522,7 +522,7 @@ ListItem_t *pxListItem, *pxNext;
 ListItem_t const *pxListEnd;
 List_t const * pxList;
 EventBits_t uxBitsToClear = 0, uxBitsWaitedFor, uxControlBits;
-EventGroup_t *pxEventBits = ( EventGroup_t * ) xEventGroup;
+EventGroup_t *pxEventBits = xEventGroup;
 BaseType_t xMatchFound = pdFALSE;
 
     /* Check the user is not attempting to set the bits used by the kernel
@@ -612,7 +612,7 @@ BaseType_t xMatchFound = pdFALSE;
 
 void vEventGroupDelete( EventGroupHandle_t xEventGroup )
 {
-EventGroup_t *pxEventBits = ( EventGroup_t * ) xEventGroup;
+EventGroup_t *pxEventBits = xEventGroup;
 const List_t *pxTasksWaitingForBits = &( pxEventBits->xTasksWaitingForBits );
 
     vTaskSuspendAll();
@@ -723,7 +723,7 @@ BaseType_t xWaitConditionMet = pdFALSE;
     UBaseType_t uxEventGroupGetNumber( void* xEventGroup )
     {
     UBaseType_t xReturn;
-    EventGroup_t *pxEventBits = ( EventGroup_t * ) xEventGroup;
+	EventGroup_t const *pxEventBits = ( EventGroup_t * ) xEventGroup;  an EventGroup_t, but EventGroupHandle_t is kept opaque outside of this file for data hiding purposes. */
 
         if( xEventGroup == NULL )
         {
