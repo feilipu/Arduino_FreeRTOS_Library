@@ -1,4 +1,4 @@
-Documentation and download available at http://www.FreeRTOS.org/
+Documentation and download available at https://www.FreeRTOS.org/
 
 Changes between FreeRTOS V10.0.1 and FreeRTOS V10.1.0 released 22 August 2018
 

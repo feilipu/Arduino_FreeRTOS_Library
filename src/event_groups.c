@@ -719,7 +719,7 @@ BaseType_t xWaitConditionMet = pdFALSE;
     UBaseType_t uxEventGroupGetNumber( void* xEventGroup )
     {
     UBaseType_t xReturn;
-	EventGroup_t const *pxEventBits = ( EventGroup_t * ) xEventGroup;  an EventGroup_t, but EventGroupHandle_t is kept opaque outside of this file for data hiding purposes. */
+    EventGroup_t const *pxEventBits = ( EventGroup_t * ) xEventGroup;
 
         if( xEventGroup == NULL )
         {
