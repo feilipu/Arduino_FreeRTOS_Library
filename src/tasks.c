@@ -44,7 +44,7 @@ task.h is included from an application file. */
 MPU ports require MPU_WRAPPERS_INCLUDED_FROM_API_FILE to be defined for the
 header files above, but not in this file, in order to generate the correct
 privileged Vs unprivileged linkage and placement. */
-#undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE /*lint !e961 !e750. */
+#undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE
 
 /* Set configUSE_STATS_FORMATTING_FUNCTIONS to 2 to include the stats formatting
 functions but without including stdio.h here. */
@@ -278,7 +278,7 @@ typedef struct TaskControlBlock_t
     ListItem_t          xEventListItem;     /*< Used to reference a task from an event list. */
     UBaseType_t         uxPriority;         /*< The priority of the task.  0 is the lowest priority. */
     StackType_t         *pxStack;           /*< Points to the start of the stack. */
-    char                pcTaskName[ configMAX_TASK_NAME_LEN ];/*< Descriptive name given to the task when created.  Facilitates debugging only. */ /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
+    char                pcTaskName[ configMAX_TASK_NAME_LEN ];/*< Descriptive name given to the task when created.  Facilitates debugging only. */
 
     #if ( ( portSTACK_GROWTH > 0 ) || ( configRECORD_STACK_HIGH_ADDRESS == 1 ) )
         StackType_t     *pxEndOfStack;      /*< Points to the highest valid address for the stack. */
@@ -752,7 +752,7 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB ) PRIVILEGED_FUNCTION;
                 /* Allocate space for the stack used by the task being created.
                 The base of the stack memory stored in the TCB so the task can
                 be deleted later if required. */
-                pxNewTCB->pxStack = ( StackType_t * ) pvPortMalloc( ( ( ( size_t ) usStackDepth ) * sizeof( StackType_t ) ) ); /*lint !e961 MISRA exception as the casts are only redundant for some ports. */
+                pxNewTCB->pxStack = ( StackType_t * ) pvPortMalloc( ( ( ( size_t ) usStackDepth ) * sizeof( StackType_t ) ) );
 
                 if( pxNewTCB->pxStack == NULL )
                 {
@@ -936,7 +936,7 @@ UBaseType_t x;
     listSET_LIST_ITEM_OWNER( &( pxNewTCB->xStateListItem ), pxNewTCB );
 
     /* Event lists are always in priority order. */
-    listSET_LIST_ITEM_VALUE( &( pxNewTCB->xEventListItem ), ( TickType_t ) configMAX_PRIORITIES - ( TickType_t ) uxPriority ); /*lint !e961 MISRA exception as the casts are only redundant for some ports. */
+    listSET_LIST_ITEM_VALUE( &( pxNewTCB->xEventListItem ), ( TickType_t ) configMAX_PRIORITIES - ( TickType_t ) uxPriority );
     listSET_LIST_ITEM_OWNER( &( pxNewTCB->xEventListItem ), pxNewTCB );
 
     #if ( portCRITICAL_NESTING_IN_TCB == 1 )
@@ -1406,7 +1406,7 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB )
                 }
             #endif
 
-            else /*lint !e525 Negative indentation is intended to make use of pre-processor clearer. */
+            else
             {
                 /* If the task is not in any other state, it must be in the
                 Ready (including pending ready) state. */
@@ -1415,7 +1415,7 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB )
         }
 
         return eReturn;
-    } /*lint !e818 xTask cannot be a pointer to const because it is a typedef. */
+    }
 
 #endif /* INCLUDE_eTaskGetState */
 /*-----------------------------------------------------------*/
@@ -1592,7 +1592,7 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB )
                 being used for anything else. */
                 if( ( listGET_LIST_ITEM_VALUE( &( pxTCB->xEventListItem ) ) & taskEVENT_LIST_ITEM_VALUE_IN_USE ) == 0UL )
                 {
-                    listSET_LIST_ITEM_VALUE( &( pxTCB->xEventListItem ), ( ( TickType_t ) configMAX_PRIORITIES - ( TickType_t ) uxNewPriority ) ); /*lint !e961 MISRA exception as the casts are only redundant for some ports. */
+                    listSET_LIST_ITEM_VALUE( &( pxTCB->xEventListItem ), ( ( TickType_t ) configMAX_PRIORITIES - ( TickType_t ) uxNewPriority ) );
                 }
                 else
                 {
@@ -1788,7 +1788,7 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB )
         }
 
         return xReturn;
-    } /*lint !e818 xTask cannot be a pointer to const because it is a typedef. */
+    }
 
 #endif /* INCLUDE_vTaskSuspend */
 /*-----------------------------------------------------------*/
@@ -2290,7 +2290,7 @@ UBaseType_t uxTaskGetNumberOfTasks( void )
 }
 /*-----------------------------------------------------------*/
 
-char *pcTaskGetName( TaskHandle_t xTaskToQuery ) /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
+char *pcTaskGetName( TaskHandle_t xTaskToQuery )
 {
 TCB_t *pxTCB;
 
@@ -2372,7 +2372,7 @@ TCB_t *pxTCB;
 
 #if ( INCLUDE_xTaskGetHandle == 1 )
 
-    TaskHandle_t xTaskGetHandle( const char *pcNameToQuery ) /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
+    TaskHandle_t xTaskGetHandle( const char *pcNameToQuery )
     {
     UBaseType_t uxQueue = configMAX_PRIORITIES;
     TCB_t* pxTCB;
@@ -2394,7 +2394,7 @@ TCB_t *pxTCB;
                     break;
                 }
 
-            } while( uxQueue > ( UBaseType_t ) tskIDLE_PRIORITY ); /*lint !e961 MISRA exception as the casts are only redundant for some ports. */
+            } while( uxQueue > ( UBaseType_t ) tskIDLE_PRIORITY );
 
             /* Search the delayed lists. */
             if( pxTCB == NULL )
@@ -2453,7 +2453,7 @@ TCB_t *pxTCB;
                     uxQueue--;
                     uxTask += prvListTasksWithinSingleList( &( pxTaskStatusArray[ uxTask ] ), &( pxReadyTasksLists[ uxQueue ] ), eReady );
 
-                } while( uxQueue > ( UBaseType_t ) tskIDLE_PRIORITY ); /*lint !e961 MISRA exception as the casts are only redundant for some ports. */
+                } while( uxQueue > ( UBaseType_t ) tskIDLE_PRIORITY );
 
                 /* Fill in an TaskStatus_t structure with information on each
                 task in the Blocked state. */
@@ -3188,7 +3188,7 @@ BaseType_t xReturn;
             else
         #endif
 
-        if( ( xNumOfOverflows != pxTimeOut->xOverflowCount ) && ( xConstTickCount >= pxTimeOut->xTimeOnEntering ) ) /*lint !e525 Indentation preferred as is to make code within pre-processor directives clearer. */
+        if( ( xNumOfOverflows != pxTimeOut->xOverflowCount ) && ( xConstTickCount >= pxTimeOut->xTimeOnEntering ) )
         {
             /* The tick count is greater than the time at which
             vTaskSetTimeout() was called, but has also overflowed since
@@ -3687,7 +3687,7 @@ static void prvCheckTasksWaitingTermination( void )
             ulCount++;
         }
 
-        ulCount /= ( uint32_t ) sizeof( StackType_t ); /*lint !e961 Casting is not redundant on smaller architectures. */
+        ulCount /= ( uint32_t ) sizeof( StackType_t );
 
         return ( configSTACK_DEPTH_TYPE ) ulCount;
     }
@@ -3899,7 +3899,7 @@ TCB_t *pxTCB;
                 not being used for anything else. */
                 if( ( listGET_LIST_ITEM_VALUE( &( pxMutexHolderTCB->xEventListItem ) ) & taskEVENT_LIST_ITEM_VALUE_IN_USE ) == 0UL )
                 {
-                    listSET_LIST_ITEM_VALUE( &( pxMutexHolderTCB->xEventListItem ), ( TickType_t ) configMAX_PRIORITIES - ( TickType_t ) pxCurrentTCB->uxPriority ); /*lint !e961 MISRA exception as the casts are only redundant for some ports. */
+                    listSET_LIST_ITEM_VALUE( &( pxMutexHolderTCB->xEventListItem ), ( TickType_t ) configMAX_PRIORITIES - ( TickType_t ) pxCurrentTCB->uxPriority );
                 }
                 else
                 {
@@ -4010,7 +4010,7 @@ TCB_t *pxTCB;
                     /* Reset the event list item value.  It cannot be in use for
                     any other purpose if this task is running, and it must be
                     running to give back the mutex. */
-                    listSET_LIST_ITEM_VALUE( &( pxTCB->xEventListItem ), ( TickType_t ) configMAX_PRIORITIES - ( TickType_t ) pxTCB->uxPriority ); /*lint !e961 MISRA exception as the casts are only redundant for some ports. */
+                    listSET_LIST_ITEM_VALUE( &( pxTCB->xEventListItem ), ( TickType_t ) configMAX_PRIORITIES - ( TickType_t ) pxTCB->uxPriority );
                     prvAddTaskToReadyList( pxTCB );
 
                     /* Return true to indicate that a context switch is required.
@@ -4096,7 +4096,7 @@ TCB_t *pxTCB;
                     being used for anything else. */
                     if( ( listGET_LIST_ITEM_VALUE( &( pxTCB->xEventListItem ) ) & taskEVENT_LIST_ITEM_VALUE_IN_USE ) == 0UL )
                     {
-                        listSET_LIST_ITEM_VALUE( &( pxTCB->xEventListItem ), ( TickType_t ) configMAX_PRIORITIES - ( TickType_t ) uxPriorityToUse ); /*lint !e961 MISRA exception as the casts are only redundant for some ports. */
+                        listSET_LIST_ITEM_VALUE( &( pxTCB->xEventListItem ), ( TickType_t ) configMAX_PRIORITIES - ( TickType_t ) uxPriorityToUse );
                     }
                     else
                     {
@@ -4469,7 +4469,7 @@ TickType_t uxReturn;
 
     /* Reset the event list item to its normal value - so it can be used with
     queues and semaphores. */
-    listSET_LIST_ITEM_VALUE( &( pxCurrentTCB->xEventListItem ), ( ( TickType_t ) configMAX_PRIORITIES - ( TickType_t ) pxCurrentTCB->uxPriority ) ); /*lint !e961 MISRA exception as the casts are only redundant for some ports. */
+    listSET_LIST_ITEM_VALUE( &( pxCurrentTCB->xEventListItem ), ( ( TickType_t ) configMAX_PRIORITIES - ( TickType_t ) pxCurrentTCB->uxPriority ) );
 
     return uxReturn;
 }

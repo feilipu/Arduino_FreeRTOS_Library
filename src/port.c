@@ -423,8 +423,6 @@ uint16_t usAddress;
 	*pxTopOfStack = ( StackType_t ) 0x031;	/* R31 */
 	pxTopOfStack--;
 
-	/*lint +e950 +e611 +e923 */
-
 	return pxTopOfStack;
 }
 /*-----------------------------------------------------------*/

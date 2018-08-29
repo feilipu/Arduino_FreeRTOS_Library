@@ -39,10 +39,6 @@ task.h is included from an application file. */
 #include "timers.h"
 #include "event_groups.h"
 
-/* Lint e961 and e750 are suppressed as a MISRA exception justified because the
-MPU ports require MPU_WRAPPERS_INCLUDED_FROM_API_FILE to be defined for the
-header files above, but not in this file, in order to generate the correct
-privileged Vs unprivileged linkage and placement. */
 #undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE
 
 /* The following bit fields convey control information in a task's event list
@@ -531,7 +527,7 @@ BaseType_t xMatchFound = pdFALSE;
     configASSERT( ( uxBitsToSet & eventEVENT_BITS_CONTROL_BYTES ) == 0 );
 
     pxList = &( pxEventBits->xTasksWaitingForBits );
-    pxListEnd = listGET_END_MARKER( pxList ); /*lint !e826 !e740 The mini list structure is used as the list end to save RAM.  This is checked and valid. */
+    pxListEnd = listGET_END_MARKER( pxList );
     vTaskSuspendAll();
     {
         traceEVENT_GROUP_SET_BITS( xEventGroup, uxBitsToSet );

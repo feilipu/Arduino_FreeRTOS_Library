@@ -47,12 +47,11 @@ task.h is included from an application file. */
 because the MPU ports require MPU_WRAPPERS_INCLUDED_FROM_API_FILE to be defined
 for the header files above, but not in this file, in order to generate the
 correct privileged Vs unprivileged linkage and placement. */
-#undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE /*lint !e961 !e750 !e9021. */
+#undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE
 
 /* If the user has not provided application specific Rx notification macros,
 or #defined the notification macros away, them provide default implementations
 that uses task notifications. */
-/*lint -save -e9026 Function like macros allowed and needed here so they can be overidden. */
 #ifndef sbRECEIVE_COMPLETED
     #define sbRECEIVE_COMPLETED( pxStreamBuffer )                                       \
         vTaskSuspendAll();                                                              \
@@ -126,7 +125,6 @@ that uses task notifications. */
         portCLEAR_INTERRUPT_MASK_FROM_ISR( uxSavedInterruptStatus );                    \
     }
 #endif /* sbSEND_COMPLETE_FROM_ISR */
-/*lint -restore (9026) */
 
 /* The number of bytes used to hold the length of a message in the buffer. */
 #define sbBYTES_TO_STORE_MESSAGE_LENGTH ( sizeof( configMESSAGE_BUFFER_LENGTH_TYPE ) )
@@ -138,7 +136,7 @@ that uses task notifications. */
 /*-----------------------------------------------------------*/
 
 /* Structure that hold state information on the buffer. */
-typedef struct StreamBufferDef_t /*lint !e9058 Style convention uses tag. */
+typedef struct StreamBufferDef_t
 {
     volatile size_t xTail;              /* Index to the next item to read within the buffer. */
     volatile size_t xHead;              /* Index to the next item to write within the buffer. */
@@ -243,7 +241,7 @@ static void prvInitialiseNewStreamBuffer( StreamBuffer_t * const pxStreamBuffer,
         the buffer was empty. */
         if( xTriggerLevelBytes == ( size_t ) 0 )
         {
-            xTriggerLevelBytes = ( size_t ) 1; /*lint !e9044 Parameter modified to ensure it doesn't have a dangerous value. */
+            xTriggerLevelBytes = ( size_t ) 1;
         }
 
         /* A stream buffer requires a StreamBuffer_t structure and a buffer.
@@ -255,12 +253,12 @@ static void prvInitialiseNewStreamBuffer( StreamBuffer_t * const pxStreamBuffer,
         space would be reported as one byte smaller than would be logically
         expected. */
         xBufferSizeBytes++;
-        pucAllocatedMemory = ( uint8_t * ) pvPortMalloc( xBufferSizeBytes + sizeof( StreamBuffer_t ) ); /*lint !e9079 malloc() only returns void*. */
+        pucAllocatedMemory = ( uint8_t * ) pvPortMalloc( xBufferSizeBytes + sizeof( StreamBuffer_t ) );
 
         if( pucAllocatedMemory != NULL )
         {
-            prvInitialiseNewStreamBuffer( ( StreamBuffer_t * ) pucAllocatedMemory, /* Structure at the start of the allocated memory. */ /*lint !e9087 Safe cast as allocated memory is aligned. */ /*lint !e826 Area is not too small and alignment is guaranteed provided malloc() behaves as expected and returns aligned buffer. */
-                                           pucAllocatedMemory + sizeof( StreamBuffer_t ),  /* Storage area follows. */ /*lint !e9016 Indexing past structure valid for uint8_t pointer, also storage area has no alignment requirement. */
+            prvInitialiseNewStreamBuffer( ( StreamBuffer_t * ) pucAllocatedMemory, /* Structure at the start of the allocated memory. */
+                                           pucAllocatedMemory + sizeof( StreamBuffer_t ),  /* Storage area follows. */
                                            xBufferSizeBytes,
                                            xTriggerLevelBytes,
                                            ucFlags );
@@ -286,7 +284,7 @@ static void prvInitialiseNewStreamBuffer( StreamBuffer_t * const pxStreamBuffer,
                                                            uint8_t * const pucStreamBufferStorageArea,
                                                            StaticStreamBuffer_t * const pxStaticStreamBuffer )
     {
-    StreamBuffer_t * const pxStreamBuffer = ( StreamBuffer_t * ) pxStaticStreamBuffer; /*lint !e740 !e9087 Safe cast as StaticStreamBuffer_t is opaque Streambuffer_t. */
+    StreamBuffer_t * const pxStreamBuffer = ( StreamBuffer_t * ) pxStaticStreamBuffer;
     StreamBufferHandle_t xReturn;
     uint8_t ucFlags;
 
@@ -342,7 +340,7 @@ static void prvInitialiseNewStreamBuffer( StreamBuffer_t * const pxStreamBuffer,
 
             traceSTREAM_BUFFER_CREATE( pxStreamBuffer, xIsMessageBuffer );
 
-            xReturn = ( StreamBufferHandle_t ) pxStaticStreamBuffer; /*lint !e9087 Data hiding requires cast to opaque type. */
+            xReturn = ( StreamBufferHandle_t ) pxStaticStreamBuffer;
         }
         else
         {
@@ -370,7 +368,7 @@ StreamBuffer_t * pxStreamBuffer = xStreamBuffer;
         {
             /* Both the structure and the buffer were allocated using a single call
             to pvPortMalloc(), hence only one call to vPortFree() is required. */
-            vPortFree( ( void * ) pxStreamBuffer ); /*lint !e9087 Standard free() semantics require void *, plus pxStreamBuffer was allocated by pvPortMalloc(). */
+            vPortFree( ( void * ) pxStreamBuffer );
         }
         #else
         {
@@ -699,7 +697,7 @@ static size_t prvWriteMessageToBuffer( StreamBuffer_t * const pxStreamBuffer,
     if( xShouldWrite != pdFALSE )
     {
         /* Writes the data itself. */
-        xReturn = prvWriteBytesToBuffer( pxStreamBuffer, ( const uint8_t * ) pvTxData, xDataLengthBytes ); /*lint !e9079 Storage buffer is implemented as uint8_t for ease of sizing, alighment and access. */
+        xReturn = prvWriteBytesToBuffer( pxStreamBuffer, ( const uint8_t * ) pvTxData, xDataLengthBytes );
     }
     else
     {
@@ -961,7 +959,7 @@ configMESSAGE_BUFFER_LENGTH_TYPE xTempNextMessageLength;
     }
 
     /* Read the actual data. */
-    xReceivedLength = prvReadBytesFromBuffer( pxStreamBuffer, ( uint8_t * ) pvRxData, xNextMessageLength, xBytesAvailable ); /*lint !e9079 Data storage area is implemented as uint8_t array for ease of sizing, indexing and alignment. */
+    xReceivedLength = prvReadBytesFromBuffer( pxStreamBuffer, ( uint8_t * ) pvRxData, xNextMessageLength, xBytesAvailable );
 
     return xReceivedLength;
 }
@@ -1100,7 +1098,7 @@ size_t xNextHead, xFirstLength;
 
     /* Write as many bytes as can be written in the first write. */
     configASSERT( ( xNextHead + xFirstLength ) <= pxStreamBuffer->xLength );
-    memcpy( ( void* ) ( &( pxStreamBuffer->pucBuffer[ xNextHead ] ) ), ( const void * ) pucData, xFirstLength ); /*lint !e9087 memcpy() requires void *. */
+    memcpy( ( void* ) ( &( pxStreamBuffer->pucBuffer[ xNextHead ] ) ), ( const void * ) pucData, xFirstLength );
 
     /* If the number of bytes written was less than the number that could be
     written in the first write... */
@@ -1108,7 +1106,7 @@ size_t xNextHead, xFirstLength;
     {
         /* ...then write the remaining bytes to the start of the buffer. */
         configASSERT( ( xCount - xFirstLength ) <= pxStreamBuffer->xLength );
-        memcpy( ( void * ) pxStreamBuffer->pucBuffer, ( const void * ) &( pucData[ xFirstLength ] ), xCount - xFirstLength ); /*lint !e9087 memcpy() requires void *. */
+        memcpy( ( void * ) pxStreamBuffer->pucBuffer, ( const void * ) &( pucData[ xFirstLength ] ), xCount - xFirstLength );
     }
     else
     {
@@ -1151,7 +1149,7 @@ size_t xCount, xFirstLength, xNextTail;
         read.  Asserts check bounds of read and write. */
         configASSERT( xFirstLength <= xMaxCount );
         configASSERT( ( xNextTail + xFirstLength ) <= pxStreamBuffer->xLength );
-        memcpy( ( void * ) pucData, ( const void * ) &( pxStreamBuffer->pucBuffer[ xNextTail ] ), xFirstLength ); /*lint !e9087 memcpy() requires void *. */
+        memcpy( ( void * ) pucData, ( const void * ) &( pxStreamBuffer->pucBuffer[ xNextTail ] ), xFirstLength );
 
         /* If the total number of wanted bytes is greater than the number
         that could be read in the first read... */
@@ -1159,7 +1157,7 @@ size_t xCount, xFirstLength, xNextTail;
         {
             /*...then read the remaining bytes from the start of the buffer. */
             configASSERT( xCount <= xMaxCount );
-            memcpy( ( void * ) &( pucData[ xFirstLength ] ), ( void * ) ( pxStreamBuffer->pucBuffer ), xCount - xFirstLength ); /*lint !e9087 memcpy() requires void *. */
+            memcpy( ( void * ) &( pucData[ xFirstLength ] ), ( void * ) ( pxStreamBuffer->pucBuffer ), xCount - xFirstLength );
         }
         else
         {
@@ -1225,7 +1223,7 @@ static void prvInitialiseNewStreamBuffer( StreamBuffer_t * const pxStreamBuffer,
     }
     #endif
 
-    memset( ( void * ) pxStreamBuffer, 0x00, sizeof( StreamBuffer_t ) ); /*lint !e9087 memset() requires void *. */
+    memset( ( void * ) pxStreamBuffer, 0x00, sizeof( StreamBuffer_t ) );
     pxStreamBuffer->pucBuffer = pucBuffer;
     pxStreamBuffer->xLength = xBufferSizeBytes;
     pxStreamBuffer->xTriggerLevelBytes = xTriggerLevelBytes;

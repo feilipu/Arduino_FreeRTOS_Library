@@ -113,7 +113,7 @@ typedef struct xMEMORY_REGION
 typedef struct xTASK_PARAMETERS
 {
     TaskFunction_t pvTaskCode;
-    const char * const pcName;    /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
+    const char * const pcName;
     configSTACK_DEPTH_TYPE usStackDepth;
     void *pvParameters;
     UBaseType_t uxPriority;
@@ -129,7 +129,7 @@ in the system. */
 typedef struct xTASK_STATUS
 {
     TaskHandle_t xHandle;           /* The handle of the task to which the rest of the information in the structure relates. */
-    const char *pcTaskName;         /* A pointer to the task's name.  This value will be invalid if the task was deleted since the structure was populated! */ /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
+    const char *pcTaskName;         /* A pointer to the task's name.  This value will be invalid if the task was deleted since the structure was populated! */
     UBaseType_t xTaskNumber;        /* A number unique to the task. */
     eTaskState eCurrentState;       /* The state in which the task existed when the structure was populated. */
     UBaseType_t uxCurrentPriority;  /* The priority at which the task was running (may be inherited) when the structure was populated. */
@@ -441,7 +441,7 @@ is used in assert() statements. */
                                     void * const pvParameters,
                                     UBaseType_t uxPriority,
                                     StackType_t * const puxStackBuffer,
-                                    StaticTask_t * const pxTaskBuffer ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
+                                    StaticTask_t * const pxTaskBuffer ) PRIVILEGED_FUNCTION;
 #endif /* configSUPPORT_STATIC_ALLOCATION */
 
 /**
@@ -1383,7 +1383,7 @@ UBaseType_t uxTaskGetNumberOfTasks( void ) PRIVILEGED_FUNCTION;
  * \defgroup pcTaskGetName pcTaskGetName
  * \ingroup TaskUtils
  */
-char *pcTaskGetName( TaskHandle_t xTaskToQuery ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
+char *pcTaskGetName( TaskHandle_t xTaskToQuery ) PRIVILEGED_FUNCTION;
 
 /**
  * task. h
@@ -1399,7 +1399,7 @@ char *pcTaskGetName( TaskHandle_t xTaskToQuery ) PRIVILEGED_FUNCTION; /*lint !e9
  * \defgroup pcTaskGetHandle pcTaskGetHandle
  * \ingroup TaskUtils
  */
-TaskHandle_t xTaskGetHandle( const char *pcNameToQuery ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
+TaskHandle_t xTaskGetHandle( const char *pcNameToQuery ) PRIVILEGED_FUNCTION;
 
 /**
  * task.h
@@ -1632,7 +1632,7 @@ UBaseType_t uxTaskGetSystemState( TaskStatus_t * const pxTaskStatusArray, const 
  * \defgroup vTaskList vTaskList
  * \ingroup TaskUtils
  */
-void vTaskList( char * pcWriteBuffer ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
+void vTaskList( char * pcWriteBuffer ) PRIVILEGED_FUNCTION;
 
 /**
  * task. h
@@ -1686,7 +1686,7 @@ void vTaskList( char * pcWriteBuffer ) PRIVILEGED_FUNCTION; /*lint !e971 Unquali
  * \defgroup vTaskGetRunTimeStats vTaskGetRunTimeStats
  * \ingroup TaskUtils
  */
-void vTaskGetRunTimeStats( char *pcWriteBuffer ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
+void vTaskGetRunTimeStats( char *pcWriteBuffer ) PRIVILEGED_FUNCTION;
 
 /**
  * task. h
