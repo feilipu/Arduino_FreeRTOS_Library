@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.1.0
+ * FreeRTOS Kernel V10.1.1
  * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -33,7 +33,10 @@
     #error "include Arduino_FreeRTOS.h must appear in source files before include timers.h"
 #endif
 
+/*lint -save -e537 This headers are only multiply included if the application code
+happens to also be including task.h. */
 #include "task.h"
+/*lint -restore */
 
 #ifdef __cplusplus
 extern "C" {
@@ -222,7 +225,7 @@ typedef void (*PendedFunction_t)( void *, uint32_t );
  * @endverbatim
  */
 #if( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
-    TimerHandle_t xTimerCreate( const char * const pcTimerName,
+    TimerHandle_t xTimerCreate(	const char * const pcTimerName, /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
                                 const TickType_t xTimerPeriodInTicks,
                                 const UBaseType_t uxAutoReload,
                                 void * const pvTimerID,
@@ -352,7 +355,7 @@ typedef void (*PendedFunction_t)( void *, uint32_t );
  * @endverbatim
  */
 #if( configSUPPORT_STATIC_ALLOCATION == 1 )
-    TimerHandle_t xTimerCreateStatic(   const char * const pcTimerName,
+    TimerHandle_t xTimerCreateStatic(   const char * const pcTimerName, /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
                                         const TickType_t xTimerPeriodInTicks,
                                         const UBaseType_t uxAutoReload,
                                         void * const pvTimerID,
@@ -1226,7 +1229,7 @@ BaseType_t xTimerPendFunctionCall( PendedFunction_t xFunctionToPend, void *pvPar
  *
  * @return The name assigned to the timer specified by the xTimer parameter.
  */
-const char * pcTimerGetName( TimerHandle_t xTimer ) PRIVILEGED_FUNCTION;
+const char * pcTimerGetName( TimerHandle_t xTimer ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
 
 /**
  * TickType_t xTimerGetPeriod( TimerHandle_t xTimer );

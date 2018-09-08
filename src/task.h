@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.1.0
+ * FreeRTOS Kernel V10.1.1
  * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -43,10 +43,10 @@ extern "C" {
  * MACROS AND DEFINITIONS
  *----------------------------------------------------------*/
 
-#define tskKERNEL_VERSION_NUMBER "V10.1.0"
+#define tskKERNEL_VERSION_NUMBER "V10.1.1"
 #define tskKERNEL_VERSION_MAJOR 10
 #define tskKERNEL_VERSION_MINOR 1
-#define tskKERNEL_VERSION_BUILD 0
+#define tskKERNEL_VERSION_BUILD 1
 
 /**
  * task. h
@@ -113,7 +113,7 @@ typedef struct xMEMORY_REGION
 typedef struct xTASK_PARAMETERS
 {
     TaskFunction_t pvTaskCode;
-    const char * const pcName;
+    const char * const pcName; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
     configSTACK_DEPTH_TYPE usStackDepth;
     void *pvParameters;
     UBaseType_t uxPriority;
@@ -129,7 +129,7 @@ in the system. */
 typedef struct xTASK_STATUS
 {
     TaskHandle_t xHandle;           /* The handle of the task to which the rest of the information in the structure relates. */
-    const char *pcTaskName;         /* A pointer to the task's name.  This value will be invalid if the task was deleted since the structure was populated! */
+    const char *pcTaskName;         /* A pointer to the task's name.  This value will be invalid if the task was deleted since the structure was populated! */ /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
     UBaseType_t xTaskNumber;        /* A number unique to the task. */
     eTaskState eCurrentState;       /* The state in which the task existed when the structure was populated. */
     UBaseType_t uxCurrentPriority;  /* The priority at which the task was running (may be inherited) when the structure was populated. */
@@ -320,7 +320,7 @@ is used in assert() statements. */
  */
 #if( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
     BaseType_t xTaskCreate( TaskFunction_t pxTaskCode,
-                            const char * const pcName,
+                            const char * const pcName, /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
                             const configSTACK_DEPTH_TYPE usStackDepth,
                             void * const pvParameters,
                             UBaseType_t uxPriority,
@@ -436,7 +436,7 @@ is used in assert() statements. */
  */
 #if( configSUPPORT_STATIC_ALLOCATION == 1 )
     TaskHandle_t xTaskCreateStatic( TaskFunction_t pxTaskCode,
-                                    const char * const pcName,
+                                    const char * const pcName, /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
                                     const configSTACK_DEPTH_TYPE ulStackDepth,
                                     void * const pvParameters,
                                     UBaseType_t uxPriority,
@@ -1383,7 +1383,7 @@ UBaseType_t uxTaskGetNumberOfTasks( void ) PRIVILEGED_FUNCTION;
  * \defgroup pcTaskGetName pcTaskGetName
  * \ingroup TaskUtils
  */
-char *pcTaskGetName( TaskHandle_t xTaskToQuery ) PRIVILEGED_FUNCTION;
+char *pcTaskGetName( TaskHandle_t xTaskToQuery ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
 
 /**
  * task. h
@@ -1399,11 +1399,11 @@ char *pcTaskGetName( TaskHandle_t xTaskToQuery ) PRIVILEGED_FUNCTION;
  * \defgroup pcTaskGetHandle pcTaskGetHandle
  * \ingroup TaskUtils
  */
-TaskHandle_t xTaskGetHandle( const char *pcNameToQuery ) PRIVILEGED_FUNCTION;
+TaskHandle_t xTaskGetHandle( const char *pcNameToQuery ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
 
 /**
  * task.h
- * <PRE>UBaseType_t uxTaskGetStackHighWaterMark( TaskHandle_t xTask );</PRE>
+ * <PRE>configSTACK_DEPTH_TYPE uxTaskGetStackHighWaterMark( TaskHandle_t xTask );</PRE>
  *
  * INCLUDE_uxTaskGetStackHighWaterMark must be set to 1 in FreeRTOSConfig.h for
  * this function to be available.
@@ -1420,11 +1420,7 @@ TaskHandle_t xTaskGetHandle( const char *pcNameToQuery ) PRIVILEGED_FUNCTION;
  * actual spaces on the stack rather than bytes) since the task referenced by
  * xTask was created.
  */
-#if configENABLE_BACKWARD_COMPATIBILITY == 1
-UBaseType_t uxTaskGetStackHighWaterMark( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
-#else
 configSTACK_DEPTH_TYPE uxTaskGetStackHighWaterMark( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
-#endif /* configENABLE_BACKWARD_COMPATIBILITY */
 
 /* When using trace macros it is sometimes necessary to include task.h before
 FreeRTOS.h.  When this is done TaskHookFunction_t will not yet have been defined,
@@ -1632,7 +1628,7 @@ UBaseType_t uxTaskGetSystemState( TaskStatus_t * const pxTaskStatusArray, const 
  * \defgroup vTaskList vTaskList
  * \ingroup TaskUtils
  */
-void vTaskList( char * pcWriteBuffer ) PRIVILEGED_FUNCTION;
+void vTaskList( char * pcWriteBuffer ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
 
 /**
  * task. h
@@ -1686,7 +1682,7 @@ void vTaskList( char * pcWriteBuffer ) PRIVILEGED_FUNCTION;
  * \defgroup vTaskGetRunTimeStats vTaskGetRunTimeStats
  * \ingroup TaskUtils
  */
-void vTaskGetRunTimeStats( char *pcWriteBuffer ) PRIVILEGED_FUNCTION;
+void vTaskGetRunTimeStats( char *pcWriteBuffer ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
 
 /**
  * task. h

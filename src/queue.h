@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.1.0
+ * FreeRTOS Kernel V10.1.1
  * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -1455,7 +1455,7 @@ BaseType_t xQueueGiveMutexRecursive( QueueHandle_t xMutex ) PRIVILEGED_FUNCTION;
  * preferably in ROM/Flash), not on the stack.
  */
 #if( configQUEUE_REGISTRY_SIZE > 0 )
-    void vQueueAddToRegistry( QueueHandle_t xQueue, const char *pcQueueName ) PRIVILEGED_FUNCTION;
+    void vQueueAddToRegistry( QueueHandle_t xQueue, const char *pcQueueName ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
 #endif
 
 /*
@@ -1484,7 +1484,7 @@ BaseType_t xQueueGiveMutexRecursive( QueueHandle_t xMutex ) PRIVILEGED_FUNCTION;
  * returned.
  */
 #if( configQUEUE_REGISTRY_SIZE > 0 )
-    const char *pcQueueGetName( QueueHandle_t xQueue ) PRIVILEGED_FUNCTION;
+    const char *pcQueueGetName( QueueHandle_t xQueue ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
 #endif
 
 /*

@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.1.0
+ * FreeRTOS Kernel V10.1.1
  * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -40,7 +40,11 @@ task.h is included from an application file. */
 #include "timers.h"
 #include "stack_macros.h"
 
-#undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE
+/* Lint e9021, e961 and e750 are suppressed as a MISRA exception justified
+because the MPU ports require MPU_WRAPPERS_INCLUDED_FROM_API_FILE to be defined
+for the header files above, but not in this file, in order to generate the
+correct privileged Vs unprivileged linkage and placement. */
+#undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE /*lint !e961 !e750 !e9021. */
 
 /* Set configUSE_STATS_FORMATTING_FUNCTIONS to 2 to include the stats formatting
 functions but without including stdio.h here. */
@@ -274,7 +278,7 @@ typedef struct TaskControlBlock_t
     ListItem_t          xEventListItem;     /*< Used to reference a task from an event list. */
     UBaseType_t         uxPriority;         /*< The priority of the task.  0 is the lowest priority. */
     StackType_t         *pxStack;           /*< Points to the start of the stack. */
-    char                pcTaskName[ configMAX_TASK_NAME_LEN ];/*< Descriptive name given to the task when created.  Facilitates debugging only. */
+    char                pcTaskName[ configMAX_TASK_NAME_LEN ];/*< Descriptive name given to the task when created.  Facilitates debugging only. */ /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
 
     #if ( ( portSTACK_GROWTH > 0 ) || ( configRECORD_STACK_HIGH_ADDRESS == 1 ) )
         StackType_t     *pxEndOfStack;      /*< Points to the highest valid address for the stack. */
@@ -324,7 +328,7 @@ typedef struct TaskControlBlock_t
 
     /* See the comments above the definition of
     tskSTATIC_AND_DYNAMIC_ALLOCATION_POSSIBLE. */
-    #if( tskSTATIC_AND_DYNAMIC_ALLOCATION_POSSIBLE != 0 )
+    #if( tskSTATIC_AND_DYNAMIC_ALLOCATION_POSSIBLE != 0 ) /*lint !e731 !e9029 Macro has been consolidated for readability reasons. */
         uint8_t    ucStaticallyAllocated;         /*< Set to pdTRUE if the task is a statically allocated to ensure no attempt is made to free the memory. */
     #endif
 
@@ -342,6 +346,8 @@ typedef struct TaskControlBlock_t
 below to enable the use of older kernel aware debuggers. */
 typedef tskTCB TCB_t;
 
+/*lint -save -e956 A manual analysis and inspection has been used to determine
+which static variables must be declared volatile. */
 PRIVILEGED_DATA TCB_t * volatile pxCurrentTCB __attribute__((used)) = NULL;
 
 /* Lists for ready and blocked tasks. --------------------*/
@@ -403,7 +409,7 @@ PRIVILEGED_DATA static volatile UBaseType_t uxSchedulerSuspended    = ( UBaseTyp
 
 #if( configUSE_TICK_HOOK > 0 )
 
-    extern void vApplicationTickHook( void );
+    extern void vApplicationTickHook( void ); /*lint !e526 Symbol not defined as it is an application callback. */
 
 #endif
 
@@ -542,7 +548,7 @@ static void prvResetNextTaskUnblockTime( void );
  * dynamically to fill in the structure's members.
  */
 static void prvInitialiseNewTask(   TaskFunction_t pxTaskCode,
-                                    const char * const pcName,
+                                    const char * const pcName, /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
                                     const configSTACK_DEPTH_TYPE ulStackDepth,
                                     void * const pvParameters,
                                     UBaseType_t uxPriority,
@@ -572,7 +578,7 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB ) PRIVILEGED_FUNCTION;
 #if( configSUPPORT_STATIC_ALLOCATION == 1 )
 
     TaskHandle_t xTaskCreateStatic( TaskFunction_t pxTaskCode,
-                                    const char * const pcName,
+                                    const char * const pcName, /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
                                     const configSTACK_DEPTH_TYPE ulStackDepth,
                                     void * const pvParameters,
                                     UBaseType_t uxPriority,
@@ -592,7 +598,7 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB ) PRIVILEGED_FUNCTION;
             structure. */
             volatile size_t xSize = sizeof( StaticTask_t );
             configASSERT( xSize == sizeof( TCB_t ) );
-            ( void ) xSize;
+            ( void ) xSize; /* Prevent lint warning when configASSERT() is not used. */
         }
         #endif /* configASSERT_DEFINED */
 
@@ -601,10 +607,10 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB ) PRIVILEGED_FUNCTION;
         {
             /* The memory used for the task's TCB and stack are passed into this
             function - use them. */
-            pxNewTCB = ( TCB_t * ) pxTaskBuffer;
+            pxNewTCB = ( TCB_t * ) pxTaskBuffer; /*lint !e740 !e9087 Unusual cast is ok as the structures are designed to have the same alignment, and the size is checked by an assert. */
             pxNewTCB->pxStack = ( StackType_t * ) puxStackBuffer;
 
-            #if( tskSTATIC_AND_DYNAMIC_ALLOCATION_POSSIBLE != 0 )
+            #if( tskSTATIC_AND_DYNAMIC_ALLOCATION_POSSIBLE != 0 ) /*lint !e731 !e9029 Macro has been consolidated for readability reasons. */
             {
                 /* Tasks can be created statically or dynamically, so note this
                 task was created statically in case the task is later deleted. */
@@ -724,7 +730,7 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB ) PRIVILEGED_FUNCTION;
 #if( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
 
     BaseType_t xTaskCreate( TaskFunction_t pxTaskCode,
-                            const char * const pcName,
+                            const char * const pcName, /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
                             const configSTACK_DEPTH_TYPE usStackDepth,
                             void * const pvParameters,
                             UBaseType_t uxPriority,
@@ -748,7 +754,7 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB ) PRIVILEGED_FUNCTION;
                 /* Allocate space for the stack used by the task being created.
                 The base of the stack memory stored in the TCB so the task can
                 be deleted later if required. */
-                pxNewTCB->pxStack = ( StackType_t * ) pvPortMalloc( ( ( ( size_t ) usStackDepth ) * sizeof( StackType_t ) ) );
+                pxNewTCB->pxStack = ( StackType_t * ) pvPortMalloc( ( ( ( size_t ) usStackDepth ) * sizeof( StackType_t ) ) ); /*lint !e961 MISRA exception as the casts are only redundant for some ports. */
 
                 if( pxNewTCB->pxStack == NULL )
                 {
@@ -763,12 +769,12 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB ) PRIVILEGED_FUNCTION;
         StackType_t *pxStack;
 
             /* Allocate space for the stack used by the task being created. */
-            pxStack = ( StackType_t * ) pvPortMalloc( ( ( ( size_t ) usStackDepth ) * sizeof( StackType_t ) ) );
+            pxStack = ( StackType_t * ) pvPortMalloc( ( ( ( size_t ) usStackDepth ) * sizeof( StackType_t ) ) ); /*lint !e9079 All values returned by pvPortMalloc() have at least the alignment required by the MCU's stack and this allocation is the stack. */
 
             if( pxStack != NULL )
             {
                 /* Allocate space for the TCB. */
-                pxNewTCB = ( TCB_t * ) pvPortMalloc( sizeof( TCB_t ) );
+                pxNewTCB = ( TCB_t * ) pvPortMalloc( sizeof( TCB_t ) ); /*lint !e9087 !e9079 All values returned by pvPortMalloc() have at least the alignment required by the MCU's stack, and the first member of TCB_t is always a pointer to the task's stack. */
 
                 if( pxNewTCB != NULL )
                 {
@@ -791,7 +797,7 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB ) PRIVILEGED_FUNCTION;
 
         if( pxNewTCB != NULL )
         {
-            #if( tskSTATIC_AND_DYNAMIC_ALLOCATION_POSSIBLE != 0 )
+            #if( tskSTATIC_AND_DYNAMIC_ALLOCATION_POSSIBLE != 0 ) /*lint !e9029 !e731 Macro has been consolidated for readability reasons. */
             {
                 /* Tasks can be created statically or dynamically, so note this
                 task was created dynamically in case it is later deleted. */
@@ -815,7 +821,7 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB ) PRIVILEGED_FUNCTION;
 /*-----------------------------------------------------------*/
 
 static void prvInitialiseNewTask(   TaskFunction_t pxTaskCode,
-                                    const char * const pcName,
+                                    const char * const pcName, /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
                                     const configSTACK_DEPTH_TYPE ulStackDepth,
                                     void * const pvParameters,
                                     UBaseType_t uxPriority,
@@ -857,7 +863,7 @@ UBaseType_t x;
     #if( portSTACK_GROWTH < 0 )
     {
         pxTopOfStack = &( pxNewTCB->pxStack[ ulStackDepth - ( configSTACK_DEPTH_TYPE ) 1 ] );
-        pxTopOfStack = ( StackType_t * ) ( ( ( portPOINTER_SIZE_TYPE ) pxTopOfStack ) & ( ~( ( portPOINTER_SIZE_TYPE ) portBYTE_ALIGNMENT_MASK ) ) );
+        pxTopOfStack = ( StackType_t * ) ( ( ( portPOINTER_SIZE_TYPE ) pxTopOfStack ) & ( ~( ( portPOINTER_SIZE_TYPE ) portBYTE_ALIGNMENT_MASK ) ) ); /*lint !e923 !e9033 !e9078 MISRA exception.  Avoiding casts between pointers and integers is not practical.  Size differences accounted for using portPOINTER_SIZE_TYPE type.  Checked by assert(). */
 
         /* Check the alignment of the calculated top of stack is correct. */
         configASSERT( ( ( ( portPOINTER_SIZE_TYPE ) pxTopOfStack & ( portPOINTER_SIZE_TYPE ) portBYTE_ALIGNMENT_MASK ) == 0UL ) );
@@ -932,7 +938,7 @@ UBaseType_t x;
     listSET_LIST_ITEM_OWNER( &( pxNewTCB->xStateListItem ), pxNewTCB );
 
     /* Event lists are always in priority order. */
-    listSET_LIST_ITEM_VALUE( &( pxNewTCB->xEventListItem ), ( TickType_t ) configMAX_PRIORITIES - ( TickType_t ) uxPriority );
+    listSET_LIST_ITEM_VALUE( &( pxNewTCB->xEventListItem ), ( TickType_t ) configMAX_PRIORITIES - ( TickType_t ) uxPriority ); /*lint !e961 MISRA exception as the casts are only redundant for some ports. */
     listSET_LIST_ITEM_OWNER( &( pxNewTCB->xEventListItem ), pxNewTCB );
 
     #if ( portCRITICAL_NESTING_IN_TCB == 1 )
@@ -1402,7 +1408,7 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB )
                 }
             #endif
 
-            else
+            else /*lint !e525 Negative indentation is intended to make use of pre-processor clearer. */
             {
                 /* If the task is not in any other state, it must be in the
                 Ready (including pending ready) state. */
@@ -1411,7 +1417,7 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB )
         }
 
         return eReturn;
-    }
+    } /*lint !e818 xTask cannot be a pointer to const because it is a typedef. */
 
 #endif /* INCLUDE_eTaskGetState */
 /*-----------------------------------------------------------*/
@@ -1588,7 +1594,7 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB )
                 being used for anything else. */
                 if( ( listGET_LIST_ITEM_VALUE( &( pxTCB->xEventListItem ) ) & taskEVENT_LIST_ITEM_VALUE_IN_USE ) == 0UL )
                 {
-                    listSET_LIST_ITEM_VALUE( &( pxTCB->xEventListItem ), ( ( TickType_t ) configMAX_PRIORITIES - ( TickType_t ) uxNewPriority ) );
+                    listSET_LIST_ITEM_VALUE( &( pxTCB->xEventListItem ), ( ( TickType_t ) configMAX_PRIORITIES - ( TickType_t ) uxNewPriority ) ); /*lint !e961 MISRA exception as the casts are only redundant for some ports. */
                 }
                 else
                 {
@@ -1720,7 +1726,7 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB )
                 /* The scheduler is not running, but the task that was pointed
                 to by pxCurrentTCB has just been suspended and pxCurrentTCB
                 must be adjusted to point to a different task. */
-                if( listCURRENT_LIST_LENGTH( &xSuspendedTaskList ) == uxCurrentNumberOfTasks )
+                if( listCURRENT_LIST_LENGTH( &xSuspendedTaskList ) == uxCurrentNumberOfTasks ) /*lint !e931 Right has no side effect, just volatile. */
                 {
                     /* No other tasks are ready, so set pxCurrentTCB back to
                     NULL so when the next task is created pxCurrentTCB will
@@ -1764,7 +1770,7 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB )
             {
                 /* Is it in the suspended list because it is in the    Suspended
                 state, or because is is blocked with no timeout? */
-                if( listIS_CONTAINED_WITHIN( NULL, &( pxTCB->xEventListItem ) ) != pdFALSE )
+                if( listIS_CONTAINED_WITHIN( NULL, &( pxTCB->xEventListItem ) ) != pdFALSE ) /*lint !e961.  The cast is only redundant when NULL is used. */
                 {
                     xReturn = pdTRUE;
                 }
@@ -1784,7 +1790,7 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB )
         }
 
         return xReturn;
-    }
+    } /*lint !e818 xTask cannot be a pointer to const because it is a typedef. */
 
 #endif /* INCLUDE_vTaskSuspend */
 /*-----------------------------------------------------------*/
@@ -1932,10 +1938,10 @@ BaseType_t xReturn;
         xIdleTaskHandle = xTaskCreateStatic(    prvIdleTask,
                                                 configIDLE_TASK_NAME,
                                                 ulIdleTaskStackSize,
-                                                ( void * ) NULL,
+                                                ( void * ) NULL, /*lint !e961.  The cast is not redundant for all compilers. */
                                                 portPRIVILEGE_BIT, /* In effect ( tskIDLE_PRIORITY | portPRIVILEGE_BIT ), but tskIDLE_PRIORITY is zero. */
                                                 pxIdleTaskStackBuffer,
-                                                pxIdleTaskTCBBuffer );
+                                                pxIdleTaskTCBBuffer ); /*lint !e961 MISRA exception, justified as it is not a redundant explicit cast to all supported compilers. */
 
         if( xIdleTaskHandle != NULL )
         {
@@ -1954,7 +1960,7 @@ BaseType_t xReturn;
                                 configMINIMAL_STACK_SIZE,
                                 ( void * ) NULL,
                                 portPRIVILEGE_BIT, /* In effect ( tskIDLE_PRIORITY | portPRIVILEGE_BIT ), but tskIDLE_PRIORITY is zero. */
-                                &xIdleTaskHandle );
+                                &xIdleTaskHandle ); /*lint !e961 MISRA exception, justified as it is not a redundant explicit cast to all supported compilers. */
     }
     #endif /* configSUPPORT_STATIC_ALLOCATION */
 
@@ -2148,7 +2154,7 @@ BaseType_t xAlreadyYielded = pdFALSE;
                 appropriate ready list. */
                 while( listLIST_IS_EMPTY( &xPendingReadyList ) == pdFALSE )
                 {
-                    pxTCB = listGET_OWNER_OF_HEAD_ENTRY( ( &xPendingReadyList ) );
+                    pxTCB = listGET_OWNER_OF_HEAD_ENTRY( ( &xPendingReadyList ) ); /*lint !e9079 void * is used as this macro is used with timers and co-routines too.  Alignment is known to be fine as the type of the pointer stored and retrieved is the same. */
                     ( void ) uxListRemove( &( pxTCB->xEventListItem ) );
                     ( void ) uxListRemove( &( pxTCB->xStateListItem ) );
                     prvAddTaskToReadyList( pxTCB );
@@ -2286,7 +2292,7 @@ UBaseType_t uxTaskGetNumberOfTasks( void )
 }
 /*-----------------------------------------------------------*/
 
-char *pcTaskGetName( TaskHandle_t xTaskToQuery )
+char *pcTaskGetName( TaskHandle_t xTaskToQuery ) /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
 {
 TCB_t *pxTCB;
 
@@ -2311,11 +2317,11 @@ TCB_t *pxTCB;
 
         if( listCURRENT_LIST_LENGTH( pxList ) > ( UBaseType_t ) 0 )
         {
-            listGET_OWNER_OF_NEXT_ENTRY( pxFirstTCB, pxList );
+            listGET_OWNER_OF_NEXT_ENTRY( pxFirstTCB, pxList ); /*lint !e9079 void * is used as this macro is used with timers and co-routines too.  Alignment is known to be fine as the type of the pointer stored and retrieved is the same. */
 
             do
             {
-                listGET_OWNER_OF_NEXT_ENTRY( pxNextTCB, pxList );
+                listGET_OWNER_OF_NEXT_ENTRY( pxNextTCB, pxList ); /*lint !e9079 void * is used as this macro is used with timers and co-routines too.  Alignment is known to be fine as the type of the pointer stored and retrieved is the same. */
 
                 /* Check each character in the name looking for a match or
                 mismatch. */
@@ -2368,7 +2374,7 @@ TCB_t *pxTCB;
 
 #if ( INCLUDE_xTaskGetHandle == 1 )
 
-    TaskHandle_t xTaskGetHandle( const char *pcNameToQuery )
+    TaskHandle_t xTaskGetHandle( const char *pcNameToQuery ) /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
     {
     UBaseType_t uxQueue = configMAX_PRIORITIES;
     TCB_t* pxTCB;
@@ -2390,7 +2396,7 @@ TCB_t *pxTCB;
                     break;
                 }
 
-            } while( uxQueue > ( UBaseType_t ) tskIDLE_PRIORITY );
+            } while( uxQueue > ( UBaseType_t ) tskIDLE_PRIORITY ); /*lint !e961 MISRA exception as the casts are only redundant for some ports. */
 
             /* Search the delayed lists. */
             if( pxTCB == NULL )
@@ -2449,7 +2455,7 @@ TCB_t *pxTCB;
                     uxQueue--;
                     uxTask += prvListTasksWithinSingleList( &( pxTaskStatusArray[ uxTask ] ), &( pxReadyTasksLists[ uxQueue ] ), eReady );
 
-                } while( uxQueue > ( UBaseType_t ) tskIDLE_PRIORITY );
+                } while( uxQueue > ( UBaseType_t ) tskIDLE_PRIORITY ); /*lint !e961 MISRA exception as the casts are only redundant for some ports. */
 
                 /* Fill in an TaskStatus_t structure with information on each
                 task in the Blocked state. */
@@ -2633,7 +2639,7 @@ BaseType_t xSwitchRequired = pdFALSE;
         delayed lists if it wraps to 0. */
         xTickCount = xConstTickCount;
 
-        if( xConstTickCount == ( TickType_t ) 0U )
+        if( xConstTickCount == ( TickType_t ) 0U ) /*lint !e774 'if' does not always evaluate to false as it is looking for an overflow. */
         {
             taskSWITCH_DELAYED_LISTS();
         }
@@ -2657,7 +2663,7 @@ BaseType_t xSwitchRequired = pdFALSE;
                     unlikely that the
                     if( xTickCount >= xNextTaskUnblockTime ) test will pass
                     next time through. */
-                    xNextTaskUnblockTime = portMAX_DELAY;
+                    xNextTaskUnblockTime = portMAX_DELAY; /*lint !e961 MISRA exception as the casts are only redundant for some ports. */
                     break;
                 }
                 else
@@ -2666,7 +2672,7 @@ BaseType_t xSwitchRequired = pdFALSE;
                     item at the head of the delayed list.  This is the time
                     at which the task at the head of the delayed list must
                     be removed from the Blocked state. */
-                    pxTCB = listGET_OWNER_OF_HEAD_ENTRY( pxDelayedTaskList );
+                    pxTCB = listGET_OWNER_OF_HEAD_ENTRY( pxDelayedTaskList ); /*lint !e9079 void * is used as this macro is used with timers and co-routines too.  Alignment is known to be fine as the type of the pointer stored and retrieved is the same. */
                     xItemValue = listGET_LIST_ITEM_VALUE( &( pxTCB->xStateListItem ) );
 
                     if( xConstTickCount < xItemValue )
@@ -2677,7 +2683,7 @@ BaseType_t xSwitchRequired = pdFALSE;
                         state -    so record the item value in
                         xNextTaskUnblockTime. */
                         xNextTaskUnblockTime = xItemValue;
-                        break;
+                        break; /*lint !e9011 Code structure here is deemed easier to understand with multiple breaks. */
                     }
                     else
                     {
@@ -2932,7 +2938,7 @@ void vTaskSwitchContext( void )
 
         /* Select a new task to run using either the generic C or port
         optimised asm code. */
-        taskSELECT_HIGHEST_PRIORITY_TASK();
+        taskSELECT_HIGHEST_PRIORITY_TASK(); /*lint !e9079 void * is used as this macro is used with timers and co-routines too.  Alignment is known to be fine as the type of the pointer stored and retrieved is the same. */
         traceTASK_SWITCHED_IN();
 
         /* After the new task is switched in, update the global errno. */
@@ -3045,7 +3051,7 @@ BaseType_t xReturn;
 
     This function assumes that a check has already been made to ensure that
     pxEventList is not empty. */
-    pxUnblockedTCB = listGET_OWNER_OF_HEAD_ENTRY( pxEventList );
+    pxUnblockedTCB = listGET_OWNER_OF_HEAD_ENTRY( pxEventList ); /*lint !e9079 void * is used as this macro is used with timers and co-routines too.  Alignment is known to be fine as the type of the pointer stored and retrieved is the same. */
     configASSERT( pxUnblockedTCB );
     ( void ) uxListRemove( &( pxUnblockedTCB->xEventListItem ) );
 
@@ -3108,7 +3114,7 @@ TCB_t *pxUnblockedTCB;
 
     /* Remove the event list form the event flag.  Interrupts do not access
     event flags. */
-    pxUnblockedTCB = listGET_LIST_ITEM_OWNER( pxEventListItem );
+    pxUnblockedTCB = listGET_LIST_ITEM_OWNER( pxEventListItem ); /*lint !e9079 void * is used as this macro is used with timers and co-routines too.  Alignment is known to be fine as the type of the pointer stored and retrieved is the same. */
     configASSERT( pxUnblockedTCB );
     ( void ) uxListRemove( pxEventListItem );
 
@@ -3184,7 +3190,7 @@ BaseType_t xReturn;
             else
         #endif
 
-        if( ( xNumOfOverflows != pxTimeOut->xOverflowCount ) && ( xConstTickCount >= pxTimeOut->xTimeOnEntering ) )
+    if( ( xNumOfOverflows != pxTimeOut->xOverflowCount ) && ( xConstTickCount >= pxTimeOut->xTimeOnEntering ) ) /*lint !e525 Indentation preferred as is to make code within pre-processor directives clearer. */
         {
             /* The tick count is greater than the time at which
             vTaskSetTimeout() was called, but has also overflowed since
@@ -3193,7 +3199,7 @@ BaseType_t xReturn;
             was called. */
             xReturn = pdTRUE;
         }
-        else if( xElapsedTime < *pxTicksToWait )
+        else if( xElapsedTime < *pxTicksToWait ) /*lint !e961 Explicit casting is only redundant with some compilers, whereas others require it to prevent integer conversion errors. */
         {
             /* Not a genuine timeout. Adjust parameters for time remaining. */
             *pxTicksToWait -= xElapsedTime;
@@ -3528,7 +3534,7 @@ static void prvCheckTasksWaitingTermination( void )
         {
             taskENTER_CRITICAL();
             {
-                pxTCB = listGET_OWNER_OF_HEAD_ENTRY( ( &xTasksWaitingTermination ) );
+                pxTCB = listGET_OWNER_OF_HEAD_ENTRY( ( &xTasksWaitingTermination ) ); /*lint !e9079 void * is used as this macro is used with timers and co-routines too.  Alignment is known to be fine as the type of the pointer stored and retrieved is the same. */
                 ( void ) uxListRemove( &( pxTCB->xStateListItem ) );
                 --uxCurrentNumberOfTasks;
                 --uxDeletedTasksWaitingCleanUp;
@@ -3647,7 +3653,7 @@ static void prvCheckTasksWaitingTermination( void )
 
         if( listCURRENT_LIST_LENGTH( pxList ) > ( UBaseType_t ) 0 )
         {
-            listGET_OWNER_OF_NEXT_ENTRY( pxFirstTCB, pxList );
+            listGET_OWNER_OF_NEXT_ENTRY( pxFirstTCB, pxList ); /*lint !e9079 void * is used as this macro is used with timers and co-routines too.  Alignment is known to be fine as the type of the pointer stored and retrieved is the same. */
 
             /* Populate an TaskStatus_t structure within the
             pxTaskStatusArray array for each task that is referenced from
@@ -3655,7 +3661,7 @@ static void prvCheckTasksWaitingTermination( void )
             meaning of each TaskStatus_t structure member. */
             do
             {
-                listGET_OWNER_OF_NEXT_ENTRY( pxNextTCB, pxList );
+                listGET_OWNER_OF_NEXT_ENTRY( pxNextTCB, pxList ); /*lint !e9079 void * is used as this macro is used with timers and co-routines too.  Alignment is known to be fine as the type of the pointer stored and retrieved is the same. */
                 vTaskGetInfo( ( TaskHandle_t ) pxNextTCB, &( pxTaskStatusArray[ uxTask ] ), pdTRUE, eState );
                 uxTask++;
             } while( pxNextTCB != pxFirstTCB );
@@ -3683,7 +3689,7 @@ static void prvCheckTasksWaitingTermination( void )
             ulCount++;
         }
 
-        ulCount /= ( uint32_t ) sizeof( StackType_t );
+        ulCount /= ( uint32_t ) sizeof( StackType_t ); /*lint !e961 Casting is not redundant on smaller architectures. */
 
         return ( configSTACK_DEPTH_TYPE ) ulCount;
     }
@@ -3692,33 +3698,6 @@ static void prvCheckTasksWaitingTermination( void )
 /*-----------------------------------------------------------*/
 
 #if ( INCLUDE_uxTaskGetStackHighWaterMark == 1 )
-
-#if configENABLE_BACKWARD_COMPATIBILITY == 1
-
-    UBaseType_t uxTaskGetStackHighWaterMark( TaskHandle_t xTask )
-    {
-    TCB_t *pxTCB;
-    uint8_t *pucEndOfStack;
-    UBaseType_t uxReturn;
-
-        pxTCB = prvGetTCBFromHandle( xTask );
-
-        #if portSTACK_GROWTH < 0
-        {
-            pucEndOfStack = ( uint8_t * ) pxTCB->pxStack;
-        }
-        #else
-        {
-            pucEndOfStack = ( uint8_t * ) pxTCB->pxEndOfStack;
-        }
-        #endif
-
-        uxReturn = ( UBaseType_t ) prvTaskCheckFreeStackSpace( pucEndOfStack );
-
-        return uxReturn;
-    }
-
-#else
 
     configSTACK_DEPTH_TYPE uxTaskGetStackHighWaterMark( TaskHandle_t xTask )
     {
@@ -3742,8 +3721,6 @@ static void prvCheckTasksWaitingTermination( void )
 
         return uxReturn;
     }
-
-#endif /* configENABLE_BACKWARD_COMPATIBILITY */
 
 #endif /* INCLUDE_uxTaskGetStackHighWaterMark */
 /*-----------------------------------------------------------*/
@@ -3772,7 +3749,7 @@ static void prvCheckTasksWaitingTermination( void )
             vPortFree( pxTCB->pxStack );
             vPortFree( pxTCB );
         }
-        #elif( tskSTATIC_AND_DYNAMIC_ALLOCATION_POSSIBLE != 0 )
+        #elif( tskSTATIC_AND_DYNAMIC_ALLOCATION_POSSIBLE != 0 ) /*lint !e731 !e9029 Macro has been consolidated for readability reasons. */
         {
             /* The task could have been allocated statically or dynamically, so
             check what was statically allocated before trying to free the
@@ -3822,7 +3799,7 @@ TCB_t *pxTCB;
         the item at the head of the delayed list.  This is the time at
         which the task at the head of the delayed list should be removed
         from the Blocked state. */
-        ( pxTCB ) = listGET_OWNER_OF_HEAD_ENTRY( pxDelayedTaskList );
+        ( pxTCB ) = listGET_OWNER_OF_HEAD_ENTRY( pxDelayedTaskList ); /*lint !e9079 void * is used as this macro is used with timers and co-routines too.  Alignment is known to be fine as the type of the pointer stored and retrieved is the same. */
         xNextTaskUnblockTime = listGET_LIST_ITEM_VALUE( &( ( pxTCB )->xStateListItem ) );
     }
 }
@@ -3895,7 +3872,7 @@ TCB_t *pxTCB;
                 not being used for anything else. */
                 if( ( listGET_LIST_ITEM_VALUE( &( pxMutexHolderTCB->xEventListItem ) ) & taskEVENT_LIST_ITEM_VALUE_IN_USE ) == 0UL )
                 {
-                    listSET_LIST_ITEM_VALUE( &( pxMutexHolderTCB->xEventListItem ), ( TickType_t ) configMAX_PRIORITIES - ( TickType_t ) pxCurrentTCB->uxPriority );
+                    listSET_LIST_ITEM_VALUE( &( pxMutexHolderTCB->xEventListItem ), ( TickType_t ) configMAX_PRIORITIES - ( TickType_t ) pxCurrentTCB->uxPriority ); /*lint !e961 MISRA exception as the casts are only redundant for some ports. */
                 }
                 else
                 {
@@ -4006,7 +3983,7 @@ TCB_t *pxTCB;
                     /* Reset the event list item value.  It cannot be in use for
                     any other purpose if this task is running, and it must be
                     running to give back the mutex. */
-                    listSET_LIST_ITEM_VALUE( &( pxTCB->xEventListItem ), ( TickType_t ) configMAX_PRIORITIES - ( TickType_t ) pxTCB->uxPriority );
+                    listSET_LIST_ITEM_VALUE( &( pxTCB->xEventListItem ), ( TickType_t ) configMAX_PRIORITIES - ( TickType_t ) pxTCB->uxPriority ); /*lint !e961 MISRA exception as the casts are only redundant for some ports. */
                     prvAddTaskToReadyList( pxTCB );
 
                     /* Return true to indicate that a context switch is required.
@@ -4092,7 +4069,7 @@ TCB_t *pxTCB;
                     being used for anything else. */
                     if( ( listGET_LIST_ITEM_VALUE( &( pxTCB->xEventListItem ) ) & taskEVENT_LIST_ITEM_VALUE_IN_USE ) == 0UL )
                     {
-                        listSET_LIST_ITEM_VALUE( &( pxTCB->xEventListItem ), ( TickType_t ) configMAX_PRIORITIES - ( TickType_t ) uxPriorityToUse );
+                        listSET_LIST_ITEM_VALUE( &( pxTCB->xEventListItem ), ( TickType_t ) configMAX_PRIORITIES - ( TickType_t ) uxPriorityToUse ); /*lint !e961 MISRA exception as the casts are only redundant for some ports. */
                     }
                     else
                     {
@@ -4274,7 +4251,7 @@ TCB_t *pxTCB;
         /* Allocate an array index for each task.  NOTE!  if
         configSUPPORT_DYNAMIC_ALLOCATION is set to 0 then pvPortMalloc() will
         equate to NULL. */
-        pxTaskStatusArray = pvPortMalloc( uxCurrentNumberOfTasks * sizeof( TaskStatus_t ) );
+        pxTaskStatusArray = pvPortMalloc( uxCurrentNumberOfTasks * sizeof( TaskStatus_t ) ); /*lint !e9079 All values returned by pvPortMalloc() have at least the alignment required by the MCU's stack and this allocation allocates a struct that has the alignment requirements of a pointer. */
 
         if( pxTaskStatusArray != NULL )
         {
@@ -4313,8 +4290,8 @@ TCB_t *pxTCB;
                 pcWriteBuffer = prvWriteNameToBuffer( pcWriteBuffer, pxTaskStatusArray[ x ].pcTaskName );
 
                 /* Write the rest of the string. */
-                sprintf( pcWriteBuffer, "\t%c\t%u\t%u\t%u\r\n", cStatus, ( unsigned int ) pxTaskStatusArray[ x ].uxCurrentPriority, ( unsigned int ) pxTaskStatusArray[ x ].usStackHighWaterMark, ( unsigned int ) pxTaskStatusArray[ x ].xTaskNumber );
-                pcWriteBuffer += strlen( pcWriteBuffer );
+                sprintf( pcWriteBuffer, "\t%c\t%u\t%u\t%u\r\n", cStatus, ( unsigned int ) pxTaskStatusArray[ x ].uxCurrentPriority, ( unsigned int ) pxTaskStatusArray[ x ].usStackHighWaterMark, ( unsigned int ) pxTaskStatusArray[ x ].xTaskNumber ); /*lint !e586 sprintf() allowed as this is compiled with many compilers and this is a utility function only - not part of the core kernel implementation. */
+                pcWriteBuffer += strlen( pcWriteBuffer ); /*lint !e9016 Pointer arithmetic ok on char pointers especially as in this case where it best denotes the intent of the code. */
             }
 
             /* Free the array again.  NOTE!  If configSUPPORT_DYNAMIC_ALLOCATION
@@ -4379,7 +4356,7 @@ TCB_t *pxTCB;
         /* Allocate an array index for each task.  NOTE!  If
         configSUPPORT_DYNAMIC_ALLOCATION is set to 0 then pvPortMalloc() will
         equate to NULL. */
-        pxTaskStatusArray = pvPortMalloc( uxCurrentNumberOfTasks * sizeof( TaskStatus_t ) );
+        pxTaskStatusArray = pvPortMalloc( uxCurrentNumberOfTasks * sizeof( TaskStatus_t ) ); /*lint !e9079 All values returned by pvPortMalloc() have at least the alignment required by the MCU's stack and this allocation allocates a struct that has the alignment requirements of a pointer. */
 
         if( pxTaskStatusArray != NULL )
         {
@@ -4415,7 +4392,7 @@ TCB_t *pxTCB;
                         {
                             /* sizeof( int ) == sizeof( long ) so a smaller
                             printf() library can be used. */
-                            sprintf( pcWriteBuffer, "\t%u\t\t%u%%\r\n", ( unsigned int ) pxTaskStatusArray[ x ].ulRunTimeCounter, ( unsigned int ) ulStatsAsPercentage );
+                            sprintf( pcWriteBuffer, "\t%u\t\t%u%%\r\n", ( unsigned int ) pxTaskStatusArray[ x ].ulRunTimeCounter, ( unsigned int ) ulStatsAsPercentage ); /*lint !e586 sprintf() allowed as this is compiled with many compilers and this is a utility function only - not part of the core kernel implementation. */
                         }
                         #endif
                     }
@@ -4431,12 +4408,12 @@ TCB_t *pxTCB;
                         {
                             /* sizeof( int ) == sizeof( long ) so a smaller
                             printf() library can be used. */
-                            sprintf( pcWriteBuffer, "\t%u\t\t<1%%\r\n", ( unsigned int ) pxTaskStatusArray[ x ].ulRunTimeCounter );
+                            sprintf( pcWriteBuffer, "\t%u\t\t<1%%\r\n", ( unsigned int ) pxTaskStatusArray[ x ].ulRunTimeCounter ); /*lint !e586 sprintf() allowed as this is compiled with many compilers and this is a utility function only - not part of the core kernel implementation. */
                         }
                         #endif
                     }
 
-                    pcWriteBuffer += strlen( pcWriteBuffer );
+                    pcWriteBuffer += strlen( pcWriteBuffer ); /*lint !e9016 Pointer arithmetic ok on char pointers especially as in this case where it best denotes the intent of the code. */
                 }
             }
             else
@@ -4465,7 +4442,7 @@ TickType_t uxReturn;
 
     /* Reset the event list item to its normal value - so it can be used with
     queues and semaphores. */
-    listSET_LIST_ITEM_VALUE( &( pxCurrentTCB->xEventListItem ), ( ( TickType_t ) configMAX_PRIORITIES - ( TickType_t ) pxCurrentTCB->uxPriority ) );
+    listSET_LIST_ITEM_VALUE( &( pxCurrentTCB->xEventListItem ), ( ( TickType_t ) configMAX_PRIORITIES - ( TickType_t ) pxCurrentTCB->uxPriority ) ); /*lint !e961 MISRA exception as the casts are only redundant for some ports. */
 
     return uxReturn;
 }
@@ -5018,7 +4995,7 @@ const TickType_t xConstTickCount = xTickCount;
     {
         /* The current task must be in a ready list, so there is no need to
         check, and the port reset macro can be called directly. */
-        portRESET_READY_PRIORITY( pxCurrentTCB->uxPriority, uxTopReadyPriority );
+        portRESET_READY_PRIORITY( pxCurrentTCB->uxPriority, uxTopReadyPriority ); /*lint !e931 pxCurrentTCB cannot change as it is the calling task.  pxCurrentTCB->uxPriority and uxTopReadyPriority cannot change as called with scheduler suspended or in a critical section. */
     }
     else
     {

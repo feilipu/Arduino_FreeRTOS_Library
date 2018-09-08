@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.1.0
+ * FreeRTOS Kernel V10.1.1
  * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -59,7 +59,6 @@ extern "C" {
 #include "projdefs.h"
 
 /* Definitions specific to the port being used. */
-#include "portmacro.h"
 #include "portable.h"
 
 /* Must be defaulted before configUSE_NEWLIB_REENTRANT is used below. */

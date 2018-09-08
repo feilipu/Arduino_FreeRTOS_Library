@@ -1,5 +1,15 @@
 Documentation and download available at https://www.FreeRTOS.org/
 
+Changes between FreeRTOS V10.1.0 and FreeRTOS V10.1.1 released 7 September 2018
+
+	+ Reverted a few structure name changes that broke several kernel aware
+	  debugger plug-ins.
+	+ Updated to the latest trace recorder code.
+	+ Fixed some formatting in the FreeRTOS+TCP TCP/IP stack code.
+	+ Reverted moving some variables from file to function scope as doing so
+	  broke debug scenarios that require the static qualifier to be removed.
+    + Arduino FreeRTOS - above reversions not implemented.
+
 Changes between FreeRTOS V10.0.1 and FreeRTOS V10.1.0 released 22 August 2018
 
 	FreeRTOS Kernel Changes:

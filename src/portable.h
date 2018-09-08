@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.1.0
+ * FreeRTOS Kernel V10.1.1
  * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -44,13 +44,7 @@ specific constants has been moved into the deprecated_definitions.h header
 file. */
 //#include "deprecated_definitions.h"
 
-/* If portENTER_CRITICAL is not defined then including deprecated_definitions.h
-did not result in a portmacro.h header file being included - and it should be
-included here.  In this case the path to the correct portmacro.h header file
-must be set in the compiler's include path. */
-#ifndef portENTER_CRITICAL
-    #include "portmacro.h"
-#endif
+#include "portmacro.h"
 
 #if portBYTE_ALIGNMENT == 32
     #define portBYTE_ALIGNMENT_MASK ( 0x001f )
