@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Phillip Stevens  All Rights Reserved.
+ * Copyright (C) 2019 Phillip Stevens  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -49,7 +49,7 @@ extern "C" {
                                 WDTO_500MS
 */
 //    xxx Watchdog Timer is 128kHz nominal, but 120 kHz at 5V DC and 25 degrees is actually more accurate, from data sheet.
-#define configTICK_RATE_HZ      ( (TickType_t)( (uint32_t)128000 >> (portUSE_WDTO + 11) ) ) // 2^11 = 2048 WDT scaler for 128kHz Timer
+#define configTICK_RATE_HZ      ( (TickType_t)( (uint32_t)128000 >> (portUSE_WDTO + 11) ) )  // 2^11 = 2048 WDT scaler for 128kHz Timer
 
 /*-----------------------------------------------------------*/
 

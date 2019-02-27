@@ -1,6 +1,6 @@
 /*
- * FreeRTOS Kernel V10.1.1
- * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V10.2.0
+ * Copyright (C) 2019 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -123,8 +123,8 @@ use of FreeRTOS.*/
     /* Define macros that set the new structure members to known values. */
     #define listSET_FIRST_LIST_ITEM_INTEGRITY_CHECK_VALUE( pxItem )     ( pxItem )->xListItemIntegrityValue1 = pdINTEGRITY_CHECK_VALUE
     #define listSET_SECOND_LIST_ITEM_INTEGRITY_CHECK_VALUE( pxItem )    ( pxItem )->xListItemIntegrityValue2 = pdINTEGRITY_CHECK_VALUE
-    #define listSET_LIST_INTEGRITY_CHECK_1_VALUE( pxList )      ( pxList )->xListIntegrityValue1 = pdINTEGRITY_CHECK_VALUE
-    #define listSET_LIST_INTEGRITY_CHECK_2_VALUE( pxList )      ( pxList )->xListIntegrityValue2 = pdINTEGRITY_CHECK_VALUE
+    #define listSET_LIST_INTEGRITY_CHECK_1_VALUE( pxList )        ( pxList )->xListIntegrityValue1 = pdINTEGRITY_CHECK_VALUE
+    #define listSET_LIST_INTEGRITY_CHECK_2_VALUE( pxList )        ( pxList )->xListIntegrityValue2 = pdINTEGRITY_CHECK_VALUE
 
     /* Define macros that will assert if one of the structure members does not
     contain its expected value. */

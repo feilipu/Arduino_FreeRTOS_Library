@@ -1,5 +1,42 @@
 Documentation and download available at https://www.FreeRTOS.org/
 
+Changes between FreeRTOS V10.1.1 and FreeRTOS V10.2.0 released February 25 2019:
+
+	+ Added GCC RISC-V MCU port with three separate demo applications.
+	+ Included pre-existing ARM Cortex-M33 (ARMv8-M) GCC/ARMclang and IAR ports
+	  with Keil simulator demo.
+	+ Update the method used to detect if a timer is active.  Previously the
+	  timer was deemed to be inactive if it was not referenced from a list.
+	  However, when a timer is updated it is temporarily removed from, then
+	  re-added to a list, so now the timer's active status is stored separately.
+	+ Add vTimerSetReloadMode(), xTaskGetIdleRunTimeCounter(), and
+	  xTaskGetApplicationTaskTagFromISR() API functions.
+	+ Updated third party Xtensa port so it is MIT licensed.
+	+ Added configINCLUDE_PLATFORM_H_INSTEAD_OF_IODEFINE_H to the Renesas
+	  compiler RX600v2 port to enable switching between platform.h and
+	  iodefine.h includes within that port's port.c file.
+	+ Removed the 'FromISR' functions from the MPU ports as ISRs run privileged
+	  anyway.
+	+ Added uxTaskGetStackHighWaterMark2() function to enable the return type to
+	  be changed without breaking backward compatibility.
+	  uxTaskGetStackHighWaterMark() returns a UBaseType_t as always,
+	  uxTaskGetStackHighWaterMark2() returns configSTACK_DEPTH_TYPE to allow the
+	  user to determine the return type.
+	+ Arduino_FreeRTOS - above uxTaskGetStackHighWaterMark2() not implemented.
+	+ Fixed issues in memory protected ports related to different combinations
+	  of static memory only and dynamic memory only builds.  As a result the
+	  definition of tskSTATIC_AND_DYNAMIC_ALLOCATION_POSSIBLE became more
+	  complex and was moved to FreeRTOS.h with a table explaining its definition.
+	+ Added a 'get task tag from ISR' function.
+	+ Change the method used to determine if a timer is active or not from just
+	  seeing if it is referenced from the active timer list to storing its
+	  active state explicitly.  The change prevents the timer reporting that it
+	  is inactive while it is being moved from one list to another.
+	+ The pcName parameter passed into the task create functions can be NULL,
+	  previously a name had to be provided.
+	+ When using tickless idle, prvResetNextTaskUnblockTime() is now only called
+	  in xTaskRemoveFromEventList() if the scheduler is not suspended.
+
 Changes between FreeRTOS V10.1.0 and FreeRTOS V10.1.1 released 7 September 2018
 
 	+ Reverted a few structure name changes that broke several kernel aware
@@ -8,7 +45,7 @@ Changes between FreeRTOS V10.1.0 and FreeRTOS V10.1.1 released 7 September 2018
 	+ Fixed some formatting in the FreeRTOS+TCP TCP/IP stack code.
 	+ Reverted moving some variables from file to function scope as doing so
 	  broke debug scenarios that require the static qualifier to be removed.
-    + Arduino FreeRTOS - above reversions not implemented.
+	+ Arduino_FreeRTOS - above reversions not implemented.
 
 Changes between FreeRTOS V10.0.1 and FreeRTOS V10.1.0 released 22 August 2018
 

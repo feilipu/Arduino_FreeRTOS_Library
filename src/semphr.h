@@ -1,6 +1,6 @@
 /*
- * FreeRTOS Kernel V10.1.1
- * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V10.2.0
+ * Copyright (C) 2019 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -37,8 +37,8 @@
 typedef QueueHandle_t SemaphoreHandle_t;
 
 #define semBINARY_SEMAPHORE_QUEUE_LENGTH    ( ( uint8_t ) 1U )
-#define semSEMAPHORE_QUEUE_ITEM_LENGTH        ( ( uint8_t ) 0U )
-#define semGIVE_BLOCK_TIME                    ( ( TickType_t ) 0U )
+#define semSEMAPHORE_QUEUE_ITEM_LENGTH      ( ( uint8_t ) 0U )
+#define semGIVE_BLOCK_TIME                  ( ( TickType_t ) 0U )
 
 
 /**
@@ -561,8 +561,8 @@ typedef QueueHandle_t SemaphoreHandle_t;
  *
  * Example usage:
  <pre>
- \#define LONG_TIME 0xffff
- \#define TICKS_TO_WAIT    10
+ \#define LONG_TIME         0xffff
+ \#define TICKS_TO_WAIT     10
  SemaphoreHandle_t xSemaphore = NULL;
 
  // Repetitive task.

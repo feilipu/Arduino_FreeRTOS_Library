@@ -1,6 +1,6 @@
 /*
- * FreeRTOS Kernel V10.1.1
- * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V10.2.0
+ * Copyright (C) 2019 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -57,7 +57,7 @@ typedef unsigned char UBaseType_t;
 
 #if( configUSE_16_BIT_TICKS == 1 )
     typedef uint16_t TickType_t;
-    #define portMAX_DELAY ( TickType_t ) 0xffffU
+    #define portMAX_DELAY ( TickType_t ) 0xffff
 #else
     typedef uint32_t TickType_t;
     #define portMAX_DELAY ( TickType_t ) 0xffffffffUL
