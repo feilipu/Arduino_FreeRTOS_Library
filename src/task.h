@@ -340,7 +340,7 @@ is used in assert() statements. */
  *<pre>
  TaskHandle_t xTaskCreateStatic( TaskFunction_t pvTaskCode,
                                  const char * const pcName,
-                                 uint32_t ulStackDepth,
+                                 configSTACK_DEPTH_TYPE ulStackDepth,
                                  void *pvParameters,
                                  UBaseType_t uxPriority,
                                  StackType_t *pxStackBuffer,

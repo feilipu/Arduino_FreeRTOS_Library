@@ -75,7 +75,7 @@ functions but without including stdio.h here. */
  */
 #define tskSTACK_FILL_BYTE    ( 0xa5U )
 
-/* Bits used to recored how a task's stack and TCB were allocated. */
+/* Bits used to record how a task's stack and TCB were allocated. */
 #define tskDYNAMICALLY_ALLOCATED_STACK_AND_TCB      ( ( uint8_t ) 0 )
 #define tskSTATICALLY_ALLOCATED_STACK_ONLY          ( ( uint8_t ) 1 )
 #define tskSTATICALLY_ALLOCATED_STACK_AND_TCB       ( ( uint8_t ) 2 )

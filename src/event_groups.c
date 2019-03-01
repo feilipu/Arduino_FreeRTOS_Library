@@ -134,7 +134,7 @@ static BaseType_t prvTestWaitCondition( const EventBits_t uxCurrentEventBits, co
             traceEVENT_GROUP_CREATE_FAILED();
         }
 
-		return pxEventBits;
+        return pxEventBits;
     }
 
 #endif /* configSUPPORT_STATIC_ALLOCATION */
@@ -182,7 +182,7 @@ static BaseType_t prvTestWaitCondition( const EventBits_t uxCurrentEventBits, co
             traceEVENT_GROUP_CREATE_FAILED(); /*lint !e9063 Else branch only exists to allow tracing and does not generate code if trace macros are not defined. */
         }
 
-		return pxEventBits;
+        return pxEventBits;
     }
 
 #endif /* configSUPPORT_DYNAMIC_ALLOCATION */

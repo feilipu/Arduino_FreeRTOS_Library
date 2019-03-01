@@ -331,8 +331,8 @@ BaseType_t xReturn = pdFAIL;
         pxNewTimer = ( Timer_t * ) pxTimerBuffer; /*lint !e740 !e9087 StaticTimer_t is a pointer to a Timer_t, so guaranteed to be aligned and sized correctly (checked by an assert()), so this is safe. */
 
         if( pxNewTimer != NULL )
-            {
-                /* Timers can be created statically or dynamically so note this
+        {
+            /* Timers can be created statically or dynamically so note this
             timer was created statically in case it is later deleted.  The
             autoreload bit may get set in prvInitialiseNewTimer(). */
             pxNewTimer->ucStatus = tmrSTATUS_IS_STATICALLY_ALLOCATED;
