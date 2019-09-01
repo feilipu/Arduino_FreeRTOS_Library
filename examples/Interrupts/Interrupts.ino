@@ -47,7 +47,7 @@ void loop() {}
 
 void interruptHandler() {
   /**
-   * Give semaphore in the interrup handler
+   * Give semaphore in the interrupt handler
    * https://www.freertos.org/a00124.html
    */
   
