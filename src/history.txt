@@ -1,5 +1,25 @@
 Documentation and download available at https://www.FreeRTOS.org/
 
+Changes between FreeRTOS V10.2.1 and FreeRTOS V10.2.0 released May 13 2019:
+
+	+ Added ARM Cortex-M23 port layer to complement the pre-existing ARM
+	  Cortex-M33 port layer.
+	+ The RISC-V port now automatically switches between 32-bit and 64-bit
+	  cores.
+	+ Introduced the portMEMORY_BARRIER macro to prevent instruction re-ordering
+	  when GCC link time optimisation is used.
+	+ Introduced the portDONT_DISCARD macro to the ARMv8-M ports to try and
+	  prevent the secure side builds from removing symbols required by the
+	  non secure side build.
+	+ Introduced the portARCH_NAME to provide additional data to select semi-
+	  automated build environments.
+	+ Cortex-M33 and Cortex-M23 ports now correctly disable the MPU before
+	  updating the MPU registers.
+
+	+ Added Nuvoton NuMaker-PFM-M2351 ARM Cortex-M23 demo.
+	+ Added LPC55S69 ARM Cortex-M33 demo.
+	+ Added an STM32 dual core AMP stress test demo.
+
 Changes between FreeRTOS V10.1.1 and FreeRTOS V10.2.0 released February 25 2019:
 
 	+ Added GCC RISC-V MCU port with three separate demo applications.
@@ -2637,7 +2657,3 @@ Changes between V1.00 and V1.01
 	+ Prevent the call to kbhit() in main.c for debug builds as the debugger
 	  seems to have problems stepping over the call.  This if for the PC port
 	  only.
-
-
-
-
