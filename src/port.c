@@ -31,7 +31,7 @@
 #include <avr/sleep.h>
 #include <avr/wdt.h>
 
-#include "Arduino_FreeRTOS.h"
+#include "FreeRTOS.h"
 #include "task.h"
 
 /*-----------------------------------------------------------
