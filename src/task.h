@@ -2416,6 +2416,3 @@ void vTaskInternalSetTimeOutState( TimeOut_t * const pxTimeOut ) PRIVILEGED_FUNC
 }
 #endif
 #endif /* INC_TASK_H */
-
-
-

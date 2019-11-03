@@ -2927,15 +2927,3 @@ Queue_t * const pxQueue = xQueue;
 	}
 
 #endif /* configUSE_QUEUE_SETS */
-
-
-
-
-
-
-
-
-
-
-
-
