@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.2.0
+ * FreeRTOS Kernel V10.2.1
  * Copyright (C) 2019 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -42,176 +42,59 @@ Purely for reasons of backward compatibility the old method is still valid, but
 to make it clear that new projects should not use it, support for the port
 specific constants has been moved into the deprecated_definitions.h header
 file. */
-//#include "deprecated_definitions.h"
+#include "deprecated_definitions.h"
 
 /* If portENTER_CRITICAL is not defined then including deprecated_definitions.h
 did not result in a portmacro.h header file being included - and it should be
 included here.  In this case the path to the correct portmacro.h header file
 must be set in the compiler's include path. */
 #ifndef portENTER_CRITICAL
-#include "portmacro.h"
+	#include "portmacro.h"
 #endif
 
 #if portBYTE_ALIGNMENT == 32
-    #define portBYTE_ALIGNMENT_MASK ( 0x001f )
+	#define portBYTE_ALIGNMENT_MASK ( 0x001f )
 #endif
 
 #if portBYTE_ALIGNMENT == 16
-    #define portBYTE_ALIGNMENT_MASK ( 0x000f )
+	#define portBYTE_ALIGNMENT_MASK ( 0x000f )
 #endif
 
 #if portBYTE_ALIGNMENT == 8
-    #define portBYTE_ALIGNMENT_MASK ( 0x0007 )
+	#define portBYTE_ALIGNMENT_MASK ( 0x0007 )
 #endif
 
 #if portBYTE_ALIGNMENT == 4
-    #define portBYTE_ALIGNMENT_MASK    ( 0x0003 )
+	#define portBYTE_ALIGNMENT_MASK	( 0x0003 )
 #endif
 
 #if portBYTE_ALIGNMENT == 2
-    #define portBYTE_ALIGNMENT_MASK    ( 0x0001 )
+	#define portBYTE_ALIGNMENT_MASK	( 0x0001 )
 #endif
 
 #if portBYTE_ALIGNMENT == 1
-    #define portBYTE_ALIGNMENT_MASK    ( 0x0000 )
+	#define portBYTE_ALIGNMENT_MASK	( 0x0000 )
 #endif
 
 #ifndef portBYTE_ALIGNMENT_MASK
-    #error "Invalid portBYTE_ALIGNMENT definition"
+	#error "Invalid portBYTE_ALIGNMENT definition"
 #endif
 
 #ifndef portNUM_CONFIGURABLE_REGIONS
-    #define portNUM_CONFIGURABLE_REGIONS 1
+	#define portNUM_CONFIGURABLE_REGIONS 1
+#endif
+
+#ifndef portHAS_STACK_OVERFLOW_CHECKING
+	#define portHAS_STACK_OVERFLOW_CHECKING 0
+#endif
+
+#ifndef portARCH_NAME
+	#define portARCH_NAME NULL
 #endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/*-----------------------------------------------------------*/
-
-#include <avr/wdt.h>
-
-/**
-    Enable the watchdog timer, configuring it for expire after
-    (value) timeout (which is a combination of the WDP0
-    through WDP3 bits).
-
-    This function is derived from <avr/wdt.h> but enables only
-    the interrupt bit (WDIE), rather than the reset bit (WDE).
-
-    Can't find it documented but the WDT, once enabled,
-    rolls over and fires a new interrupt each time.
-
-    See also the symbolic constants WDTO_15MS et al.
-
-    Updated to match avr-libc 2.0.0
-*/
-
-static __inline__
-__attribute__ ((__always_inline__))
-void wdt_interrupt_enable (const uint8_t value)
-{
-    if (_SFR_IO_REG_P (_WD_CONTROL_REG))
-    {
-        __asm__ __volatile__ (
-                "in __tmp_reg__,__SREG__"   "\n\t"
-                "cli"                       "\n\t"
-                "wdr"                       "\n\t"
-                "out %0, %1"                "\n\t"
-                "out __SREG__,__tmp_reg__"  "\n\t"
-                "out %0, %2"                "\n\t"
-                : /* no outputs */
-                : "I" (_SFR_IO_ADDR(_WD_CONTROL_REG)),
-                "r" ((uint8_t)(_BV(_WD_CHANGE_BIT) | _BV(WDE))),
-                "r" ((uint8_t) ((value & 0x08 ? _WD_PS3_MASK : 0x00) |
-                        _BV(WDIF) | _BV(WDIE) | (value & 0x07)) )
-                : "r0"
-        );
-    }
-    else
-    {
-        __asm__ __volatile__ (
-                "in __tmp_reg__,__SREG__"   "\n\t"
-                "cli"                       "\n\t"
-                "wdr"                       "\n\t"
-                "sts %0, %1"                "\n\t"
-                "out __SREG__,__tmp_reg__"  "\n\t"
-                "sts %0, %2"                "\n\t"
-                : /* no outputs */
-                : "n" (_SFR_MEM_ADDR(_WD_CONTROL_REG)),
-                "r" ((uint8_t)(_BV(_WD_CHANGE_BIT) | _BV(WDE))),
-                "r" ((uint8_t) ((value & 0x08 ? _WD_PS3_MASK : 0x00) |
-                        _BV(WDIF) | _BV(WDIE) | (value & 0x07)) )
-                : "r0"
-        );
-    }
-}
-
-/*-----------------------------------------------------------*/
-/**
-    Enable the watchdog timer, configuring it for expire after
-    (value) timeout (which is a combination of the WDP0
-    through WDP3 bits).
-
-    This function is derived from <avr/wdt.h> but enables both
-    the reset bit (WDE), and the interrupt bit (WDIE).
-
-    This will ensure that if the interrupt is not serviced
-    before the second timeout, the AVR will reset.
-
-    Servicing the interrupt automatically clears it,
-    and ensures the AVR does not reset.
-
-    Can't find it documented but the WDT, once enabled,
-    rolls over and fires a new interrupt each time.
-
-    See also the symbolic constants WDTO_15MS et al.
-
-    Updated to match avr-libc 2.0.0
-*/
-
-static __inline__
-__attribute__ ((__always_inline__))
-void wdt_interrupt_reset_enable (const uint8_t value)
-{
-    if (_SFR_IO_REG_P (_WD_CONTROL_REG))
-    {
-        __asm__ __volatile__ (
-                "in __tmp_reg__,__SREG__"   "\n\t"
-                "cli"                       "\n\t"
-                "wdr"                       "\n\t"
-                "out %0, %1"                "\n\t"
-                "out __SREG__,__tmp_reg__"  "\n\t"
-                "out %0, %2"                "\n\t"
-                : /* no outputs */
-                : "I" (_SFR_IO_ADDR(_WD_CONTROL_REG)),
-                "r" ((uint8_t)(_BV(_WD_CHANGE_BIT) | _BV(WDE))),
-                "r" ((uint8_t) ((value & 0x08 ? _WD_PS3_MASK : 0x00) |
-                        _BV(WDIF) | _BV(WDIE) | _BV(WDE) | (value & 0x07)) )
-                : "r0"
-        );
-    }
-    else
-    {
-        __asm__ __volatile__ (
-                "in __tmp_reg__,__SREG__"   "\n\t"
-                "cli"                       "\n\t"
-                "wdr"                       "\n\t"
-                "sts %0, %1"                "\n\t"
-                "out __SREG__,__tmp_reg__"  "\n\t"
-                "sts %0, %2"                "\n\t"
-                : /* no outputs */
-                : "n" (_SFR_MEM_ADDR(_WD_CONTROL_REG)),
-                "r" ((uint8_t)(_BV(_WD_CHANGE_BIT) | _BV(WDE))),
-                "r" ((uint8_t) ((value & 0x08 ? _WD_PS3_MASK : 0x00) |
-                        _BV(WDIF) | _BV(WDIE) | _BV(WDE) | (value & 0x07)) )
-                : "r0"
-        );
-    }
-}
-
-/*-----------------------------------------------------------*/
 
 #include "mpu_wrappers.h"
 
@@ -222,24 +105,24 @@ void wdt_interrupt_reset_enable (const uint8_t value)
  *
  */
 #if( portUSING_MPU_WRAPPERS == 1 )
-    #if( portHAS_STACK_OVERFLOW_CHECKING == 1 )
-        StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, StackType_t *pxEndOfStack, TaskFunction_t pxCode, void *pvParameters, BaseType_t xRunPrivileged ) PRIVILEGED_FUNCTION;
-    #else
-    StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t pxCode, void *pvParameters, BaseType_t xRunPrivileged ) PRIVILEGED_FUNCTION;
-    #endif
+	#if( portHAS_STACK_OVERFLOW_CHECKING == 1 )
+		StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, StackType_t *pxEndOfStack, TaskFunction_t pxCode, void *pvParameters, BaseType_t xRunPrivileged ) PRIVILEGED_FUNCTION;
+	#else
+		StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t pxCode, void *pvParameters, BaseType_t xRunPrivileged ) PRIVILEGED_FUNCTION;
+	#endif
 #else
-    #if( portHAS_STACK_OVERFLOW_CHECKING == 1 )
-        StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, StackType_t *pxEndOfStack, TaskFunction_t pxCode, void *pvParameters ) PRIVILEGED_FUNCTION;
-#else
-    StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t pxCode, void *pvParameters ) PRIVILEGED_FUNCTION;
-#endif
+	#if( portHAS_STACK_OVERFLOW_CHECKING == 1 )
+		StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, StackType_t *pxEndOfStack, TaskFunction_t pxCode, void *pvParameters ) PRIVILEGED_FUNCTION;
+	#else
+		StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t pxCode, void *pvParameters ) PRIVILEGED_FUNCTION;
+	#endif
 #endif
 
 /* Used by heap_5.c. */
 typedef struct HeapRegion
 {
-    uint8_t *pucStartAddress;
-    size_t xSizeInBytes;
+	uint8_t *pucStartAddress;
+	size_t xSizeInBytes;
 } HeapRegion_t;
 
 /*
@@ -286,8 +169,8 @@ void vPortEndScheduler( void ) PRIVILEGED_FUNCTION;
  * contained in xRegions.
  */
 #if( portUSING_MPU_WRAPPERS == 1 )
-    struct xMEMORY_REGION;
-    void vPortStoreTaskMPUSettings( xMPU_SETTINGS *xMPUSettings, const struct xMEMORY_REGION * const xRegions, StackType_t *pxBottomOfStack, configSTACK_DEPTH_TYPE ulStackDepth ) PRIVILEGED_FUNCTION;
+	struct xMEMORY_REGION;
+	void vPortStoreTaskMPUSettings( xMPU_SETTINGS *xMPUSettings, const struct xMEMORY_REGION * const xRegions, StackType_t *pxBottomOfStack, uint32_t ulStackDepth ) PRIVILEGED_FUNCTION;
 #endif
 
 #ifdef __cplusplus
@@ -295,4 +178,3 @@ void vPortEndScheduler( void ) PRIVILEGED_FUNCTION;
 #endif
 
 #endif /* PORTABLE_H */
-
