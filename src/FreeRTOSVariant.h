@@ -52,8 +52,8 @@ extern "C" {
 /*-----------------------------------------------------------*/
 
 #ifndef INC_TASK_H
-#include "Arduino_FreeRTOS.h"
-#include "task.h"
+  #include "FreeRTOS.h"
+  #include "task.h"
 #endif
 
 void initVariant(void);

@@ -5,4 +5,6 @@
  */
 #include <FreeRTOS.h>
 
+#include <FreeRTOSVariant.h>
+
 #endif
