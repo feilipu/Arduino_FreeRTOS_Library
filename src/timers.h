@@ -1,6 +1,6 @@
 /*
- * FreeRTOS Kernel V10.2.0
- * Copyright (C) 2019 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V10.3.0
+ * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -1234,8 +1234,8 @@ const char * pcTimerGetName( TimerHandle_t xTimer ) PRIVILEGED_FUNCTION; /*lint 
 /**
  * void vTimerSetReloadMode( TimerHandle_t xTimer, const UBaseType_t uxAutoReload );
  *
- * Updates a timer to be either an autoreload timer, in which case the timer
- * automatically resets itself each time it expires, or a one shot timer, in
+ * Updates a timer to be either an auto-reload timer, in which case the timer
+ * automatically resets itself each time it expires, or a one-shot timer, in
  * which case the timer will only expire once unless it is manually restarted.
  *
  * @param xTimer The handle of the timer being updated.
@@ -1247,6 +1247,20 @@ const char * pcTimerGetName( TimerHandle_t xTimer ) PRIVILEGED_FUNCTION; /*lint 
  * enter the dormant state after it expires.
  */
 void vTimerSetReloadMode( TimerHandle_t xTimer, const UBaseType_t uxAutoReload ) PRIVILEGED_FUNCTION;
+
+/**
+* UBaseType_t uxTimerGetReloadMode( TimerHandle_t xTimer );
+*
+* Queries a timer to determine if it is an auto-reload timer, in which case the timer
+* automatically resets itself each time it expires, or a one-shot timer, in
+* which case the timer will only expire once unless it is manually restarted.
+*
+* @param xTimer The handle of the timer being queried.
+*
+* @return If the timer is an auto-reload timer then pdTRUE is returned, otherwise
+* pdFALSE is returned.
+*/
+UBaseType_t uxTimerGetReloadMode( TimerHandle_t xTimer ) PRIVILEGED_FUNCTION;
 
 /**
  * TickType_t xTimerGetPeriod( TimerHandle_t xTimer );
