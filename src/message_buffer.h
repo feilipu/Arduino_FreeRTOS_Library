@@ -62,8 +62,8 @@
 #ifndef FREERTOS_MESSAGE_BUFFER_H
 #define FREERTOS_MESSAGE_BUFFER_H
 
-#ifndef INC_FREERTOS_H
-	#error "include FreeRTOS.h must appear in source files before include message_buffer.h"
+#ifndef INC_ARDUINO_FREERTOS_H
+	#error "include Arduino_FreeRTOS.h must appear in source files before include message_buffer.h"
 #endif
 
 /* Message buffers are built onto of stream buffers. */
