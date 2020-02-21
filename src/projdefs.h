@@ -38,7 +38,11 @@ typedef void (*TaskFunction_t)( void * );
 overridden by a macro of the same name defined in FreeRTOSConfig.h in case the
 definition here is not suitable for your application. */
 #ifndef pdMS_TO_TICKS
-    #define pdMS_TO_TICKS( xTimeInMs ) ( ( TickType_t ) ( ( ( xTimeInMs ) * (uint32_t) configTICK_RATE_HZ ) / 1000 ) )
+#if configUSE_16_BIT_TICKS == 1
+    #define pdMS_TO_TICKS( xTimeInMs ) ( ( TickType_t ) ( ( ( TickType_t ) ( xTimeInMs ) * ( uint32_t ) configTICK_RATE_HZ ) / ( TickType_t ) 1000 ) )
+#else
+    #define pdMS_TO_TICKS( xTimeInMs ) ( ( TickType_t ) ( ( ( TickType_t ) ( xTimeInMs ) * ( TickType_t ) configTICK_RATE_HZ ) / ( TickType_t ) 1000 ) )
+#endif
 #endif
 
 #define pdFALSE         ( ( BaseType_t ) 0 )
@@ -59,7 +63,7 @@ definition here is not suitable for your application. */
     #define configUSE_LIST_DATA_INTEGRITY_CHECK_BYTES 0
 #endif
 
-#if( configUSE_16_BIT_TICKS == 1 )
+#if configUSE_16_BIT_TICKS == 1
     #define pdINTEGRITY_CHECK_VALUE 0x5a5a
 #else
     #define pdINTEGRITY_CHECK_VALUE 0x5a5a5a5aUL
