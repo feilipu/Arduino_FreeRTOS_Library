@@ -55,7 +55,7 @@ typedef portSTACK_TYPE StackType_t;
 typedef signed char BaseType_t;
 typedef unsigned char UBaseType_t;
 
-#if( configUSE_16_BIT_TICKS == 1 )
+#if configUSE_16_BIT_TICKS == 1
     typedef uint16_t TickType_t;
     #define portMAX_DELAY ( TickType_t ) 0xffff
 #else

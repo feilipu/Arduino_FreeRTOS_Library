@@ -66,7 +66,7 @@
 	#error "include Arduino_FreeRTOS.h must appear in source files before include message_buffer.h"
 #endif
 
-/* Message buffers are built onto of stream buffers. */
+/* Message buffers are built on top of stream buffers. */
 #include "stream_buffer.h"
 
 #if defined( __cplusplus )
