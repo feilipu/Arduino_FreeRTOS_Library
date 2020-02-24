@@ -326,11 +326,7 @@ typedef struct TaskControlBlock_t
         int iTaskErrno;
     #endif
 
-} tskTCB;
-
-/* The old tskTCB name is maintained above then typedefed to the new TCB_t name
-below to enable the use of older kernel aware debuggers. */
-typedef tskTCB TCB_t;
+} TCB_t;
 
 /*lint -save -e956 A manual analysis and inspection has been used to determine
 which static variables must be declared volatile. */
