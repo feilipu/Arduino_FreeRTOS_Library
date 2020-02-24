@@ -61,7 +61,7 @@ void initVariant(void);
 void vApplicationIdleHook( void );
 
 void vApplicationMallocFailedHook( void );
-void vApplicationStackOverflowHook( TaskHandle_t xTask, portCHAR *pcTaskName );
+void vApplicationStackOverflowHook( TaskHandle_t xTask, char *pcTaskName );
 
 void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer,
                                     StackType_t **ppxIdleTaskStackBuffer,

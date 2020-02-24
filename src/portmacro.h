@@ -43,17 +43,10 @@ extern "C" {
  */
 
 /* Type definitions. */
-#define portCHAR        char
-#define portFLOAT       float
-#define portDOUBLE      double
-#define portLONG        long
-#define portSHORT       int
-#define portSTACK_TYPE  uint8_t
-#define portBASE_TYPE   uint8_t
 
-typedef portSTACK_TYPE StackType_t;
-typedef signed char BaseType_t;
-typedef unsigned char UBaseType_t;
+typedef uint8_t StackType_t;
+typedef int8_t BaseType_t;
+typedef uint8_t UBaseType_t;
 
 #if configUSE_16_BIT_TICKS == 1
     typedef uint16_t TickType_t;

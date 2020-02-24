@@ -32,7 +32,7 @@ void setup() {
   // Now set up two Tasks to run independently.
   xTaskCreate(
     TaskDigitalRead
-    ,  (const portCHAR *)"DigitalRead"  // A name just for humans
+    ,  "DigitalRead"  // A name just for humans
     ,  128  // This stack size can be checked & adjusted by reading the Stack Highwater
     ,  NULL
     ,  2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
@@ -40,7 +40,7 @@ void setup() {
 
   xTaskCreate(
     TaskAnalogRead
-    ,  (const portCHAR *) "AnalogRead"
+    ,  "AnalogRead"
     ,  128  // Stack size
     ,  NULL
     ,  1  // Priority

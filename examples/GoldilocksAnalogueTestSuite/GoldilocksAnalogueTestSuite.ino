@@ -178,7 +178,7 @@ void setup() {
   // Now set up two tasks to help us with testing.
   xTaskCreate(
     TaskReport
-    ,  (const portCHAR *)"RedLED" // report reguarly on the status of its stack and the tick values.
+    ,  "RedLED" // report reguarly on the status of its stack and the tick values.
     ,  256        // Stack size
     ,  NULL
     ,  2          // priority
@@ -186,7 +186,7 @@ void setup() {
 
   xTaskCreate(
     TaskAnalogue
-    ,  (const portCHAR *) "Analogue"
+    ,  "Analogue"
     ,  256        // This stack size can be checked & adjusted by reading Highwater
     ,  NULL
     ,  1          // priority
