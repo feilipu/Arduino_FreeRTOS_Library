@@ -796,7 +796,7 @@ BaseType_t xMessageBufferReceiveCompletedFromISR( MessageBufferHandle_t xStreamB
 #define xMessageBufferReceiveCompletedFromISR( xMessageBuffer, pxHigherPriorityTaskWoken ) xStreamBufferReceiveCompletedFromISR( ( StreamBufferHandle_t ) xMessageBuffer, pxHigherPriorityTaskWoken )
 
 #if defined( __cplusplus )
-} /* extern "C" */
+}
 #endif
 
 #endif	/* !defined( FREERTOS_MESSAGE_BUFFER_H ) */
