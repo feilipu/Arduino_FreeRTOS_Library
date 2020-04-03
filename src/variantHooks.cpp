@@ -23,6 +23,7 @@
  * This file is NOT part of the FreeRTOS distribution.
  *
  */
+#include <stdlib.h>
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -45,6 +46,10 @@ extern void loop(void);
 void initVariant(void) __attribute__ ((OS_main));
 void initVariant(void)
 {
+    // as the Task stacks are usually on heap before memory within the task, the normal
+    // __malloc_heap_end = 0 doesn't work. Allow for a minimal initial stack only.
+    __malloc_heap_end = (char *)(RAMEND - configMINIMAL_STACK_SIZE);
+
 #if defined(USBCON)
     USBDevice.attach();
 #endif
