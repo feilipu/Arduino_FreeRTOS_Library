@@ -111,6 +111,14 @@ extern void vPortYield( void )          __attribute__ ( ( naked ) );
 
 #define portTASK_FUNCTION( vFunction, pvParameters ) void vFunction( void *pvParameters )
 
+/* Tickless idle/low power functionality. */
+#if( configUSE_TICKLESS_IDLE > 0 )
+    #ifndef portSUPPRESS_TICKS_AND_SLEEP
+        extern void vPortSuppressTicksAndSleep(TickType_t xExpectedIdleTime);
+        #define portSUPPRESS_TICKS_AND_SLEEP(xExpectedIdleTime) vPortSuppressTicksAndSleep(xExpectedIdleTime)
+    #endif
+#endif
+
 #ifdef __cplusplus
 }
 #endif
