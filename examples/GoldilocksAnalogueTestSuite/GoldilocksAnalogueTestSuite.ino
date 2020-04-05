@@ -20,7 +20,7 @@
 #include <semphr.h>
 
 // From Library: AVR Real Time Clock Library
-#include <Arduino_RTC.h>
+#include <AVR_RTC.h>
 
 // From Library: Goldilocks Analogue DAC Library
 #include <DAC.h>
