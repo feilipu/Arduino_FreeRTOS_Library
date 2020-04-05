@@ -19,9 +19,8 @@
 #include <Arduino_FreeRTOS.h>
 #include <semphr.h>
 
-// From Library: AVR Standard C Time Library
-#include <ephemera_common.h>
-#include <time.h>
+// From Library: AVR Real Time Clock Library
+#include <Arduino_RTC.h>
 
 // From Library: Goldilocks Analogue DAC Library
 #include <DAC.h>
@@ -92,7 +91,7 @@ void setup() {
     CurrTimeDate.tm_min = (uint8_t)     16;
     CurrTimeDate.tm_sec = (uint8_t)     0;
 
-    set_system_time( mktime( (ptm)&CurrTimeDate));
+    set_system_time( mktime( (tm*)&CurrTimeDate ) );
   }
 
   // Semaphores are useful to stop a task proceeding, where it should be stopped because it is using a resource, such as the Serial port.
