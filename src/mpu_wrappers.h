@@ -176,22 +176,10 @@ only for ports that are using the MPU. */
 
 #else /* portUSING_MPU_WRAPPERS */
 
-#if defined(__AVR_ATmega2560__) || defined(__AVR_ATmega2561__)    // Mega with 2560
     #define PRIVILEGED_FUNCTION     __attribute__ ((hot))
     #define PRIVILEGED_DATA
     #define FREERTOS_SYSTEM_CALL    __attribute__ ((hot))
     #define portUSING_MPU_WRAPPERS 0
-#elif defined(__AVR_ATmega640__) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega1281__) || defined(__AVR_ATmega664P__) || defined(__AVR_ATmega1284P__) || defined(__AVR_ATmega1284PA__) // Goldilocks with 1284p
-    #define PRIVILEGED_FUNCTION     __attribute__ ((hot))
-    #define PRIVILEGED_DATA
-    #define FREERTOS_SYSTEM_CALL    __attribute__ ((hot))
-    #define portUSING_MPU_WRAPPERS 0
-#else                                                            // Uno with 328p or Leonardo with 32u4
-    #define PRIVILEGED_FUNCTION     __attribute__ ((hot))
-    #define PRIVILEGED_DATA
-    #define FREERTOS_SYSTEM_CALL    __attribute__ ((hot))
-    #define portUSING_MPU_WRAPPERS 0
-#endif
 
 #endif /* portUSING_MPU_WRAPPERS */
 
