@@ -74,4 +74,15 @@ Testing with the Software Serial library shows some incompatibilities at low bau
 * `FreeRTOSVariant.h` : Contains the AVR specific configurations for this port of freeRTOS.
 * `heap_3.c` : Contains the heap allocation scheme based on `malloc()`. Other schemes are available, but depend on user configuration for specific MCU choice.
 
+### PlatformIO
+
+[Arduino FreeRTOS](https://platformio.org/lib/show/507/FreeRTOS) is available in the [PlatformIO library manager](https://docs.platformio.org/en/latest/librarymanager/index.html) for use in a [PlatformIO project](https://docs.platformio.org/en/latest/projectconf/index.html).
+
+Watchdog period is configurable using build-flags:
+
+```python
+build_flags =
+  -DportUSE_WDTO=WDTO_15MS
+
+```
 
