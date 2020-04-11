@@ -76,12 +76,11 @@ typedef uint8_t                     UBaseType_t;
 
 #define portDISABLE_INTERRUPTS()    __asm__ __volatile__ ( "cli" ::: "memory")
 #define portENABLE_INTERRUPTS()     __asm__ __volatile__ ( "sei" ::: "memory")
-
 /*-----------------------------------------------------------*/
 
 /* Architecture specifics. */
 
-#define sleep_reset()                   do { _SLEEP_CONTROL_REG = 0; } while(0)     // reset all sleep_mode() configurations.
+#define sleep_reset()                   do { _SLEEP_CONTROL_REG = 0; } while(0)     /* reset all sleep_mode() configurations. */
 
 #define portSTACK_GROWTH            ( -1 )
 
