@@ -65,7 +65,8 @@ Testing with the Software Serial library shows some incompatibilities at low bau
   * ATmega1284p @ 24.576MHz : Seeed Studio Goldilocks, Seeed Studio Goldilocks Analogue
   * ATmega2560 @ 16MHz : Arduino Mega, Arduino ADK
   * ATmega2560 @ 16MHz : Seeed Studio ADK
-  * ATmegaXXXX @ XXMHz : Anything with an ATmega MCU, really.
+  
+The new megaAVR 0-Series devices are not compatible with this library. They are not yet supported by avr-libc and their interrupt structure is substantially different to previous devices. It may be a while until the avr-libc is updated, but when that happens further support can be added.
 
 ## Files & Configuration
 
