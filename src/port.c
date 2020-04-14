@@ -529,7 +529,7 @@ void vPortYieldFromTick( void )
     }
     portRESTORE_CONTEXT();
 
-    __asm__ __volatile__ ( "reti" );
+    __asm__ __volatile__ ( "ret" );
 }
 /*-----------------------------------------------------------*/
 
@@ -562,6 +562,7 @@ void prvSetupTimerInterrupt( void )
     ISR(portSCHEDULER_ISR)
     {
         vPortYieldFromTick();
+        __asm__ __volatile__ ( "reti" );
     }
 #else
 
