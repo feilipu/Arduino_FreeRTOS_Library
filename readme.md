@@ -66,7 +66,7 @@ Testing with the Software Serial library shows some incompatibilities at low bau
   * ATmega2560 @ 16MHz : Arduino Mega, Arduino ADK
   * ATmega2560 @ 16MHz : Seeed Studio ADK
   
-The new megaAVR 0-Series devices are not compatible with this library. They are not yet supported by avr-libc and their interrupt structure is substantially different to previous devices. It may be a while until the avr-libc is updated, but when that happens further support can be added.
+The new megaAVR 0-Series devices (eg. ATmega4809) are not fully compatible with this library. Their Timer configuration and structure is substantially different from previous devices, and forms part of a new __avr8x__ architecture. It may be a while until avr-libc is updated to include support, but when that happens further workd can be added here.
 
 ## Files & Configuration
 
