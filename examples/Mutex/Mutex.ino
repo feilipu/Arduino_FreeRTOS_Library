@@ -7,7 +7,7 @@
 #include <Arduino_FreeRTOS.h>
 
 
-// Include mutex supoport
+// Include mutex support
 #include <semphr.h>
 
 /*
