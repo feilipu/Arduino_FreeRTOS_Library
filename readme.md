@@ -11,13 +11,14 @@ The canonical source for information is the [FreeRTOS Web Site](https://www.free
 
 My other [AVRfreeRTOS Sourceforge Repository](https://sourceforge.net/projects/avrfreertos/) or [AVRfreeRTOS Github](https://github.com/feilipu/avrfreertos) has plenty of examples, ranging from [blink](https://sourceforge.net/projects/avrfreertos/files/MegaBlink/) through to a [synthesiser](https://sourceforge.net/projects/avrfreertos/files/GA_Synth/).
 
+This library was the genesis of [generalised support for the ATmega platform within FreeRTOS](https://github.com/FreeRTOS/FreeRTOS-Kernel/pull/48).
+
 ## General
 
 FreeRTOS has a multitude of configuration options, which can be specified from within the FreeRTOSConfig.h file.
 To keep commonality with all of the Arduino hardware options, some sensible defaults have been selected.
 
-The AVR Watchdog Timer is used to generate 15ms time slices, but Tasks that finish before their allocated time will hand execution back to the Scheduler.
-This does not affect the use of any of the normal Timer functions in Arduino.
+The AVR Watchdog Timer is used to generate 15ms time slices, but Tasks that finish before their allocated time will hand execution back to the Scheduler. This does not affect the use of any of the normal Timer functions in Arduino.
 
 Time slices can be selected from 15ms up to 500ms. Slower time slicing can allow the Arduino MCU to sleep for longer, without the complexity of a Tickless idle.
 
@@ -28,6 +29,8 @@ Watchdog period options:
 * `WDTO_120MS`
 * `WDTO_250MS`
 * `WDTO_500MS`
+* `WDTO_1S`
+* `WDTO_2S`
 
 Note that Timer resolution is affected by integer math division and the time slice selected. Trying to measure 50ms, using a 120ms time slice for example, won't work.
 
@@ -66,7 +69,7 @@ Testing with the Software Serial library shows some incompatibilities at low bau
   * ATmega2560 @ 16MHz : Arduino Mega, Arduino ADK
   * ATmega2560 @ 16MHz : Seeed Studio ADK
   
-The new megaAVR 0-Series devices (eg. ATmega4809) are not fully compatible with this library. Their Timer configuration and structure is substantially different from previous devices, and forms part of a new __avr8x__ architecture. It may be a while until avr-libc is updated to include support, but when that happens further workd can be added here.
+The new megaAVR 0-Series devices (eg. ATmega4809) are not fully compatible with this library. Their Timer configuration is substantially different from previous devices, and forms part of a new __avr8x__ architecture. It may be a while until avr-libc is updated to include support for megaAVR devices, but when that happens further work will be added here.
 
 ## Files & Configuration
 
@@ -84,6 +87,5 @@ Watchdog period is configurable using build-flags:
 ```python
 build_flags =
   -DportUSE_WDTO=WDTO_15MS
-
 ```
 
