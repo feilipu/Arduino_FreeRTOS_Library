@@ -106,4 +106,28 @@ to exclude the API function. */
 #define configMAX(a,b)  ({ __typeof__ (a) _a = (a); __typeof__ (b) _b = (b); _a > _b ? _a : _b; })
 #define configMIN(a,b)  ({ __typeof__ (a) _a = (a); __typeof__ (b) _b = (b); _a < _b ? _a : _b; })
 
+/**
+ * configASSERT macro: https://www.freertos.org/a00110.html#configASSERT
+ */
+#ifndef configASSERT
+    /**
+     * Enable configASSERT macro by default if it is not defined.
+     */
+    #ifndef configDEFAULT_ASSERT
+        #define configDEFAULT_ASSERT 1
+    #endif
+
+    /**
+     * Define a hook method for configASSERT macro if configASSERT is enabled.
+     */
+    #if configDEFAULT_ASSERT == 1
+        extern void vApplicationAssertHook();
+        #define configASSERT( x ) if (( x ) == 0) { vApplicationAssertHook(); }
+    #endif
+
+#else
+    #define configDEFAULT_ASSERT 0
+#endif
+
+
 #endif /* FREERTOS_CONFIG_H */
