@@ -159,9 +159,7 @@ void vApplicationMallocFailedHook( void )
     for(;;)
     {
         _delay_ms(50);
-
         prvBlinkMainLed(); // Main LED fast blink.
-
     }
 }
 
@@ -257,15 +255,13 @@ void vApplicationAssertHook() {
         prvBlinkMainLed(); // Led off.
 
         _delay_ms(2000);
-        
-        prvBlinkMainLed(); // Led on.
-        _delay_ms(100);
-
-        prvBlinkMainLed(); // Lef off
-        _delay_ms(100);
-        
         prvBlinkMainLed(); // Led on.
 
+        _delay_ms(100);
+        prvBlinkMainLed(); // Led off
+
+        _delay_ms(100);
+        prvBlinkMainLed(); // Led on.
     }
 }
 #endif
