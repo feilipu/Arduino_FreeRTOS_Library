@@ -77,6 +77,8 @@ void vApplicationIdleHook( void )
     if (serialEventRun) serialEventRun();
 }
 
+#else
+    void loop() {} //Empty loop function
 #endif /* configUSE_IDLE_HOOK == 1 */
 /*-----------------------------------------------------------*/
 
