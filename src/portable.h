@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.3.0
+ * FreeRTOS Kernel V10.4.1
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -19,49 +19,48 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * http://www.FreeRTOS.org
- * http://aws.amazon.com/freertos
+ * https://www.FreeRTOS.org
+ * https://github.com/FreeRTOS
  *
- * 1 tab == 4 spaces!
  */
 
 /*-----------------------------------------------------------
- * Portable layer API.  Each function must be defined for each port.
- *----------------------------------------------------------*/
+* Portable layer API.  Each function must be defined for each port.
+*----------------------------------------------------------*/
 
 #ifndef PORTABLE_H
 #define PORTABLE_H
 
 /* Each FreeRTOS port has a unique portmacro.h header file.  Originally a
-pre-processor definition was used to ensure the pre-processor found the correct
-portmacro.h file for the port being used.  That scheme was deprecated in favour
-of setting the compiler's include path such that it found the correct
-portmacro.h file - removing the need for the constant and allowing the
-portmacro.h file to be located anywhere in relation to the port being used.
-Purely for reasons of backward compatibility the old method is still valid, but
-to make it clear that new projects should not use it, support for the port
-specific constants has been moved into the deprecated_definitions.h header
-file. */
+ * pre-processor definition was used to ensure the pre-processor found the correct
+ * portmacro.h file for the port being used.  That scheme was deprecated in favour
+ * of setting the compiler's include path such that it found the correct
+ * portmacro.h file - removing the need for the constant and allowing the
+ * portmacro.h file to be located anywhere in relation to the port being used.
+ * Purely for reasons of backward compatibility the old method is still valid, but
+ * to make it clear that new projects should not use it, support for the port
+ * specific constants has been moved into the deprecated_definitions.h header
+ * file. */
 //#include "deprecated_definitions.h"
 
 /* If portENTER_CRITICAL is not defined then including deprecated_definitions.h
-did not result in a portmacro.h header file being included - and it should be
-included here.  In this case the path to the correct portmacro.h header file
-must be set in the compiler's include path. */
+ * did not result in a portmacro.h header file being included - and it should be
+ * included here.  In this case the path to the correct portmacro.h header file
+ * must be set in the compiler's include path. */
 #ifndef portENTER_CRITICAL
-#include "portmacro.h"
+    #include "portmacro.h"
 #endif
 
 #if portBYTE_ALIGNMENT == 32
-    #define portBYTE_ALIGNMENT_MASK ( 0x001f )
+    #define portBYTE_ALIGNMENT_MASK    ( 0x001f )
 #endif
 
 #if portBYTE_ALIGNMENT == 16
-    #define portBYTE_ALIGNMENT_MASK ( 0x000f )
+    #define portBYTE_ALIGNMENT_MASK    ( 0x000f )
 #endif
 
 #if portBYTE_ALIGNMENT == 8
-    #define portBYTE_ALIGNMENT_MASK ( 0x0007 )
+    #define portBYTE_ALIGNMENT_MASK    ( 0x0007 )
 #endif
 
 #if portBYTE_ALIGNMENT == 4
@@ -81,145 +80,22 @@ must be set in the compiler's include path. */
 #endif
 
 #ifndef portNUM_CONFIGURABLE_REGIONS
-    #define portNUM_CONFIGURABLE_REGIONS 1
+    #define portNUM_CONFIGURABLE_REGIONS    1
 #endif
 
 #ifndef portHAS_STACK_OVERFLOW_CHECKING
-    #define portHAS_STACK_OVERFLOW_CHECKING 0
+    #define portHAS_STACK_OVERFLOW_CHECKING    0
 #endif
 
 #ifndef portARCH_NAME
-    #define portARCH_NAME NULL
+    #define portARCH_NAME    NULL
 #endif
 
+/* *INDENT-OFF* */
 #ifdef __cplusplus
-extern "C" {
+    extern "C" {
 #endif
-
-/*-----------------------------------------------------------*/
-
-#include <avr/wdt.h>
-
-/**
-    Enable the watchdog timer, configuring it for expire after
-    (value) timeout (which is a combination of the WDP0
-    through WDP3 bits).
-
-    This function is derived from <avr/wdt.h> but enables only
-    the interrupt bit (WDIE), rather than the reset bit (WDE).
-
-    Can't find it documented but the WDT, once enabled,
-    rolls over and fires a new interrupt each time.
-
-    See also the symbolic constants WDTO_15MS et al.
-
-    Updated to match avr-libc 2.0.0
-*/
-
-static __inline__
-__attribute__ ((__always_inline__))
-void wdt_interrupt_enable (const uint8_t value)
-{
-    if (_SFR_IO_REG_P (_WD_CONTROL_REG))
-    {
-        __asm__ __volatile__ (
-                "in __tmp_reg__,__SREG__"   "\n\t"
-                "cli"                       "\n\t"
-                "wdr"                       "\n\t"
-                "out %0, %1"                "\n\t"
-                "out __SREG__,__tmp_reg__"  "\n\t"
-                "out %0, %2"                "\n\t"
-                : /* no outputs */
-                : "I" (_SFR_IO_ADDR(_WD_CONTROL_REG)),
-                "r" ((uint8_t)(_BV(_WD_CHANGE_BIT) | _BV(WDE))),
-                "r" ((uint8_t) ((value & 0x08 ? _WD_PS3_MASK : 0x00) |
-                        _BV(WDIF) | _BV(WDIE) | (value & 0x07)) )
-                : "r0"
-        );
-    }
-    else
-    {
-        __asm__ __volatile__ (
-                "in __tmp_reg__,__SREG__"   "\n\t"
-                "cli"                       "\n\t"
-                "wdr"                       "\n\t"
-                "sts %0, %1"                "\n\t"
-                "out __SREG__,__tmp_reg__"  "\n\t"
-                "sts %0, %2"                "\n\t"
-                : /* no outputs */
-                : "n" (_SFR_MEM_ADDR(_WD_CONTROL_REG)),
-                "r" ((uint8_t)(_BV(_WD_CHANGE_BIT) | _BV(WDE))),
-                "r" ((uint8_t) ((value & 0x08 ? _WD_PS3_MASK : 0x00) |
-                        _BV(WDIF) | _BV(WDIE) | (value & 0x07)) )
-                : "r0"
-        );
-    }
-}
-
-/*-----------------------------------------------------------*/
-/**
-    Enable the watchdog timer, configuring it for expire after
-    (value) timeout (which is a combination of the WDP0
-    through WDP3 bits).
-
-    This function is derived from <avr/wdt.h> but enables both
-    the reset bit (WDE), and the interrupt bit (WDIE).
-
-    This will ensure that if the interrupt is not serviced
-    before the second timeout, the AVR will reset.
-
-    Servicing the interrupt automatically clears it,
-    and ensures the AVR does not reset.
-
-    Can't find it documented but the WDT, once enabled,
-    rolls over and fires a new interrupt each time.
-
-    See also the symbolic constants WDTO_15MS et al.
-
-    Updated to match avr-libc 2.0.0
-*/
-
-static __inline__
-__attribute__ ((__always_inline__))
-void wdt_interrupt_reset_enable (const uint8_t value)
-{
-    if (_SFR_IO_REG_P (_WD_CONTROL_REG))
-    {
-        __asm__ __volatile__ (
-                "in __tmp_reg__,__SREG__"   "\n\t"
-                "cli"                       "\n\t"
-                "wdr"                       "\n\t"
-                "out %0, %1"                "\n\t"
-                "out __SREG__,__tmp_reg__"  "\n\t"
-                "out %0, %2"                "\n\t"
-                : /* no outputs */
-                : "I" (_SFR_IO_ADDR(_WD_CONTROL_REG)),
-                "r" ((uint8_t)(_BV(_WD_CHANGE_BIT) | _BV(WDE))),
-                "r" ((uint8_t) ((value & 0x08 ? _WD_PS3_MASK : 0x00) |
-                        _BV(WDIF) | _BV(WDIE) | _BV(WDE) | (value & 0x07)) )
-                : "r0"
-        );
-    }
-    else
-    {
-        __asm__ __volatile__ (
-                "in __tmp_reg__,__SREG__"   "\n\t"
-                "cli"                       "\n\t"
-                "wdr"                       "\n\t"
-                "sts %0, %1"                "\n\t"
-                "out __SREG__,__tmp_reg__"  "\n\t"
-                "sts %0, %2"                "\n\t"
-                : /* no outputs */
-                : "n" (_SFR_MEM_ADDR(_WD_CONTROL_REG)),
-                "r" ((uint8_t)(_BV(_WD_CHANGE_BIT) | _BV(WDE))),
-                "r" ((uint8_t) ((value & 0x08 ? _WD_PS3_MASK : 0x00) |
-                        _BV(WDIF) | _BV(WDIE) | _BV(WDE) | (value & 0x07)) )
-                : "r0"
-        );
-    }
-}
-
-/*-----------------------------------------------------------*/
+/* *INDENT-ON* */
 
 #include "mpu_wrappers.h"
 
@@ -229,38 +105,50 @@ void wdt_interrupt_reset_enable (const uint8_t value)
  * the order that the port expects to find them.
  *
  */
-#if( portUSING_MPU_WRAPPERS == 1 )
-    #if( portHAS_STACK_OVERFLOW_CHECKING == 1 )
-        StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, StackType_t *pxEndOfStack, TaskFunction_t pxCode, void *pvParameters, BaseType_t xRunPrivileged ) PRIVILEGED_FUNCTION;
+#if ( portUSING_MPU_WRAPPERS == 1 )
+    #if ( portHAS_STACK_OVERFLOW_CHECKING == 1 )
+        StackType_t * pxPortInitialiseStack( StackType_t * pxTopOfStack,
+                                             StackType_t * pxEndOfStack,
+                                             TaskFunction_t pxCode,
+                                             void * pvParameters,
+                                             BaseType_t xRunPrivileged ) PRIVILEGED_FUNCTION;
     #else
-    StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t pxCode, void *pvParameters, BaseType_t xRunPrivileged ) PRIVILEGED_FUNCTION;
+        StackType_t * pxPortInitialiseStack( StackType_t * pxTopOfStack,
+                                             TaskFunction_t pxCode,
+                                             void * pvParameters,
+                                             BaseType_t xRunPrivileged ) PRIVILEGED_FUNCTION;
     #endif
-#else
-    #if( portHAS_STACK_OVERFLOW_CHECKING == 1 )
-        StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, StackType_t *pxEndOfStack, TaskFunction_t pxCode, void *pvParameters ) PRIVILEGED_FUNCTION;
-#else
-    StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t pxCode, void *pvParameters ) PRIVILEGED_FUNCTION;
-#endif
-#endif
+#else /* if ( portUSING_MPU_WRAPPERS == 1 ) */
+    #if ( portHAS_STACK_OVERFLOW_CHECKING == 1 )
+        StackType_t * pxPortInitialiseStack( StackType_t * pxTopOfStack,
+                                             StackType_t * pxEndOfStack,
+                                             TaskFunction_t pxCode,
+                                             void * pvParameters ) PRIVILEGED_FUNCTION;
+    #else
+        StackType_t * pxPortInitialiseStack( StackType_t * pxTopOfStack,
+                                             TaskFunction_t pxCode,
+                                             void * pvParameters ) PRIVILEGED_FUNCTION;
+    #endif
+#endif /* if ( portUSING_MPU_WRAPPERS == 1 ) */
 
 /* Used by heap_5.c to define the start address and size of each memory region
-that together comprise the total FreeRTOS heap space. */
+ * that together comprise the total FreeRTOS heap space. */
 typedef struct HeapRegion
 {
-    uint8_t *pucStartAddress;
+    uint8_t * pucStartAddress;
     size_t xSizeInBytes;
 } HeapRegion_t;
 
 /* Used to pass information about the heap out of vPortGetHeapStats(). */
 typedef struct xHeapStats
 {
-    size_t xAvailableHeapSpaceInBytes;      /* The total heap size currently available - this is the sum of all the free blocks, not the largest block that can be allocated. */
-    size_t xSizeOfLargestFreeBlockInBytes;  /* The maximum size, in bytes, of all the free blocks within the heap at the time vPortGetHeapStats() is called. */
-    size_t xSizeOfSmallestFreeBlockInBytes; /* The minimum size, in bytes, of all the free blocks within the heap at the time vPortGetHeapStats() is called. */
-    size_t xNumberOfFreeBlocks;             /* The number of free memory blocks within the heap at the time vPortGetHeapStats() is called. */
-    size_t xMinimumEverFreeBytesRemaining;  /* The minimum amount of total free memory (sum of all free blocks) there has been in the heap since the system booted. */
-    size_t xNumberOfSuccessfulAllocations;  /* The number of calls to pvPortMalloc() that have returned a valid memory block. */
-    size_t xNumberOfSuccessfulFrees;        /* The number of calls to vPortFree() that has successfully freed a block of memory. */
+    size_t xAvailableHeapSpaceInBytes;          /* The total heap size currently available - this is the sum of all the free blocks, not the largest block that can be allocated. */
+    size_t xSizeOfLargestFreeBlockInBytes;      /* The maximum size, in bytes, of all the free blocks within the heap at the time vPortGetHeapStats() is called. */
+    size_t xSizeOfSmallestFreeBlockInBytes;     /* The minimum size, in bytes, of all the free blocks within the heap at the time vPortGetHeapStats() is called. */
+    size_t xNumberOfFreeBlocks;                 /* The number of free memory blocks within the heap at the time vPortGetHeapStats() is called. */
+    size_t xMinimumEverFreeBytesRemaining;      /* The minimum amount of total free memory (sum of all free blocks) there has been in the heap since the system booted. */
+    size_t xNumberOfSuccessfulAllocations;      /* The number of calls to pvPortMalloc() that have returned a valid memory block. */
+    size_t xNumberOfSuccessfulFrees;            /* The number of calls to vPortFree() that has successfully freed a block of memory. */
 } HeapStats_t;
 
 /*
@@ -280,13 +168,13 @@ void vPortDefineHeapRegions( const HeapRegion_t * const pxHeapRegions ) PRIVILEG
  * Returns a HeapStats_t structure filled with information about the current
  * heap state.
  */
-void vPortGetHeapStats( HeapStats_t *pxHeapStats );
+void vPortGetHeapStats( HeapStats_t * pxHeapStats );
 
 /*
  * Map to the memory management routines required for the port.
  */
-void *pvPortMalloc( size_t xSize ) PRIVILEGED_FUNCTION;
-void vPortFree( void *pv ) PRIVILEGED_FUNCTION;
+void * pvPortMalloc( size_t xSize ) PRIVILEGED_FUNCTION;
+void vPortFree( void * pv ) PRIVILEGED_FUNCTION;
 void vPortInitialiseBlocks( void ) PRIVILEGED_FUNCTION;
 size_t xPortGetFreeHeapSize( void ) PRIVILEGED_FUNCTION;
 size_t xPortGetMinimumEverFreeHeapSize( void ) PRIVILEGED_FUNCTION;
@@ -311,14 +199,18 @@ void vPortEndScheduler( void ) PRIVILEGED_FUNCTION;
  * Fills the xMPUSettings structure with the memory region information
  * contained in xRegions.
  */
-#if( portUSING_MPU_WRAPPERS == 1 )
+#if ( portUSING_MPU_WRAPPERS == 1 )
     struct xMEMORY_REGION;
-    void vPortStoreTaskMPUSettings( xMPU_SETTINGS *xMPUSettings, const struct xMEMORY_REGION * const xRegions, StackType_t *pxBottomOfStack, configSTACK_DEPTH_TYPE ulStackDepth ) PRIVILEGED_FUNCTION;
+    void vPortStoreTaskMPUSettings( xMPU_SETTINGS * xMPUSettings,
+                                    const struct xMEMORY_REGION * const xRegions,
+                                    StackType_t * pxBottomOfStack,
+                                    configSTACK_DEPTH_TYPE ulStackDepth ) PRIVILEGED_FUNCTION;
 #endif
 
+/* *INDENT-OFF* */
 #ifdef __cplusplus
-}
+    }
 #endif
+/* *INDENT-ON* */
 
 #endif /* PORTABLE_H */
-

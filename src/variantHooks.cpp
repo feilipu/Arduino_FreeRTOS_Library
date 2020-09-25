@@ -18,7 +18,6 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * 1 tab == 4 spaces!
  *
  * This file is NOT part of the FreeRTOS distribution.
  *
@@ -168,25 +167,14 @@ void vApplicationMallocFailedHook( void )
 
 
 #if ( configCHECK_FOR_STACK_OVERFLOW >= 1 )
-/*---------------------------------------------------------------------------*\
-Usage:
-   called by task system when a stack overflow is noticed
-Description:
-   Stack overflow handler -- Shut down all interrupts, send serious complaint
-    to command port. SLOW Blink on main LED.
-Arguments:
-   pxTask - pointer to task handle
-   pcTaskName - pointer to task name
-Results:
-   <none>
-Notes:
-   This routine will never return.
-   This routine is referenced in the task.c file of FreeRTOS as an extern.
-\*---------------------------------------------------------------------------*/
-void vApplicationStackOverflowHook( TaskHandle_t xTask, char *pcTaskName ) __attribute__((weak));
 
-void vApplicationStackOverflowHook( TaskHandle_t xTask __attribute__((unused)), char *pcTaskName __attribute__((unused)) )
+void vApplicationStackOverflowHook( TaskHandle_t xTask,
+                                    char * pcTaskName ) __attribute__((weak));
+
+void vApplicationStackOverflowHook( TaskHandle_t xTask __attribute__((unused)),
+                                    char * pcTaskName __attribute__((unused)) )
 {
+
     prvSetMainLedOn(); // Main LED on.
 
     for(;;)
@@ -201,13 +189,13 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask __attribute__((unused)), 
 
 #if ( configSUPPORT_STATIC_ALLOCATION >= 1 )
 
-void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer,
-                                    StackType_t **ppxIdleTaskStackBuffer,
-                                    configSTACK_DEPTH_TYPE *pulIdleTaskStackSize ) __attribute__((weak));
+void vApplicationGetIdleTaskMemory( StaticTask_t ** ppxIdleTaskTCBBuffer,
+                                    StackType_t ** ppxIdleTaskStackBuffer,
+                                    configSTACK_DEPTH_TYPE * pulIdleTaskStackSize ) __attribute__((weak));
 
-void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer,
-                                    StackType_t **ppxIdleTaskStackBuffer,
-                                    configSTACK_DEPTH_TYPE *pulIdleTaskStackSize )
+void vApplicationGetIdleTaskMemory( StaticTask_t ** ppxIdleTaskTCBBuffer,
+                                    StackType_t ** ppxIdleTaskStackBuffer,
+                                    configSTACK_DEPTH_TYPE * pulIdleTaskStackSize )
 {
     static StaticTask_t xIdleTaskTCB;
     static StackType_t uxIdleTaskStack[ configMINIMAL_STACK_SIZE ];
@@ -219,13 +207,13 @@ void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer,
 
 #if ( configUSE_TIMERS >= 1 )
 
-void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer,
-                                     StackType_t **ppxTimerTaskStackBuffer,
-                                     configSTACK_DEPTH_TYPE *pulTimerTaskStackSize ) __attribute__((weak));
+void vApplicationGetTimerTaskMemory( StaticTask_t ** ppxTimerTaskTCBBuffer,
+                                     StackType_t ** ppxTimerTaskStackBuffer,
+                                     configSTACK_DEPTH_TYPE * pulTimerTaskStackSize ) __attribute__((weak));
 
-void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer,
-                                     StackType_t **ppxTimerTaskStackBuffer,
-                                     configSTACK_DEPTH_TYPE *pulTimerTaskStackSize )
+void vApplicationGetTimerTaskMemory( StaticTask_t ** ppxTimerTaskTCBBuffer,
+                                     StackType_t ** ppxTimerTaskStackBuffer,
+                                     configSTACK_DEPTH_TYPE * pulTimerTaskStackSize )
 {
     static StaticTask_t xTimerTaskTCB;
     static StackType_t uxTimerTaskStack[ configTIMER_TASK_STACK_DEPTH ];

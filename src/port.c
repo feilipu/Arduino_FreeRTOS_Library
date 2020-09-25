@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.3.0
+ * FreeRTOS Kernel V10.4.1
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -19,10 +19,9 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * http://www.FreeRTOS.org
- * http://aws.amazon.com/freertos
+ * https://www.FreeRTOS.org
+ * https://github.com/FreeRTOS
  *
- * 1 tab == 4 spaces!
  */
 
 
@@ -54,11 +53,145 @@ extern volatile TCB_t * volatile pxCurrentTCB;
 
 /*-----------------------------------------------------------*/
 
+/**
+    Enable the watchdog timer, configuring it for expire after
+    (value) timeout (which is a combination of the WDP0
+    through WDP3 bits).
+
+    This function is derived from <avr/wdt.h> but enables only
+    the interrupt bit (WDIE), rather than the reset bit (WDE).
+
+    Can't find it documented but the WDT, once enabled,
+    rolls over and fires a new interrupt each time.
+
+    See also the symbolic constants WDTO_15MS et al.
+
+    Updated to match avr-libc 2.0.0
+*/
+
+#if defined( portUSE_WDTO)
+
+static __inline__
+__attribute__ ((__always_inline__))
+void wdt_interrupt_enable (const uint8_t value)
+{
+    if (_SFR_IO_REG_P (_WD_CONTROL_REG))
+    {
+        __asm__ __volatile__ (
+                "in __tmp_reg__,__SREG__"   "\n\t"
+                "cli"                       "\n\t"
+                "wdr"                       "\n\t"
+                "out %0, %1"                "\n\t"
+                "out __SREG__,__tmp_reg__"  "\n\t"
+                "out %0, %2"                "\n\t"
+                : /* no outputs */
+                : "I" (_SFR_IO_ADDR(_WD_CONTROL_REG)),
+                "r" ((uint8_t)(_BV(_WD_CHANGE_BIT) | _BV(WDE))),
+                "r" ((uint8_t) ((value & 0x08 ? _WD_PS3_MASK : 0x00) |
+                        _BV(WDIF) | _BV(WDIE) | (value & 0x07)) )
+                : "r0"
+        );
+    }
+    else
+    {
+        __asm__ __volatile__ (
+                "in __tmp_reg__,__SREG__"   "\n\t"
+                "cli"                       "\n\t"
+                "wdr"                       "\n\t"
+                "sts %0, %1"                "\n\t"
+                "out __SREG__,__tmp_reg__"  "\n\t"
+                "sts %0, %2"                "\n\t"
+                : /* no outputs */
+                : "n" (_SFR_MEM_ADDR(_WD_CONTROL_REG)),
+                "r" ((uint8_t)(_BV(_WD_CHANGE_BIT) | _BV(WDE))),
+                "r" ((uint8_t) ((value & 0x08 ? _WD_PS3_MASK : 0x00) |
+                        _BV(WDIF) | _BV(WDIE) | (value & 0x07)) )
+                : "r0"
+        );
+    }
+}
+#endif
+
+/*-----------------------------------------------------------*/
+/**
+    Enable the watchdog timer, configuring it for expire after
+    (value) timeout (which is a combination of the WDP0
+    through WDP3 bits).
+
+    This function is derived from <avr/wdt.h> but enables both
+    the reset bit (WDE), and the interrupt bit (WDIE).
+
+    This will ensure that if the interrupt is not serviced
+    before the second timeout, the AVR will reset.
+
+    Servicing the interrupt automatically clears it,
+    and ensures the AVR does not reset.
+
+    Can't find it documented but the WDT, once enabled,
+    rolls over and fires a new interrupt each time.
+
+    See also the symbolic constants WDTO_15MS et al.
+
+    Updated to match avr-libc 2.0.0
+*/
+
+#if defined( portUSE_WDTO)
+
+static __inline__
+__attribute__ ((__always_inline__))
+void wdt_interrupt_reset_enable (const uint8_t value)
+{
+    if (_SFR_IO_REG_P (_WD_CONTROL_REG))
+    {
+        __asm__ __volatile__ (
+                "in __tmp_reg__,__SREG__"   "\n\t"
+                "cli"                       "\n\t"
+                "wdr"                       "\n\t"
+                "out %0, %1"                "\n\t"
+                "out __SREG__,__tmp_reg__"  "\n\t"
+                "out %0, %2"                "\n\t"
+                : /* no outputs */
+                : "I" (_SFR_IO_ADDR(_WD_CONTROL_REG)),
+                "r" ((uint8_t)(_BV(_WD_CHANGE_BIT) | _BV(WDE))),
+                "r" ((uint8_t) ((value & 0x08 ? _WD_PS3_MASK : 0x00) |
+                        _BV(WDIF) | _BV(WDIE) | _BV(WDE) | (value & 0x07)) )
+                : "r0"
+        );
+    }
+    else
+    {
+        __asm__ __volatile__ (
+                "in __tmp_reg__,__SREG__"   "\n\t"
+                "cli"                       "\n\t"
+                "wdr"                       "\n\t"
+                "sts %0, %1"                "\n\t"
+                "out __SREG__,__tmp_reg__"  "\n\t"
+                "sts %0, %2"                "\n\t"
+                : /* no outputs */
+                : "n" (_SFR_MEM_ADDR(_WD_CONTROL_REG)),
+                "r" ((uint8_t)(_BV(_WD_CHANGE_BIT) | _BV(WDE))),
+                "r" ((uint8_t) ((value & 0x08 ? _WD_PS3_MASK : 0x00) |
+                        _BV(WDIF) | _BV(WDIE) | _BV(WDE) | (value & 0x07)) )
+                : "r0"
+        );
+    }
+}
+#endif
+
+/*-----------------------------------------------------------*/
+/* actual number of ticks per second, after configuration. Not for RTC, which has 1 tick/second. */
+TickType_t portTickRateHz;
+
+/* remaining ticks in each second, decremented to enable the system_tick. Not for RTC, which has 1 tick/second. */
+volatile TickType_t ticksRemainingInSec;
+
+/*-----------------------------------------------------------*/
+
 /*
  * Macro to save all the general purpose registers, the save the stack pointer
  * into the TCB.
  *
- * The first thing we do is save the flags then disable interrupts.  This is to
+ * The first thing we do is save the flags then disable interrupts. This is to
  * guard our stack against having a context switch interrupt after we have already
  * pushed the registers onto the stack - causing the 32 registers to be on the
  * stack twice.
@@ -73,7 +206,7 @@ extern volatile TCB_t * volatile pxCurrentTCB;
  * #endif
  *
  * #if defined(__AVR_3_BYTE_PC__)
- * #define __EIND__  0x3C
+ * #define __EIND__ 0x3C
  * #endif
  *
  * The interrupts will have been disabled during the call to portSAVE_CONTEXT()
@@ -475,8 +608,8 @@ BaseType_t xPortStartScheduler( void )
 
 void vPortEndScheduler( void )
 {
-    /* It is unlikely that the AVR port will get stopped.  If required simply
-    disable the tick interrupt here. */
+	/* It is unlikely that the ATmega port will get stopped.  If required simply
+     * disable the tick interrupt here. */
 
         wdt_disable();      /* disable Watchdog Timer */
 }
@@ -581,4 +714,3 @@ void prvSetupTimerInterrupt( void )
         xTaskIncrementTick();
     }
 #endif
-
