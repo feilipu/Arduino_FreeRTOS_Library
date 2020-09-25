@@ -229,7 +229,7 @@
  * task should be used in place of the parameter.  This macro simply checks to
  * see if the parameter is NULL and returns a pointer to the appropriate TCB.
  */
-#define prvGetTCBFromHandle( pxHandle )    ( ( ( pxHandle ) == NULL ) ? pxCurrentTCB : ( TCB_t * )( pxHandle ) )
+#define prvGetTCBFromHandle( pxHandle )    ( ( ( pxHandle ) == NULL ) ? pxCurrentTCB : ( TCB_t * ) ( pxHandle ) )
 
 /* The item value of the event list item is normally used to hold the priority
  * of the task to which it belongs (coded to allow it to be held in reverse
@@ -1801,7 +1801,7 @@ static void prvAddNewTaskToReadyList( TCB_t * pxNewTCB )
     static BaseType_t prvTaskIsTaskSuspended( const TaskHandle_t xTask )
     {
         BaseType_t xReturn = pdFALSE;
-        const TCB_t * const pxTCB = ( TCB_t * )xTask;
+        const TCB_t * const pxTCB = ( TCB_t * ) xTask;
 
         /* Accesses xPendingReadyList so must be called from a critical
          * section. */
@@ -1846,7 +1846,7 @@ static void prvAddNewTaskToReadyList( TCB_t * pxNewTCB )
 
     void vTaskResume( TaskHandle_t xTaskToResume )
     {
-        TCB_t * const pxTCB = ( TCB_t * )xTaskToResume;
+        TCB_t * const pxTCB = ( TCB_t * ) xTaskToResume;
 
         /* It does not make sense to resume the calling task. */
         configASSERT( xTaskToResume );
@@ -1857,7 +1857,7 @@ static void prvAddNewTaskToReadyList( TCB_t * pxNewTCB )
         {
             taskENTER_CRITICAL();
             {
-                if( prvTaskIsTaskSuspended( ( TaskHandle_t )pxTCB ) != pdFALSE )
+                if( prvTaskIsTaskSuspended( ( TaskHandle_t ) pxTCB ) != pdFALSE )
                 {
                     traceTASK_RESUME( pxTCB );
 
@@ -1901,7 +1901,7 @@ static void prvAddNewTaskToReadyList( TCB_t * pxNewTCB )
     BaseType_t xTaskResumeFromISR( TaskHandle_t xTaskToResume )
     {
         BaseType_t xYieldRequired = pdFALSE;
-        TCB_t * const pxTCB = ( TCB_t * )xTaskToResume;
+        TCB_t * const pxTCB = ( TCB_t * ) xTaskToResume;
         UBaseType_t uxSavedInterruptStatus;
 
         configASSERT( xTaskToResume );
@@ -1926,7 +1926,7 @@ static void prvAddNewTaskToReadyList( TCB_t * pxNewTCB )
 
         uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
         {
-            if( prvTaskIsTaskSuspended( ( TaskHandle_t )pxTCB ) != pdFALSE )
+            if( prvTaskIsTaskSuspended( ( TaskHandle_t ) pxTCB ) != pdFALSE )
             {
                 traceTASK_RESUME_FROM_ISR( pxTCB );
 
@@ -3997,7 +3997,7 @@ static void prvResetNextTaskUnblockTime( void )
         /* A critical section is not required as this is not called from
          * an interrupt and the current TCB will always be the same for any
          * individual execution thread. */
-        xReturn = ( TaskHandle_t )pxCurrentTCB;
+        xReturn = ( TaskHandle_t ) pxCurrentTCB;
 
         return xReturn;
     }
@@ -4037,7 +4037,7 @@ static void prvResetNextTaskUnblockTime( void )
 
     BaseType_t xTaskPriorityInherit( TaskHandle_t const pxMutexHolder )
     {
-        TCB_t * const pxMutexHolderTCB = ( TCB_t * )pxMutexHolder;
+        TCB_t * const pxMutexHolderTCB = ( TCB_t * ) pxMutexHolder;
         BaseType_t xReturn = pdFALSE;
 
         /* If the mutex was given back by an interrupt while the queue was
@@ -4127,7 +4127,7 @@ static void prvResetNextTaskUnblockTime( void )
 
     BaseType_t xTaskPriorityDisinherit( TaskHandle_t const pxMutexHolder )
     {
-        TCB_t * const pxTCB = ( TCB_t * )pxMutexHolder;
+        TCB_t * const pxTCB = ( TCB_t * ) pxMutexHolder;
         BaseType_t xReturn = pdFALSE;
 
         if( pxMutexHolder != NULL )
@@ -4208,7 +4208,7 @@ static void prvResetNextTaskUnblockTime( void )
     void vTaskPriorityDisinheritAfterTimeout( TaskHandle_t const pxMutexHolder,
                                               UBaseType_t uxHighestPriorityWaitingTask )
     {
-        TCB_t * const pxTCB = ( TCB_t * )pxMutexHolder;
+        TCB_t * const pxTCB = ( TCB_t * ) pxMutexHolder;
         UBaseType_t uxPriorityUsedOnEntry, uxPriorityToUse;
         const UBaseType_t uxOnlyOneMutexHeld = ( UBaseType_t ) 1;
 
@@ -4655,7 +4655,7 @@ TickType_t uxTaskResetEventItemValue( void )
             ( pxCurrentTCB->uxMutexesHeld )++;
         }
 
-        return ( TaskHandle_t )pxCurrentTCB;
+        return ( TaskHandle_t ) pxCurrentTCB;
     }
 
 #endif /* configUSE_MUTEXES */
@@ -4833,7 +4833,7 @@ TickType_t uxTaskResetEventItemValue( void )
 
         configASSERT( uxIndexToNotify < configTASK_NOTIFICATION_ARRAY_ENTRIES );
         configASSERT( xTaskToNotify );
-        pxTCB = ( TCB_t * )xTaskToNotify;
+        pxTCB = ( TCB_t * ) xTaskToNotify;
 
         taskENTER_CRITICAL();
         {
@@ -4977,7 +4977,7 @@ TickType_t uxTaskResetEventItemValue( void )
          * https://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html */
         portASSERT_IF_INTERRUPT_PRIORITY_INVALID();
 
-        pxTCB = ( TCB_t * )xTaskToNotify;
+        pxTCB = ( TCB_t * ) xTaskToNotify;
 
         uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
         {
@@ -5112,7 +5112,7 @@ TickType_t uxTaskResetEventItemValue( void )
          * https://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html */
         portASSERT_IF_INTERRUPT_PRIORITY_INVALID();
 
-        pxTCB = ( TCB_t * )xTaskToNotify;
+        pxTCB = ( TCB_t * ) xTaskToNotify;
 
         uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
         {
