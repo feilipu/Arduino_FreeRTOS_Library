@@ -73,6 +73,6 @@ void TaskLed(void *pvParameters)
     if (xSemaphoreTake(interruptSemaphore, portMAX_DELAY) == pdPASS) {
       digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
     }
-    
+    vTaskDelay(10);
   }
 }
