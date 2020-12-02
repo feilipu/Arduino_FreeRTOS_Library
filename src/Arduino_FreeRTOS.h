@@ -927,9 +927,9 @@
 
 /* Definitions to allow backward compatibility with FreeRTOS versions prior to
  * V8 if desired. */
-//#ifndef configENABLE_BACKWARD_COMPATIBILITY
-//    #define configENABLE_BACKWARD_COMPATIBILITY    1
-//#endif
+#ifndef configENABLE_BACKWARD_COMPATIBILITY
+    #define configENABLE_BACKWARD_COMPATIBILITY    0
+#endif
 
 #ifndef configPRINTF
 
