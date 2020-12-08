@@ -1,0 +1,26 @@
+---
+name: Arduino CI
+
+on: [pull_request]
+
+jobs:
+  arduino_ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: Arduino-CI/action@v0.1.0
+        env:
+          # Not all libraries include examples or unit tests.  The default
+          #  behavior of arduino_ci is to assume that "if the files don't
+          #  exist, then they were not MEANT to exist".  In other words,
+          #  if you were to accidentally delete all your tests or example
+          #  sketches, then the CI runner would by default assume that was
+          #  intended and return a passing result.
+          #
+          # If you'd rather have the test runner fail the test in the
+          #  absence of either tests or examples, uncommenting either of
+          #  the following lines (as appropriate) will enforce that.
+
+          # EXPECT_EXAMPLES: true
+          # EXPECT_UNITTESTS: true
