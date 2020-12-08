@@ -21,6 +21,6 @@ jobs:
           # If you'd rather have the test runner fail the test in the
           #  absence of either tests or examples, uncommenting either of
           #  the following lines (as appropriate) will enforce that.
-
+          #
           # EXPECT_EXAMPLES: true
           # EXPECT_UNITTESTS: true
