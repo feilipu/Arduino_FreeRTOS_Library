@@ -22,5 +22,5 @@ jobs:
           #  absence of either tests or examples, uncommenting either of
           #  the following lines (as appropriate) will enforce that.
 
-          EXPECT_EXAMPLES: true
+          # EXPECT_EXAMPLES: true
           # EXPECT_UNITTESTS: true
