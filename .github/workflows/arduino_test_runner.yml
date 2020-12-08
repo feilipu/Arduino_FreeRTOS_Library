@@ -1,7 +1,7 @@
 ---
 name: Arduino CI
 
-on: [pull_request]
+on: [push, pull_request]
 
 jobs:
   arduino_ci:
