@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.4.1
+ * FreeRTOS Kernel V10.4.3
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -52,11 +52,12 @@
  * \ingroup FreeRTOSIntro
  */
 
+
 #ifndef LIST_H
 #define LIST_H
 
 #ifndef INC_ARDUINO_FREERTOS_H
-    #error Arduino_FreeRTOS.h must be included before list.h
+    #error "Arduino_FreeRTOS.h must be included before list.h"
 #endif
 
 /*

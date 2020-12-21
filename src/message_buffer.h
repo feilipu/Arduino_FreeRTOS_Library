@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.4.1
+ * FreeRTOS Kernel V10.4.3
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -62,7 +62,7 @@
 #define FREERTOS_MESSAGE_BUFFER_H
 
 #ifndef INC_ARDUINO_FREERTOS_H
-	#error "include Arduino_FreeRTOS.h must appear in source files before include message_buffer.h"
+    #error "include Arduino_FreeRTOS.h must appear in source files before include message_buffer.h"
 #endif
 
 /* Message buffers are built onto of stream buffers. */
