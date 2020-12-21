@@ -205,7 +205,7 @@ static void TaskAnalogue(void *pvParameters) // Prepare the DAC
   TickType_t xLastWakeTime;
   /* The xLastWakeTime variable needs to be initialised with the current tick
     count.  Note that this is the only time we access this variable.  From this
-    point on xLastWakeTime is managed automatically by the vTaskDelayUntil()
+    point on xLastWakeTime is managed automatically by the xTaskDelayUntil()
     API function. */
   xLastWakeTime = xTaskGetTickCount();
 
@@ -267,7 +267,7 @@ static void TaskAnalogue(void *pvParameters) // Prepare the DAC
 
       xSemaphoreGive( xSerialSemaphore ); // Now free the Serial Port for others.
     }
-    vTaskDelayUntil( &xLastWakeTime, ( 8192 / portTICK_PERIOD_MS ) );
+    xTaskDelayUntil( &xLastWakeTime, ( 8192 / portTICK_PERIOD_MS ) );
   }
 }
 
@@ -277,7 +277,7 @@ static void TaskReport(void *pvParameters) // report on the status of the device
   TickType_t xLastWakeTime;
   /* The xLastWakeTime variable needs to be initialised with the current tick
     count.  Note that this is the only time we access this variable.  From this
-    point on xLastWakeTime is managed automatically by the vTaskDelayUntil()
+    point on xLastWakeTime is managed automatically by the xTaskDelayUntil()
     API function. */
   xLastWakeTime = xTaskGetTickCount();
 
@@ -302,7 +302,7 @@ static void TaskReport(void *pvParameters) // report on the status of the device
 
       xSemaphoreGive( xSerialSemaphore ); // Now free the Serial Port for others.
     }
-    vTaskDelayUntil( &xLastWakeTime, ( 2048 / portTICK_PERIOD_MS ) );
+    xTaskDelayUntil( &xLastWakeTime, ( 2048 / portTICK_PERIOD_MS ) );
   }
 }
 

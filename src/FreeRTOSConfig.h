@@ -56,8 +56,6 @@
 #define configMINIMAL_STACK_SIZE            ( 192 )
 #define configMAX_TASK_NAME_LEN             ( 8 )
 
-#define configASSERT
-
 #define configQUEUE_REGISTRY_SIZE           0
 #define configCHECK_FOR_STACK_OVERFLOW      1
 
@@ -113,8 +111,10 @@ to exclude the API function. */
  * configASSERT macro: https://www.freertos.org/a00110.html#configASSERT
  */
 #ifndef configASSERT
+    #define configDEFAULT_ASSERT 0
+#else
     /**
-     * Enable configASSERT macro by default if it is not defined.
+     * Enable configASSERT macro if it is defined.
      */
     #ifndef configDEFAULT_ASSERT
         #define configDEFAULT_ASSERT 1
@@ -127,9 +127,6 @@ to exclude the API function. */
         extern void vApplicationAssertHook();
         #define configASSERT( x ) if (( x ) == 0) { vApplicationAssertHook(); }
     #endif
-
-#else
-    #define configDEFAULT_ASSERT 0
 #endif
 
 
