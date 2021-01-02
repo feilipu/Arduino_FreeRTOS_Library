@@ -1230,7 +1230,7 @@ void vQueueDelete( QueueHandle_t xQueue ) PRIVILEGED_FUNCTION;
  *  if( xHigherPriorityTaskWoken )
  *  {
  *      // Actual macro used here is port specific.
- *      portYIELD_FROM_ISR ();
+ *      portYIELD_FROM_ISR();
  *  }
  * }
  * </pre>
