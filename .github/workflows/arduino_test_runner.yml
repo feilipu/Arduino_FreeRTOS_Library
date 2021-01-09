@@ -22,8 +22,8 @@ jobs:
           #  absence of either tests or examples, uncommenting either of
           #  the following lines (as appropriate) will enforce that.
           #
-          EXPECT_EXAMPLES: false
-          EXPECT_UNITTESTS: false
+          # EXPECT_EXAMPLES: false
+          # EXPECT_UNITTESTS: false
 
           # Scanning library.properties for issues is a relatively new
           #  feature, and we may not have implemented it perfectly just
@@ -41,7 +41,7 @@ jobs:
           #
           # The default is the current directory
           #
-          USE_SUBDIR: .
+          # USE_SUBDIR: .
 
           # Although dependencies will be installed automatically via the
           # library manager, your library under test may require an
