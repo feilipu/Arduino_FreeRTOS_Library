@@ -9,7 +9,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: Arduino-CI/action@v0.1.2   # v0.1.2 or the latest version
+      - uses: Arduino-CI/action@latest  # development branch, in flux
         env:
           # Not all libraries include examples or unit tests.  The default
           #  behavior of arduino_ci is to assume that "if the files don't
