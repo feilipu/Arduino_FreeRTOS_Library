@@ -17,7 +17,7 @@ jobs:
           #
           # The default is the current directory
           #
-          # USE_SUBDIR: .
+          USE_SUBDIR: .
 
           # Not all libraries include examples or unit tests.  The default
           #  behavior of arduino_ci is to assume that "if the files don't
