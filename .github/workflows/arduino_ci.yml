@@ -9,8 +9,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: Arduino-CI/action@latest  # development branch, in flux
+      - uses: Arduino-CI/action@stable-1.x # or latest, or a pinned version
         env:
+          # Not all libraries are in the root directory of a repository.
+          # Specifying the path of the library here (relative to the root
+          # of the repository) will adjust that.
+          #
+          # The default is the current directory
+          #
+          # USE_SUBDIR: .
+
           # Not all libraries include examples or unit tests.  The default
           #  behavior of arduino_ci is to assume that "if the files don't
           #  exist, then they were not MEANT to exist".  In other words,
@@ -24,24 +32,6 @@ jobs:
           #
           # EXPECT_EXAMPLES: false
           # EXPECT_UNITTESTS: false
-
-          # Scanning library.properties for issues is a relatively new
-          #  feature, and we may not have implemented it perfectly just
-          #  yet.
-          #
-          # If you find that it incorrectly fails your library, you can
-          #  skip it.  (Please open an issue against arduino_ci as well
-          #  so that it can be fixed.)
-          #
-          SKIP_LIBRARY_PROPERTIES: false
-
-          # Not all libraries are in the root directory of a repository.
-          # Specifying the path of the library here (relative to the root
-          # of the repository) will adjust that.
-          #
-          # The default is the current directory
-          #
-          # USE_SUBDIR: .
 
           # Although dependencies will be installed automatically via the
           # library manager, your library under test may require an
