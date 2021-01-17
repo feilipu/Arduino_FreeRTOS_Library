@@ -1,5 +1,6 @@
-
-platforms:
-  # overriding the "trinket" and "gemma" platforms, as they don't have serial ports.
-  trinket: ~
-  gemma: ~
+compile:
+  platforms:
+    - uno
+    - leonardo
+    - mega2560
+    - cplayClassic
