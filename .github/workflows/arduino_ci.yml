@@ -44,10 +44,3 @@ jobs:
           # the repository root)
           #
           # CUSTOM_INIT_SCRIPT: install_dependencies.sh
-
-compile:
-  platforms:
-      - uno
-      - leonardo
-      - mega2560
-      - cplayClassic
