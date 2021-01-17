@@ -5,6 +5,9 @@ packages:
     url: https://raw.githubusercontent.com/feilipu/feilipu.github.io/master/package_goldilocks_index.json
 
 platforms:
+  trinket: ~
+  gemma: ~
+
   "Goldilocks Analogue":
     board: Goldilocks:avr:"Goldilocks Analogue"
     package: arduino:avr
