@@ -1,0 +1,18 @@
+packages:
+  arduino:avr:
+    url: https://downloads.arduino.cc/packages/package_index.json
+  Goldilocks:avr:
+    url: https://raw.githubusercontent.com/feilipu/feilipu.github.io/master/package_goldilocks_index.json
+
+platforms:
+  "Goldilocks Analogue":
+    board: Goldilocks:avr:"Goldilocks Analogue"
+    package: arduino:avr
+
+compile:
+  libraries:
+    - "AVR Standard C Time Library"
+    - "Goldilocks Analogue DAC Library"
+    - "Goldilocks Analogue SPI RAM Library"
+  platforms:
+    - "Goldilocks Analogue"
