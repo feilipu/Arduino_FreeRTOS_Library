@@ -1,7 +1,3 @@
 
-compile:
-  platforms:
-    - uno
-    - leonardo
-    - mega2560
-    - cplayClassic
+platforms:
+  trinket: ~
