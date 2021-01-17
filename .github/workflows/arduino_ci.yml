@@ -30,7 +30,7 @@ jobs:
           #  absence of either tests or examples, uncommenting either of
           #  the following lines (as appropriate) will enforce that.
           #
-          EXPECT_EXAMPLES: false
+          # EXPECT_EXAMPLES: false
           # EXPECT_UNITTESTS: false
 
           # Although dependencies will be installed automatically via the
@@ -44,3 +44,10 @@ jobs:
           # the repository root)
           #
           # CUSTOM_INIT_SCRIPT: install_dependencies.sh
+
+    compile:
+      platforms:
+          - uno
+          - leonardo
+          - mega2560
+          - cplayClassic

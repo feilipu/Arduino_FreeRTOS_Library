@@ -91,10 +91,6 @@ build_flags =
   -DportUSE_WDTO=WDTO_15MS
 ```
 
-
-
-
-
 ### Code of conduct
 
 See the [Code of conduct](https://github.com/feilipu/Arduino_FreeRTOS_Library/blob/master/CODE_OF_CONDUCT.md).
