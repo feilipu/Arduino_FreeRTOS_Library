@@ -3,7 +3,7 @@ This is a fork of Richard Barry's freeRTOS, optimised for the Arduino AVR device
 It has been created to provide access to FreeRTOS capabilities, with full compatibility to the Arduino environment.
 It does this by keeping hands off almost everything, and only touching the minimum of hardware to be successful.
 
-[![Arduino CI](https://github.com/feilipu/Arduino_FreeRTOS_Library/workflows/Arduino%20CI/badge.svg)](https://github.com/marketplace/actions/arduino_ci)
+[![Arduino_CI](https://github.com/feilipu/Arduino_FreeRTOS_Library/workflows/Arduino_CI/badge.svg)](https://github.com/marketplace/actions/arduino_ci)
 
 ## Usage & Further Reading
 
