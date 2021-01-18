@@ -11,6 +11,7 @@ platforms:
 
 compile:
   libraries:
+    - "SD"
     - "AVR Standard C Time Library"
     - "Goldilocks Analogue DAC Library"
     - "Goldilocks Analogue SPI RAM Library"
