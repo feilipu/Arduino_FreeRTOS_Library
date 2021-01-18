@@ -8,6 +8,7 @@ platforms:
   "Goldilocks Analogue":
     board: Goldilocks:avr:"Goldilocks Analogue"
     package: arduino:avr
+    package: Goldilocks:avr
 
 compile:
   libraries:
