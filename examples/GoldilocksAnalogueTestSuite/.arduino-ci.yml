@@ -6,7 +6,7 @@ packages:
 
 platforms:
   Goldilocks:
-    board: Goldilocks:avr:"Goldilocks Analogue"
+    board: Goldilocks:avr:goldilocks_analogue
     package: Goldilocks:avr
 
 compile:
