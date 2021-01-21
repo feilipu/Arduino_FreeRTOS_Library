@@ -1378,7 +1378,7 @@ static void prvAddNewTaskToReadyList( TCB_t * pxNewTCB )
     {
         eTaskState eReturn;
         List_t const * pxStateList, * pxDelayedList, * pxOverflowedDelayedList;
-        const TCB_t * const pxTCB = xTask;
+        const TCB_t * const pxTCB = ( TCB_t * ) xTask;
 
         configASSERT( pxTCB );
 
