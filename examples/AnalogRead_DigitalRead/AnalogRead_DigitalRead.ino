@@ -2,7 +2,7 @@
 #include <semphr.h>  // add the FreeRTOS functions for Semaphores (or Flags).
 
 // Declare a mutex Semaphore Handle which we will use to manage the Serial Port.
-// It will be used to ensure only only one Task is accessing this resource at any time.
+// It will be used to ensure only one Task is accessing this resource at any time.
 SemaphoreHandle_t xSerialSemaphore;
 
 // define two Tasks for DigitalRead & AnalogRead
