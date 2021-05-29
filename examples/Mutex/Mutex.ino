@@ -60,7 +60,7 @@ void TaskMutex(void *pvParameters)
     if (xSemaphoreTake(mutex, 10) == pdTRUE)
     {
       Serial.print(pcTaskGetName(NULL)); // Get task name
-      Serial.print(", Count readed value: ");
+      Serial.print(", Count read value: ");
       Serial.print(globalCount);
 
       globalCount++;

@@ -38,7 +38,7 @@ void TaskNotification(void *pvParameters)
 
   int digitalPin = 2;
 
-  Serial.begin(115200);
+  Serial.begin(9600);
 
   attachInterrupt(digitalPinToInterrupt(digitalPin), digitalPinInterruptHandler, LOW);
 
