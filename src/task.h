@@ -256,8 +256,8 @@ typedef enum
  * <pre>
  * BaseType_t xTaskCreate(
  *                            TaskFunction_t pxTaskCode,
- *                            const char *pcName,
- *                            configSTACK_DEPTH_TYPE usStackDepth,
+ *                            const char * const pcName,
+ *                            const configSTACK_DEPTH_TYPE usStackDepth,
  *                            void *pvParameters,
  *                            UBaseType_t uxPriority,
  *                            TaskHandle_t *pxCreatedTask
@@ -358,8 +358,8 @@ typedef enum
  * task. h
  * <pre>
 * TaskHandle_t xTaskCreateStatic( TaskFunction_t pxTaskCode,
- *                               const char *pcName,
- *                               uint32_t ulStackDepth,
+ *                               const char * const pcName,
+ *                               const configSTACK_DEPTH_TYPE ulStackDepth,
  *                               void *pvParameters,
  *                               UBaseType_t uxPriority,
  *                               StackType_t *puxStackBuffer,

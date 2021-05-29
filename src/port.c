@@ -613,7 +613,7 @@ void vPortEndScheduler( void )
 	/* It is unlikely that the ATmega port will get stopped.  If required simply
      * disable the tick interrupt here. */
 
-        wdt_disable();      /* disable Watchdog Timer */
+    wdt_disable();      /* disable Watchdog Timer */
 }
 /*-----------------------------------------------------------*/
 
