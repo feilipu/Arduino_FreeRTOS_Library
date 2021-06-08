@@ -34,17 +34,17 @@ void setup() {
     TaskDigitalRead
     ,  "DigitalRead"  // A name just for humans
     ,  128  // This stack size can be checked & adjusted by reading the Stack Highwater
-    ,  NULL
+    ,  NULL //Parameters for the task
     ,  2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-    ,  NULL );
+    ,  NULL ); //Task Handle
 
   xTaskCreate(
     TaskAnalogRead
-    ,  "AnalogRead"
+    ,  "AnalogRead" // A name just for humans
     ,  128  // Stack size
-    ,  NULL
+    ,  NULL //Parameters for the task
     ,  1  // Priority
-    ,  NULL );
+    ,  NULL ); //Task Handle
 
   // Now the Task scheduler, which takes over control of scheduling individual Tasks, is automatically started.
 }
