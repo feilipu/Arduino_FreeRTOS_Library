@@ -76,8 +76,8 @@
 
 /* Timer definitions. */
 #define configUSE_TIMERS                    1
-#define configTIMER_TASK_PRIORITY           ( ( UBaseType_t ) 3 )
-#define configTIMER_QUEUE_LENGTH            ( ( UBaseType_t ) 10 )
+#define configTIMER_TASK_PRIORITY           configMAX_PRIORITIES-1
+#define configTIMER_QUEUE_LENGTH            ( 10 )
 #define configTIMER_TASK_STACK_DEPTH        ( 85 )
 
 /* Set the stack depth type to be uint16_t. */
