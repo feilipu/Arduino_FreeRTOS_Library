@@ -273,7 +273,7 @@ Changes between FreeRTOS V10.0.1 and FreeRTOS V10.1.0 released 22 August 2018
 	  the read modify write access to an internal Microblaze register.
 	+ Fix minor niggles when the MPU is used with regards to prototype
 	  differences, static struct size differences, etc.
-	+ The usStackHighWaterMark member of the TaskStatus_t structure now has type
+	+ The uxStackHighWaterMark member of the TaskStatus_t structure now has type
 	  configSTACK_DEPTH_TYPE in place of uint16_t - that change should have been
 	  made when the configSTACK_DEPTH_TYPE type (which gets around the previous
 	  16-bit limit on stack size specifications) was introduced.
