@@ -111,6 +111,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://www.blackleg.es/"><img src="https://avatars1.githubusercontent.com/u/4323228" width="100px;" alt=""/><br /><sub><b>Hector Espert</b></sub></a><br /><a title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/Floessie"><img src="https://avatars1.githubusercontent.com/u/10133457" width="100px;" alt=""/><br /><sub><b>Floessie</b></sub></a><br /><a title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/Derekduke"><img src="https://avatars2.githubusercontent.com/u/30068270" width="100px;" alt=""/><br /><sub><b>Derekduke</b></sub></a><br /><a title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/ianfixes"><img src="https://avatars.githubusercontent.com/u/583459" width="100px;" alt=""/><br /><sub><b>Ian</b></sub></a><br /><a title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/balaji"><img src="https://avatars2.githubusercontent.com/u/29356302" width="100px;" alt=""/><br /><sub><b>Balaji.V</b></sub></a><br /><a title="Code">💻</a></td>
   </tr>
 </table>
