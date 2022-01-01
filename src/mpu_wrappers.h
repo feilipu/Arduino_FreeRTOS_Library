@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.4.4
+ * FreeRTOS Kernel V10.4.6
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -77,6 +77,7 @@
         #define vTaskList                              MPU_vTaskList
         #define vTaskGetRunTimeStats                   MPU_vTaskGetRunTimeStats
         #define ulTaskGetIdleRunTimeCounter            MPU_ulTaskGetIdleRunTimeCounter
+        #define ulTaskGetIdleRunTimePercent            MPU_ulTaskGetIdleRunTimePercent
         #define xTaskGenericNotify                     MPU_xTaskGenericNotify
         #define xTaskGenericNotifyWait                 MPU_xTaskGenericNotifyWait
         #define ulTaskGenericNotifyTake                MPU_ulTaskGenericNotifyTake

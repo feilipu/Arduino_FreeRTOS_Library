@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.4.4
+ * FreeRTOS Kernel V10.4.6
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -90,7 +90,11 @@ typedef uint8_t                     UBaseType_t;
  * but 120 kHz at 5V DC and 25 degrees is actually more accurate,
  * from data sheet.
  */
+#if defined( portUSE_WDTO )
 #define portTICK_PERIOD_MS          ( (TickType_t) _BV( portUSE_WDTO + 4 ) )
+#else
+#define portTICK_PERIOD_MS          ( (TickType_t) 1000 / configTICK_RATE_HZ )
+#endif
 
 #define portBYTE_ALIGNMENT          1
 #define portNOP()                   __asm__ __volatile__ ( "nop" );
