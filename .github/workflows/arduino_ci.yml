@@ -9,4 +9,4 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: Arduino-CI/action@stable-1.x # or latest, or a pinned version
+      - uses: Arduino-CI/action@v0.1.2  # or latest, or a pinned version
