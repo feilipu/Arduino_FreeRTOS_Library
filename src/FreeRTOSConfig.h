@@ -59,7 +59,7 @@
 #define configMAX_TASK_NAME_LEN             ( 8 )
 
 #define configQUEUE_REGISTRY_SIZE           0
-#define configCHECK_FOR_STACK_OVERFLOW      0
+#define configCHECK_FOR_STACK_OVERFLOW      1
 
 #define configUSE_TRACE_FACILITY            0
 #define configUSE_16_BIT_TICKS              1
@@ -69,7 +69,7 @@
 #define configUSE_COUNTING_SEMAPHORES       1
 #define configUSE_TIME_SLICING              1
 #define configUSE_QUEUE_SETS                0
-#define configUSE_MALLOC_FAILED_HOOK        0
+#define configUSE_MALLOC_FAILED_HOOK        1
 
 #define configSUPPORT_DYNAMIC_ALLOCATION    1
 #define configSUPPORT_STATIC_ALLOCATION     0
