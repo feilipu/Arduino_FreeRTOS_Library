@@ -84,7 +84,7 @@
  * \ingroup Tasks
  */
 struct TaskControlBlock_t;
-typedef struct TaskControlBlock_t* TaskHandle_t;
+typedef struct TaskControlBlock_t * TaskHandle_t;
 
 /*
  * Defines the prototype to which the application task hook function must
