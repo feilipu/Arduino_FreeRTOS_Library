@@ -81,7 +81,7 @@ typedef uint8_t                     UBaseType_t;
 
 /* Architecture specifics. */
 
-#define sleep_reset()                   do { _SLEEP_CONTROL_REG = 0; } while(0)     /* reset all sleep_mode() configurations. */
+#define sleep_reset()               do { _SLEEP_CONTROL_REG = 0; } while(0)     /* reset all sleep_mode() configurations. */
 
 #define portSTACK_GROWTH            ( -1 )
 
@@ -95,6 +95,8 @@ typedef uint8_t                     UBaseType_t;
 #else
 #define portTICK_PERIOD_MS          ( (TickType_t) 1000 / configTICK_RATE_HZ )
 #endif
+
+#define delay(ms)                   vTaskDelay((TickType_t)(ms)/portTICK_PERIOD_MS)
 
 #define portBYTE_ALIGNMENT          1
 #define portNOP()                   __asm__ __volatile__ ( "nop" );

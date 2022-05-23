@@ -40,7 +40,7 @@ Note that Timer resolution is affected by integer math division and the time sli
 
 The 8-bit AVR Timer0 has been added as an option for the experienced user. Please examine the source code to figure out how to use it.
 
-Stack for the `loop()` function has been set at 192 bytes. This can be configured by adjusting the `configMINIMAL_STACK_SIZE` parameter. If you have stack overflow issues, just increase it. Users should prefer to allocate larger structures, arrays, or buffers using `pvPortMalloc()`, rather than defining them locally on the stack.
+Stack for the `loop()` function has been set at 192 Bytes. This can be configured by adjusting the `configMINIMAL_STACK_SIZE` parameter. If you have stack overflow issues, just increase it. Users should prefer to allocate larger structures, arrays, or buffers using `pvPortMalloc()`, rather than defining them locally on the stack. If you are not using `loop()` then the stack size can be reduced to 85 Bytes, saving some valuable memory.
 
 Memory for the heap is allocated by the normal `malloc()` function, wrapped by `pvPortMalloc()`.
 This option has been selected because it is automatically adjusted to use the capabilities of each device.
