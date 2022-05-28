@@ -22,7 +22,7 @@ Over the past few years freeRTOS development has become increasingly 32-bit orie
 FreeRTOS has a multitude of configuration options, which can be specified from within the FreeRTOSConfig.h file.
 To keep commonality with all of the Arduino hardware options, some sensible defaults have been selected. Feel free to change these defaults as you gain experience with FreeRTOS.
 
-The AVR Watchdog Timer is used to generate 15ms time slices, but Tasks that finish before their allocated time will hand execution back to the Scheduler. This does not affect the use of any of the normal Timer functions in Arduino.
+The AVR Watchdog Timer is used to generate 15ms time slices (Ticks), but Tasks that finish before their allocated time will hand execution back to the Scheduler.
 
 Time slices can be selected from 15ms up to 500ms. Slower time slicing can allow the Arduino MCU to sleep for longer, without the complexity of a Tickless idle.
 
@@ -36,17 +36,15 @@ Watchdog period options:
 * `WDTO_1S`
 * `WDTO_2S`
 
-Note that Timer resolution is affected by integer math division and the time slice selected. Trying to measure 50ms, using a 120ms time slice for example, won't work. Also, trying to measure less than 15ms, with the default time slice, will not work.
+Note that Timer resolution is affected by integer math division and the time slice selected. Trying to measure 50ms, using a 120ms time slice for example, won't work. Also, trying to delay for less than 15ms, with the default time slice, will not work.
 
-The Arduino `delay()` function has been defined to automatically use the FreeRTOS `vTaskDelay()` function, so that Arduino example sketches and tutorials work with no change. If you would like to measure a short millisecond delay of less than one Tick (Watchdog period), then [use `millis()`](https://www.arduino.cc/reference/en/language/functions/time/millis/) to achieve this outcome (for example see [BlinkWithoutDelay](https://docs.arduino.cc/built-in-examples/digital/BlinkWithoutDelay)).
+The Arduino `delay()` function has been defined to automatically use the FreeRTOS `vTaskDelay()` function, so that simple Arduino example sketches and tutorials work with no change. If you would like to measure a short millisecond delay of less than one Tick (Watchdog period), then use [`millis()`](https://www.arduino.cc/reference/en/language/functions/time/millis/) (or with greater granularity use [`micros()`](https://www.arduino.cc/reference/en/language/functions/time/micros/)) to achieve this outcome (for example see [BlinkWithoutDelay](https://docs.arduino.cc/built-in-examples/digital/BlinkWithoutDelay)).
 
-The 8-bit AVR Timer0 has been added as an option for the experienced user. Please examine the source code to figure out how to use it. This using Timer0 will break Arduino `millis()` and `delay()` though, as these rely on Timer0.
+The 8-bit AVR Timer0 has been added as an option for the experienced user. Please examine the source code to figure out how to use it. Reconfiguring Timer0 for FreeRTOS will break Arduino `millis()` and `micros()` though, as these functions rely on Timer0.
 
-Stack for the `loop()` function has been set at 192 Bytes. This can be configured by adjusting the `configMINIMAL_STACK_SIZE` parameter. If you have stack overflow issues, just increase it. Users should prefer to allocate larger structures, arrays, or buffers using `pvPortMalloc()`, rather than defining them locally on the stack. If you are not using `loop()` then the stack size can be reduced to 85 Bytes, saving some valuable memory.
+Stack for the `loop()` function has been set at 192 Bytes. This can be configured by adjusting the `configMINIMAL_STACK_SIZE` parameter. If you have stack overflow issues, just increase it. Users should prefer to allocate larger structures, arrays, or buffers using `pvPortMalloc()`, rather than defining them locally on the stack. Ideally you should not use `loop()` for your sketches, and then the stack size can be reduced down to 85 Bytes, saving some valuable memory.
 
-Memory for the heap is allocated by the normal `malloc()` function, wrapped by `pvPortMalloc()`.
-This option has been selected because it is automatically adjusted to use the capabilities of each device.
-Other heap allocation schemes are supported by FreeRTOS, and they can used with additional configuration.
+Memory for the heap is allocated by the normal `malloc()` function, wrapped by `pvPortMalloc()`. This option has been selected because it is automatically adjusted to use the capabilities of each device. Other heap allocation schemes are supported by FreeRTOS, and they can used with some additional configuration.
 
 ## Upgrading
 
