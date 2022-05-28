@@ -20,7 +20,7 @@ Over the past few years freeRTOS development has become increasingly 32-bit orie
 ## General
 
 FreeRTOS has a multitude of configuration options, which can be specified from within the FreeRTOSConfig.h file.
-To keep commonality with all of the Arduino hardware options, some sensible defaults have been selected.
+To keep commonality with all of the Arduino hardware options, some sensible defaults have been selected. Feel free to change these defaults as you gain experience with FreeRTOS.
 
 The AVR Watchdog Timer is used to generate 15ms time slices, but Tasks that finish before their allocated time will hand execution back to the Scheduler. This does not affect the use of any of the normal Timer functions in Arduino.
 
@@ -36,9 +36,11 @@ Watchdog period options:
 * `WDTO_1S`
 * `WDTO_2S`
 
-Note that Timer resolution is affected by integer math division and the time slice selected. Trying to measure 50ms, using a 120ms time slice for example, won't work.
+Note that Timer resolution is affected by integer math division and the time slice selected. Trying to measure 50ms, using a 120ms time slice for example, won't work. Also, trying to measure less than 15ms, with the default time slice, will not work.
 
-The 8-bit AVR Timer0 has been added as an option for the experienced user. Please examine the source code to figure out how to use it.
+The Arduino `delay()` function has been defined to automatically use the FreeRTOS `vTaskDelay()` function, so that Arduino example sketches and tutorials work with no change. If you would like to measure a short millisecond delay of less than one Tick (Watchdog period), then [use `millis()`](https://www.arduino.cc/reference/en/language/functions/time/millis/) to achieve this outcome (for example see [BlinkWithoutDelay](https://docs.arduino.cc/built-in-examples/digital/BlinkWithoutDelay)).
+
+The 8-bit AVR Timer0 has been added as an option for the experienced user. Please examine the source code to figure out how to use it. This using Timer0 will break Arduino `millis()` and `delay()` though, as these rely on Timer0.
 
 Stack for the `loop()` function has been set at 192 Bytes. This can be configured by adjusting the `configMINIMAL_STACK_SIZE` parameter. If you have stack overflow issues, just increase it. Users should prefer to allocate larger structures, arrays, or buffers using `pvPortMalloc()`, rather than defining them locally on the stack. If you are not using `loop()` then the stack size can be reduced to 85 Bytes, saving some valuable memory.
 
