@@ -36,9 +36,9 @@ Watchdog period options:
 * `WDTO_1S`
 * `WDTO_2S`
 
-Note that Timer resolution is affected by integer math division and the time slice selected. Trying to measure 50ms, using a 120ms time slice for example, won't work. Also, trying to delay for less than 15ms, with the default time slice, will not work.
+Note that Timer resolution (or granularity) is affected by integer math division and the time slice selected. Trying to measure 50ms, using a 120ms time slice for example, won't work.
 
-The Arduino `delay()` function has been defined to automatically use the FreeRTOS `vTaskDelay()` function, so that simple Arduino example sketches and tutorials work with no change. If you would like to measure a short millisecond delay of less than one Tick (Watchdog period), then use [`millis()`](https://www.arduino.cc/reference/en/language/functions/time/millis/) (or with greater granularity use [`micros()`](https://www.arduino.cc/reference/en/language/functions/time/micros/)) to achieve this outcome (for example see [BlinkWithoutDelay](https://docs.arduino.cc/built-in-examples/digital/BlinkWithoutDelay)).
+The Arduino `delay()` function has been redefined to automatically use the FreeRTOS `vTaskDelay()` function when the delay required is one Tick or longer, so that simple Arduino example sketches and tutorials work as expected. If you would like to measure a short millisecond delay of less than one Tick, then preferably use [`millis()`](https://www.arduino.cc/reference/en/language/functions/time/millis/) (or with greater granularity use [`micros()`](https://www.arduino.cc/reference/en/language/functions/time/micros/)) to achieve this outcome (for example see [BlinkWithoutDelay](https://docs.arduino.cc/built-in-examples/digital/BlinkWithoutDelay)). However, when the delay requested is less than one Tick then the original Arduino `delay()` function will be automatically selected.
 
 The 8-bit AVR Timer0 has been added as an option for the experienced user. Please examine the source code to figure out how to use it. Reconfiguring Timer0 for FreeRTOS will break Arduino `millis()` and `micros()` though, as these functions rely on Timer0.
 

@@ -96,18 +96,20 @@ typedef uint8_t                     UBaseType_t;
 #define portTICK_PERIOD_MS          ( (TickType_t) 1000 / configTICK_RATE_HZ )
 #endif
 
-#define delay(ms)                   vTaskDelay((TickType_t)(ms)/portTICK_PERIOD_MS)
-
 #define portBYTE_ALIGNMENT          1
 #define portNOP()                   __asm__ __volatile__ ( "nop" );
 /*-----------------------------------------------------------*/
 
 /* Kernel utilities. */
-extern void vPortYield( void )      __attribute__ ( ( naked ) );
+
+extern void vPortDelay( const uint32_t ms );
+#define portDELAY( ms )             vPortDelay( ms )
+
+extern void vPortYield( void );
 #define portYIELD()                 vPortYield()
 
-extern void vPortYieldFromISR( void )   __attribute__ ( ( naked ) );
-#define portYIELD_FROM_ISR()            vPortYieldFromISR()
+extern void vPortYieldFromISR( void );
+#define portYIELD_FROM_ISR()        vPortYieldFromISR()
 /*-----------------------------------------------------------*/
 
 #if defined(__AVR_3_BYTE_PC__)

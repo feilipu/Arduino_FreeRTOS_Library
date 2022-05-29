@@ -43,6 +43,7 @@ extern void loop(void);
 /*-----------------------------------------------------------*/
 
 void initVariant(void) __attribute__ ((OS_main));
+
 void initVariant(void)
 {
     // As the Task stacks are on heap before Task allocated heap variables,
@@ -68,7 +69,7 @@ void initVariant(void)
  * NOTE: vApplicationIdleHook() MUST NOT, UNDER ANY CIRCUMSTANCES, CALL A FUNCTION THAT MIGHT BLOCK.
  *
  */
-void vApplicationIdleHook( void ) __attribute__((weak));
+void vApplicationIdleHook( void ) __attribute__ ((weak));
 
 void vApplicationIdleHook( void )
 {
@@ -149,7 +150,7 @@ Notes:
     This routine will never return.
     This routine is referenced in the task.c file of FreeRTOS as an extern.
 \*---------------------------------------------------------------------------*/
-void vApplicationMallocFailedHook( void ) __attribute__((weak));
+void vApplicationMallocFailedHook( void ) __attribute__ ((weak));
 
 void vApplicationMallocFailedHook( void )
 {
@@ -169,10 +170,10 @@ void vApplicationMallocFailedHook( void )
 #if ( configCHECK_FOR_STACK_OVERFLOW >= 1 )
 
 void vApplicationStackOverflowHook( TaskHandle_t xTask,
-                                    char * pcTaskName ) __attribute__((weak));
+                                    char * pcTaskName ) __attribute__ ((weak));
 
-void vApplicationStackOverflowHook( TaskHandle_t xTask __attribute__((unused)),
-                                    char * pcTaskName __attribute__((unused)) )
+void vApplicationStackOverflowHook( TaskHandle_t xTask __attribute__ ((unused)),
+                                    char * pcTaskName __attribute__ ((unused)) )
 {
 
     prvSetMainLedOn(); // Main LED on.
@@ -191,7 +192,7 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask __attribute__((unused)),
 
 void vApplicationGetIdleTaskMemory( StaticTask_t ** ppxIdleTaskTCBBuffer,
                                     StackType_t ** ppxIdleTaskStackBuffer,
-                                    configSTACK_DEPTH_TYPE * pulIdleTaskStackSize ) __attribute__((weak));
+                                    configSTACK_DEPTH_TYPE * pulIdleTaskStackSize ) __attribute__ ((weak));
 
 void vApplicationGetIdleTaskMemory( StaticTask_t ** ppxIdleTaskTCBBuffer,
                                     StackType_t ** ppxIdleTaskStackBuffer,
@@ -209,7 +210,7 @@ void vApplicationGetIdleTaskMemory( StaticTask_t ** ppxIdleTaskTCBBuffer,
 
 void vApplicationGetTimerTaskMemory( StaticTask_t ** ppxTimerTaskTCBBuffer,
                                      StackType_t ** ppxTimerTaskStackBuffer,
-                                     configSTACK_DEPTH_TYPE * pulTimerTaskStackSize ) __attribute__((weak));
+                                     configSTACK_DEPTH_TYPE * pulTimerTaskStackSize ) __attribute__ ((weak));
 
 void vApplicationGetTimerTaskMemory( StaticTask_t ** ppxTimerTaskTCBBuffer,
                                      StackType_t ** ppxTimerTaskStackBuffer,
