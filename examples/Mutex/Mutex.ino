@@ -49,7 +49,7 @@ void loop() {}
 
 void TaskMutex(void *pvParameters)
 {
-  int delayTime = *((int*)pvParameters); // Use task parameters to define delay
+  TickType_t delayTime = *((TickType_t*)pvParameters); // Use task parameters to define delay
 
   for (;;)
   {
