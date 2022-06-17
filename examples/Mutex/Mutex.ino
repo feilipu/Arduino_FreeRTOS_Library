@@ -49,7 +49,7 @@ void loop() {}
 
 void TaskMutex(void *pvParameters)
 {
-  int delay = *((int*)pvParameters); // Use task parameters to define delay
+  int delayTime = *((int*)pvParameters); // Use task parameters to define delay
 
   for (;;)
   {
@@ -76,6 +76,6 @@ void TaskMutex(void *pvParameters)
       xSemaphoreGive(mutex);
     }
 
-    vTaskDelay(delay / portTICK_PERIOD_MS);
+    vTaskDelay(delayTime / portTICK_PERIOD_MS);
   }
 }
