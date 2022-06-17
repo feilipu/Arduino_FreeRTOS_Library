@@ -3,8 +3,6 @@ This is a fork of Richard Barry's freeRTOS, optimised for the Arduino AVR device
 It has been created to provide access to FreeRTOS capabilities, with full compatibility to the Arduino environment.
 It does this by keeping hands off almost everything, and only touching the minimum of hardware to be successful.
 
-[![Arduino_CI](https://github.com/feilipu/Arduino_FreeRTOS_Library/workflows/Arduino_CI/badge.svg)](https://github.com/marketplace/actions/arduino_ci)
-
 ## Usage & Further Reading
 
 Read the short blog post on [Arduino FreeRTOS](https://feilipu.me/2015/11/24/arduino_freertos/) to get started. And there is another much older post on using [FreeRTOS with AVR](https://feilipu.me/2011/09/22/freertos-and-libraries-for-avr-atmega/), which may be useful to read too. There are some further posts I've written on [Hackster.IO](https://www.hackster.io/feilipu), but they're essentially the same content.
