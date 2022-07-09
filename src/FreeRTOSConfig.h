@@ -43,15 +43,9 @@
  * See https://www.freertos.org/a00110.html.
  *----------------------------------------------------------*/
 
-// And on to the things the same no matter the AVR type...
+/* And on to the things the same no matter the AVR type... */
 #define configUSE_PREEMPTION                1
 
-// Define configUSE_IDLE_HOOK
-#ifndef configUSE_IDLE_HOOK
-    #define configUSE_IDLE_HOOK             1
-#endif
-
-#define configUSE_TICK_HOOK                 0
 #define configCPU_CLOCK_HZ                  ( ( uint32_t ) F_CPU )          // This F_CPU variable set by the environment
 #define configMAX_PRIORITIES                4
 #define configIDLE_SHOULD_YIELD             1
@@ -73,6 +67,13 @@
 
 #define configSUPPORT_DYNAMIC_ALLOCATION    1
 #define configSUPPORT_STATIC_ALLOCATION     0
+
+#define configUSE_IDLE_HOOK                 1
+#define configUSE_TICK_HOOK                 0
+
+/* Delay definition - here, the user can choose which delay implementation is required.
+ * The default is to change nothing. */
+#define configUSE_PORT_DELAY                1
 
 /* Timer definitions. */
 #define configUSE_TIMERS                    1

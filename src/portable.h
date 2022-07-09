@@ -85,13 +85,18 @@
     #define portARCH_NAME               NULL
 #endif
 
+#if configUSE_PORT_DELAY == 1
 /*
- * Delay is implemented as either Arduino delay() if the delay is less than one Tick,
- * or otherwise FreeRTOS vTaskDelay().
- *
+ * If configUSE_PORT_DELAY is defined,
+ * delay() is implemented as either the Arduino delay()
+ * if the delay is less than one Tick, or
+ * otherwise as FreeRTOS vTaskDelay() for longer delays.
  */
+
 #ifndef delay
-#define delay                           vPortDelay
+    #define delay                       vPortDelay
+#endif
+
 #endif
 
 #ifndef configSTACK_ALLOCATION_FROM_SEPARATE_HEAP
