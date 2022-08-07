@@ -642,7 +642,8 @@ void vPortEndScheduler( void )
      * that breaks FreeRTOS. So its use is limited to less than one
      * System Tick (portTICK_PERIOD_MS milliseconds).
      * FreeRTOS vTaskDelay() is relies on the System Tick which here
-     * has a granularity of portTICK_PERIOD_MS milliseconds (15ms).
+     * has a granularity of portTICK_PERIOD_MS milliseconds (15ms),
+     * with the remainder implemented as an Arduino delay().
      */
 
 #ifdef delay
@@ -655,16 +656,21 @@ void vPortDelay( const uint32_t ms ) __attribute__ ((hot, flatten));
 void vPortDelay( const uint32_t ms )
 {
     if ( ms < portTICK_PERIOD_MS )
+    {
         delay( (unsigned long) (ms) );
+    }
     else
+    {
         vTaskDelay( (TickType_t) (ms) / portTICK_PERIOD_MS );
+        delay( (unsigned long) (ms - portTICK_PERIOD_MS) % portTICK_PERIOD_MS );
+    }
 }
 /*-----------------------------------------------------------*/
 
-    /*
-     * Manual context switch. The first thing we do is save the registers so we
-     * can use a naked attribute.
-     */
+/*
+ * Manual context switch. The first thing we do is save the registers so we
+ * can use a naked attribute.
+ */
 void vPortYield( void ) __attribute__ ((hot, flatten, naked));
 void vPortYield( void )
 {
@@ -676,10 +682,10 @@ void vPortYield( void )
 }
 /*-----------------------------------------------------------*/
 
-    /*
-     * Manual context switch callable from ISRs. The first thing we do is save
-     * the registers so we can use a naked attribute.
-     */
+/*
+ * Manual context switch callable from ISRs. The first thing we do is save
+ * the registers so we can use a naked attribute.
+ */
 void vPortYieldFromISR( void ) __attribute__ ((hot, flatten, naked));
 void vPortYieldFromISR( void )
 {
@@ -691,12 +697,12 @@ void vPortYieldFromISR( void )
 }
 /*-----------------------------------------------------------*/
 
-    /*
-     * Context switch function used by the tick. This must be identical to
-     * vPortYield() from the call to vTaskSwitchContext() onwards. The only
-     * difference from vPortYield() is the tick count is incremented as the
-     * call comes from the tick ISR.
-     */
+/*
+ * Context switch function used by the tick. This must be identical to
+ * vPortYield() from the call to vTaskSwitchContext() onwards. The only
+ * difference from vPortYield() is the tick count is incremented as the
+ * call comes from the tick ISR.
+ */
 void vPortYieldFromTick( void ) __attribute__ ((hot, flatten, naked));
 void vPortYieldFromTick( void )
 {
@@ -713,9 +719,9 @@ void vPortYieldFromTick( void )
 /*-----------------------------------------------------------*/
 
 #if defined( portUSE_WDTO )
-    /*
-     * Setup WDT to generate a tick interrupt.
-     */
+/*
+ * Setup WDT to generate a tick interrupt.
+ */
 void prvSetupTimerInterrupt( void )
 {
     /* reset watchdog */
@@ -726,9 +732,9 @@ void prvSetupTimerInterrupt( void )
 }
 
 #elif defined( portUSE_TIMER0 )
-    /*
-     * Setup Timer0 compare match A to generate a tick interrupt.
-     */
+/*
+ * Setup Timer0 compare match A to generate a tick interrupt.
+ */
 static void prvSetupTimerInterrupt( void )
 {
 uint32_t ulCompareMatch;

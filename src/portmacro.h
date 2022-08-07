@@ -105,10 +105,10 @@ typedef uint8_t                     UBaseType_t;
 extern void vPortDelay( const uint32_t ms );
 #define portDELAY( ms )             vPortDelay( ms )
 
-extern void vPortYield( void );
+extern void vPortYield( void ) __attribute__ ((naked));
 #define portYIELD()                 vPortYield()
 
-extern void vPortYieldFromISR( void );
+extern void vPortYieldFromISR( void ) __attribute__ ((naked));
 #define portYIELD_FROM_ISR()        vPortYieldFromISR()
 /*-----------------------------------------------------------*/
 
