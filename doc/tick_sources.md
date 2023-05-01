@@ -1,13 +1,11 @@
 # Scheduler tick sources
 
 ## Configuration
-Tick source is selected by (un)defining values `portUSE_WDTO` and `portUSE_TIMER0` in file `FreeRTOSVariant.h`. Default in Arduino_FreeRTOS is Watchdog timer (WDT), it contains all code needed for this and works out-of-the-box. 
+Tick source is selected by (un)defining values `portUSE_WDTO` and `portUSE_TIMER0` in file `FreeRTOSVariant.h`. Default in Arduino_FreeRTOS is Watchdog timer (WDT), it contains all code needed for this and works out-of-the-box.
 
-For alternative tick source, pieces of code must be provided by the application. Arduino_FreeRTOS expects you to provide function `void prvSetupTimerInterrupt(void)` responsible for the initialization of your tick source. This function is called after the Arduino's initialization and before the FreeRTOS scheduler is launched. 
+For alternative tick source, pieces of code must be provided by the application. Arduino_FreeRTOS expects you to provide function `void prvSetupTimerInterrupt(void)` responsible for the initialisation of your tick source. This function is called after the Arduino's initialisation and before the FreeRTOS scheduler is launched.
 
 NOTE: Reconfiguring Timer0 for FreeRTOS will break Arduino `millis()` and `micros()`, as these functions rely on Timer0. Functions relying on these Arduino features need to be overridden.
-
-
 
 ## WDT (default)
 Time slices can be selected from 15ms up to 500ms. Slower time slicing can allow the Arduino MCU to sleep for longer, without the complexity of a Tickless idle.
@@ -30,21 +28,23 @@ The frequency of the Watchdog Oscillator is voltage and temperature dependent as
 Timing consistency may vary as much as 20% between two devices in same setup due to individual device differences, or between a prototype and production device due to setup differences.
 
 ## Alternative tick sources
-For applications requiring high precision timing, the Ticks can be sourced from a hardware timer or external clock. 
+For applications requiring high precision timing, the Ticks can be sourced from a hardware timer or external clock.
 
-First, you switch it in `FreeRTOSVariant.h` header by removing or undefining `portUSE_WDTO` and defining `portUSE_TIMER0`. 
+First, you switch it in `FreeRTOSVariant.h` header by removing or undefining `portUSE_WDTO` and defining `portUSE_TIMER0`.
+
 ```cpp
 #undef portUSE_WDTO
 #define portUSE_TIMER0
 #define portTICK_PERIOD_MS 16
 ```
 
-Next, in your app you provide two pieces of code: the initialization function and the ISR hook. Their implementation depends of what is your tick source.
+Next, in your app you provide two pieces of code: the initialisation function and the ISR hook. Their implementation depends of what is your tick source.
 
 
 ## Hardware timer Timer0
-### Timer initialization function
-_NOTE: This code snippet is verified to work on Atmega2560. Full code avaialable [here](./tick_sources_timer0.cpp)._
+### Timer initialisation function
+_NOTE: This code snippet is verified to work on Atmega2560. Full code available [here](./tick_sources_timer0.cpp)._
+
 ```cpp
 // Formula for the frequency is:
 //      f = F_CPU / (PRESCALER * (1 + COUNTER_TOP)
@@ -79,10 +79,10 @@ void prvSetupTimerInterrupt( void )
     TCCR0A = NO_PWM | MODE_CTC_TCCR0A;
     TCCR0B = MODE_CTC_TCCR0B | PRESCALER_1024;
     OCR0A = TICK_PERIOD_16MS;
-    
+
     // Prevent missing the top and going into a possibly long wait until wrapping around:
     TCNT0 = 0;
-    
+
     // At this point the global interrupt flag is NOT YET enabled,
     // so you're NOT starting to get the ISR calls until FreeRTOS enables it just before launching the scheduler.
     TIMSK0 = INTERRUPT_AT_TOP;
@@ -93,6 +93,7 @@ Though Timer0 is given as example here, any timer can be used. A 16-bit timer (e
 
 ### ISR hook
 For **preemptive** scheduler use `naked` attribute to reduce the call overhead:
+
 ```cpp
 ISR(TIMER0_COMPA_vect, ISR_NAKED) __attribute__ ((hot, flatten));
 ISR(TIMER0_COMPA_vect) {
@@ -105,6 +106,7 @@ The context is saved at the start of `portSchedulerTick()`, then the tick count 
 
 
 For **cooperative** scheduler, the context is not saved because no switching is intended; therefore `naked` attribute cannot be applied because cooperative `portSchedulerTick()` dirties the context.
+
 ```cpp
 ISR(TIMER0_COMPA_vect) __attribute__ ((hot, flatten));
 ISR(TIMER0_COMPA_vect) {
@@ -125,6 +127,7 @@ Attributes `hot` and `flatten` help inlining all the code found inside your ISR 
 _NOTE: This code snippet was not verified on actual MCU._
 
 Assuming the external clock is connected to data pin 21 (function INT0):
+
 ```cpp
 // For register EICRA:
 #define TICK_ON_RISING_EDGE_D21   (1 << ISC01) | (1 << ISC00)
@@ -140,15 +143,16 @@ void prvSetupTimerInterrupt( void )
     // At this point the global interrupt flag is NOT YET enabled,
     // so you're NOT starting to get the ISR calls until FreeRTOS enables it just before launching the scheduler.
     EIMSK = TICK_INPUT_PIN_D21;
-    
-    // Configure the pin 
-    pinMode(21, INPUT); 
+
+    // Configure the pin
+    pinMode(21, INPUT);
 }
 ```
 
 
 ### ISR hook
-Similar to Timer0 ISR, for **preemptive** scheduler: 
+Similar to Timer0 ISR, for **preemptive** scheduler:
+
 ```cpp
 ISR(INT0_vect, ISR_NAKED) __attribute__ ((hot, flatten));
 ISR(INT0_vect) {
@@ -165,23 +169,22 @@ ISR(INT0_vect) {
 }
 ```
 
-
-
 ## Performance considerations
 When selecting the duration for the time slice, the following should be kept in mind.
 
 ### Granularity
-Note that Timer resolution (or granularity) is affected by integer math division and the time slice selected. For example, trying to measure 50ms using a 120ms time slice won't work.
+Note that Timer resolution (or granularity) is affected by integer maths division and the time slice selected. For example, trying to measure 50ms using a 120ms time slice won't work.
 
 ### Context switching
-In preemptive mode, tasks which are actively executing (i.e., those not waiting for a semaphore or queue) might be switched every time tick, depending on their priority. Switching the context involves pushing all CPU's registers of old task and poping all registers of new task. The shorter your time slice is, the bigger of overhead this becomes.
+In preemptive mode, tasks which are actively executing (i.e., those not waiting for a semaphore or queue) might be switched every time tick, depending on their priority. Switching the context involves pushing all CPU's registers of old task and popping all registers of new task. The shorter your time slice is, the bigger of overhead this becomes.
 
 In cooperative mode, context overhead is not a factor.
 
 ### Calculations
-On MCUs lacking the hardware division operation like AVR, a special care should be taken to avoid division operations. Where unavoidable, operations with divisor of power of 2 work best because they are performed with bitwise shifting, whereas an arbitrary value results in a software division operation taking ~200 clock cycles (for a uint16 operand).
+On MCUs lacking the hardware division operation like AVR, a special care should be taken to avoid division operations. Where unavoidable, operations with divisor of power of 2 work best because they are performed with bitwise shifting, whereas an arbitrary value results in a software division operation taking ~200 clock cycles (for a `uint16_t` operand).
 
 You might encounter a division when calculating delays, e.g. converting milliseconds to ticks:
+
 ```cpp
    TickType_t ticks = delay_millis / portTICK_PERIOD_MS
 ```

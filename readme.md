@@ -21,7 +21,7 @@ Over the past few years freeRTOS development has become increasingly 32-bit orie
 FreeRTOS has a multitude of configuration options, which can be specified from within the FreeRTOSConfig.h file.
 To keep commonality with all of the Arduino hardware options, some sensible defaults have been selected. Feel free to change these defaults as you gain experience with FreeRTOS.
 
-Normally, the AVR Watchdog Timer is used to generate 15ms time slices (Ticks). For applications requiring high precision timing, the Ticks can be sourced from a hardware timer or external clock. See chapter [Scheduler Tick Sources](./doc/tick_sources.md) for the configuration details. 
+Normally, the AVR Watchdog Timer is used to generate 15ms time slices (Ticks). For applications requiring high precision timing, the Ticks can be sourced from a hardware timer or external clock. See chapter [Scheduler Tick Sources](./doc/tick_sources.md) for the configuration details.f
 
 Tasks that finish before their allocated time will hand execution back to the Scheduler.
 
@@ -97,11 +97,12 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- markdownlint-disable -->
 <table>
   <tr>
-    <td align="center"><a href="https://feilipu.me/"><img src="https://avatars2.githubusercontent.com/u/3955592" width="100px;" alt=""/><br /><sub><b>Phillip Stevens</b></sub></a><br /><a title="Maintenance">🚧</a><a title="Code">💻</a><a title="Reviewed Pull Requests">👀</a></td>
-    <td align="center"><a href="https://www.blackleg.es/"><img src="https://avatars1.githubusercontent.com/u/4323228" width="100px;" alt=""/><br /><sub><b>Hector Espert</b></sub></a><br /><a title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/Floessie"><img src="https://avatars1.githubusercontent.com/u/10133457" width="100px;" alt=""/><br /><sub><b>Floessie</b></sub></a><br /><a title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/Derekduke"><img src="https://avatars2.githubusercontent.com/u/30068270" width="100px;" alt=""/><br /><sub><b>Derekduke</b></sub></a><br /><a title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/balaji"><img src="https://avatars2.githubusercontent.com/u/29356302" width="100px;" alt=""/><br /><sub><b>Balaji.V</b></sub></a><br /><a title="Code">💻</a></td>
+    <td align="center"><a href="https://feilipu.me/"><img src="https://avatars.githubusercontent.com/u/3955592" width="100px;" alt=""/><br /><sub><b>Phillip Stevens</b></sub></a><br /><a title="Maintenance">🚧</a><a title="Code">💻</a><a title="Reviewed Pull Requests">👀</a></td>
+    <td align="center"><a href="https://www.blackleg.es/"><img src="https://avatars.githubusercontent.com/u/4323228" width="100px;" alt=""/><br /><sub><b>Hector Espert</b></sub></a><br /><a title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/Floessie"><img src="https://avatars.githubusercontent.com/u/10133457" width="100px;" alt=""/><br /><sub><b>Floessie</b></sub></a><br /><a title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/Derekduke"><img src="https://avatars.githubusercontent.com/u/30068270" width="100px;" alt=""/><br /><sub><b>Derekduke</b></sub></a><br /><a title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/balaji"><img src="https://avatars.githubusercontent.com/u/29356302" width="100px;" alt=""/><br /><sub><b>Balaji.V</b></sub></a><br /><a title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/neboskreb"><img src="https://avatars.githubusercontent.com/u/35344069" width="100px;" alt=""/><br /><sub><b>John Y. Pazekha</b></sub></a><br /><a title="Code">💻</a></td>
   </tr>
 </table>
 
