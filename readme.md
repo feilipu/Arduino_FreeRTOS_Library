@@ -21,21 +21,9 @@ Over the past few years freeRTOS development has become increasingly 32-bit orie
 FreeRTOS has a multitude of configuration options, which can be specified from within the FreeRTOSConfig.h file.
 To keep commonality with all of the Arduino hardware options, some sensible defaults have been selected. Feel free to change these defaults as you gain experience with FreeRTOS.
 
-The AVR Watchdog Timer is used to generate 15ms time slices (Ticks), but Tasks that finish before their allocated time will hand execution back to the Scheduler.
+Normally, the AVR Watchdog Timer is used to generate 15ms time slices (Ticks). For applications requiring high precision timing, the Ticks can be sourced from a hardware timer or external clock. See chapter [Scheduler Tick Sources](./doc/tick_sources.md) for the configuration details. 
 
-Time slices can be selected from 15ms up to 500ms. Slower time slicing can allow the Arduino MCU to sleep for longer, without the complexity of a Tickless idle.
-
-Watchdog period options:
-* `WDTO_15MS`
-* `WDTO_30MS`
-* `WDTO_60MS`
-* `WDTO_120MS`
-* `WDTO_250MS`
-* `WDTO_500MS`
-* `WDTO_1S`
-* `WDTO_2S`
-
-Note that Timer resolution (or granularity) is affected by integer math division and the time slice selected. Trying to measure 50ms, using a 120ms time slice for example, won't work.
+Tasks that finish before their allocated time will hand execution back to the Scheduler.
 
 The Arduino `delay()` function has been redefined to automatically use the FreeRTOS `vTaskDelay()` function when the delay required is one Tick or longer, by setting `configUSE_PORT_DELAY` to `1`, so that simple Arduino example sketches and tutorials work as expected. If you would like to measure a short millisecond delay of less than one Tick, then preferably use [`millis()`](https://www.arduino.cc/reference/en/language/functions/time/millis/) (or with greater granularity use [`micros()`](https://www.arduino.cc/reference/en/language/functions/time/micros/)) to achieve this outcome (for example see [BlinkWithoutDelay](https://docs.arduino.cc/built-in-examples/digital/BlinkWithoutDelay)). However, when the delay requested is less than one Tick then the original Arduino `delay()` function will be automatically selected.
 

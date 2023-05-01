@@ -93,7 +93,7 @@ typedef uint8_t                     UBaseType_t;
 #if defined( portUSE_WDTO )
 #define portTICK_PERIOD_MS          ( (TickType_t) _BV( portUSE_WDTO + 4 ) )
 #else
-#define portTICK_PERIOD_MS          ( (TickType_t) 1000 / configTICK_RATE_HZ )
+// Variant configuration must define portTICK_PERIOD_MS as macro like `( (TickType_t) 1000 / configTICK_RATE_HZ )` or a constant value like `16`
 #endif
 
 #define portBYTE_ALIGNMENT          1

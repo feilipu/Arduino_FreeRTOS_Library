@@ -50,17 +50,6 @@
 #elif defined( portUSE_TIMER0 )
 /* Hardware constants for Timer0. */
     #warning "Timer0 used for scheduler."
-    #define portSCHEDULER_ISR           TIMER0_COMPA_vect
-    #define portCLEAR_COUNTER_ON_MATCH  ( (uint8_t) _BV(WGM01) )
-    #define portPRESCALE_1024           ( (uint8_t) (_BV(CS02)|_BV(CS00)) )
-    #define portCLOCK_PRESCALER         ( (uint32_t) 1024 )
-    #define portCOMPARE_MATCH_A_INTERRUPT_ENABLE    ( (uint8_t) _BV(OCIE0A) )
-    #define portOCRL                    OCR0A
-    #define portTCCRa                   TCCR0A
-    #define portTCCRb                   TCCR0B
-    #define portTIMSK                   TIMSK0
-    #define portTIFR                    TIFR0
-
 #else
     #error "No Timer defined for scheduler."
 #endif
@@ -525,12 +514,6 @@ volatile TickType_t ticksRemainingInSec;
 /*-----------------------------------------------------------*/
 
 /*
- * Perform hardware setup to enable ticks from relevant Timer.
- */
-static void prvSetupTimerInterrupt( void );
-/*-----------------------------------------------------------*/
-
-/*
  * See header file for description.
  */
 StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t pxCode, void *pvParameters )
@@ -653,6 +636,7 @@ void vPortEndScheduler( void )
 extern void delay ( unsigned long ms );
 
 void vPortDelay( const uint32_t ms ) __attribute__ ((hot, flatten));
+#if defined( portUSE_WDTO )
 void vPortDelay( const uint32_t ms )
 {
     if ( ms < portTICK_PERIOD_MS )
@@ -665,6 +649,10 @@ void vPortDelay( const uint32_t ms )
         delay( (unsigned long) (ms - portTICK_PERIOD_MS) % portTICK_PERIOD_MS );
     }
 }
+#elif defined( portUSE_TIMER0 )
+// The user is responsible to provide function `vPortDelay`
+extern void vPortDelay( const uint32_t ms ) __attribute__ ((hot, flatten));
+#endif
 /*-----------------------------------------------------------*/
 
 /*
@@ -732,45 +720,13 @@ void prvSetupTimerInterrupt( void )
 }
 
 #elif defined( portUSE_TIMER0 )
-/*
- * Setup Timer0 compare match A to generate a tick interrupt.
- */
-static void prvSetupTimerInterrupt( void )
-{
-uint32_t ulCompareMatch;
-uint8_t ucLowByte;
-
-    /* Using 8bit Timer0 to generate the tick. Correct fuses must be
-    selected for the configCPU_CLOCK_HZ clock.*/
-
-    ulCompareMatch = configCPU_CLOCK_HZ / configTICK_RATE_HZ;
-
-    /* We only have 8 bits so have to scale 1024 to get our required tick rate. */
-    ulCompareMatch /= portCLOCK_PRESCALER;
-
-    /* Adjust for correct value. */
-    ulCompareMatch -= ( uint32_t ) 1;
-
-    /* Setup compare match value for compare match A. Interrupts are disabled
-    before this is called so we need not worry here. */
-    ucLowByte = ( uint8_t ) ( ulCompareMatch & ( uint32_t ) 0xff );
-    portOCRL = ucLowByte;
-
-    /* Setup clock source and compare match behaviour. */
-    portTCCRa = portCLEAR_COUNTER_ON_MATCH;
-    portTCCRb = portPRESCALE_1024;
-
-
-    /* Enable the interrupt - this is okay as interrupt are currently globally disabled. */
-    ucLowByte = portTIMSK;
-    ucLowByte |= portCOMPARE_MATCH_A_INTERRUPT_ENABLE;
-    portTIMSK = ucLowByte;
-}
-
+// The user is responsible to provide function `prvSetupTimerInterrupt`
+extern void prvSetupTimerInterrupt( void );
 #endif
 
 /*-----------------------------------------------------------*/
 
+#if defined( portUSE_WDTO )
 #if configUSE_PREEMPTION == 1
 
     /*
@@ -786,7 +742,7 @@ uint8_t ucLowByte;
  */
     ISR(portSCHEDULER_ISR)
     {
-        vPortYieldFromTick();
+        portSchedulerTick();
         __asm__ __volatile__ ( "reti" );
     }
 #else
@@ -803,6 +759,17 @@ uint8_t ucLowByte;
  */
     ISR(portSCHEDULER_ISR)
     {
-        xTaskIncrementTick();
+        portSchedulerTick();
     }
 #endif
+#endif
+/*-----------------------------------------------------------*/
+
+void portSchedulerTick( void )
+{
+#if configUSE_PREEMPTION == 1
+    vPortYieldFromTick();
+#else
+    xTaskIncrementTick();
+#endif
+}
