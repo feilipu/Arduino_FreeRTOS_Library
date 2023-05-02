@@ -47,11 +47,8 @@
 #if defined( portUSE_WDTO )
     #define portSCHEDULER_ISR           WDT_vect
 
-#elif defined( portUSE_TIMER0 )
-/* Hardware constants for Timer0. */
-    #warning "Timer0 used for scheduler."
 #else
-    #error "No Timer defined for scheduler."
+    #warning "The user must define a Timer to be used for the Scheduler."
 #endif
 
 /*-----------------------------------------------------------*/
@@ -514,6 +511,12 @@ volatile TickType_t ticksRemainingInSec;
 /*-----------------------------------------------------------*/
 
 /*
+ * Perform hardware setup to enable ticks from relevant Timer.
+ */
+void prvSetupTimerInterrupt( void );
+/*-----------------------------------------------------------*/
+
+/*
  * See header file for description.
  */
 StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t pxCode, void *pvParameters )
@@ -635,8 +638,8 @@ void vPortEndScheduler( void )
 
 extern void delay ( unsigned long ms );
 
-void vPortDelay( const uint32_t ms ) __attribute__ ((hot, flatten));
 #if defined( portUSE_WDTO )
+void vPortDelay( const uint32_t ms ) __attribute__ ((hot, flatten));
 void vPortDelay( const uint32_t ms )
 {
     if ( ms < portTICK_PERIOD_MS )
@@ -649,8 +652,9 @@ void vPortDelay( const uint32_t ms )
         delay( (unsigned long) (ms - portTICK_PERIOD_MS) % portTICK_PERIOD_MS );
     }
 }
-#elif defined( portUSE_TIMER0 )
-// The user is responsible to provide function `vPortDelay`
+#else
+#warning "The user is responsible to provide function `vPortDelay()`"
+#warning "Arduino uses all AVR MCU Timers, so breakage may occur"
 extern void vPortDelay( const uint32_t ms ) __attribute__ ((hot, flatten));
 #endif
 /*-----------------------------------------------------------*/
@@ -719,14 +723,13 @@ void prvSetupTimerInterrupt( void )
     wdt_interrupt_enable( portUSE_WDTO );
 }
 
-#elif defined( portUSE_TIMER0 )
-// The user is responsible to provide function `prvSetupTimerInterrupt`
+#else
+#warning "The user is responsible to provide function `prvSetupTimerInterrupt()`"
 extern void prvSetupTimerInterrupt( void );
 #endif
 
 /*-----------------------------------------------------------*/
 
-#if defined( portUSE_WDTO )
 #if configUSE_PREEMPTION == 1
 
     /*
@@ -742,7 +745,7 @@ extern void prvSetupTimerInterrupt( void );
  */
     ISR(portSCHEDULER_ISR)
     {
-        portSchedulerTick();
+        vPortYieldFromTick();
         __asm__ __volatile__ ( "reti" );
     }
 #else
@@ -759,17 +762,6 @@ extern void prvSetupTimerInterrupt( void );
  */
     ISR(portSCHEDULER_ISR)
     {
-        portSchedulerTick();
+        xTaskIncrementTick();
     }
 #endif
-#endif
-/*-----------------------------------------------------------*/
-
-void portSchedulerTick( void )
-{
-#if configUSE_PREEMPTION == 1
-    vPortYieldFromTick();
-#else
-    xTaskIncrementTick();
-#endif
-}

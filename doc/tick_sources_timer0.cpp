@@ -47,6 +47,6 @@ void prvSetupTimerInterrupt( void )
 ISR(TIMER0_COMPA_vect, ISR_NAKED) __attribute__ ((hot, flatten));
 ISR(TIMER0_COMPA_vect)
 {
-    portSchedulerTick();
+    vPortYieldFromTick();
     __asm__ __volatile__ ( "reti" );
 }

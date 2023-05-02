@@ -28,21 +28,22 @@ The frequency of the Watchdog Oscillator is voltage and temperature dependent as
 Timing consistency may vary as much as 20% between two devices in same setup due to individual device differences, or between a prototype and production device due to setup differences.
 
 ## Alternative tick sources
-For applications requiring high precision timing, the Ticks can be sourced from a hardware timer or external clock.
+For applications requiring high precision timing, the Ticks can be sourced from one of the hardware timers or an external clock input.
 
-First, you switch it in `FreeRTOSVariant.h` header by removing or undefining `portUSE_WDTO` and defining `portUSE_TIMER0`.
+First, you switch it in `FreeRTOSVariant.h` header by removing or undefining `portUSE_WDTO` and defining, here for example, the 8-bit Timer0 `portUSE_TIMER0`.
 
 ```cpp
 #undef portUSE_WDTO
 #define portUSE_TIMER0
-#define portTICK_PERIOD_MS 16
 ```
 
-Next, in your app you provide two pieces of code: the initialisation function and the ISR hook. Their implementation depends of what is your tick source.
+Next, in your app you provide two pieces of code: the initialisation functions and the ISR hook. Their implementation depends on your tick source.
 
+## Timer specific initialisation and ISR functions
 
-## Hardware timer Timer0
-### Timer initialisation function
+For implementation examples for many different timers, including the RTC Timer2 available on some devices, please refer to `port.c` in the [AVRfreeRTOS Repository](https://github.com/feilipu/avrfreertos/tree/master/freeRTOS10xx/portable).
+
+### Hardware timer Timer0
 _NOTE: This code snippet is verified to work on Atmega2560. Full code available [here](./tick_sources_timer0.cpp)._
 
 ```cpp
@@ -89,44 +90,101 @@ void prvSetupTimerInterrupt( void )
 }
 ```
 
+To switch to an alternative tick source, here for example Timer0, insert this block in `FreeRTOSVariant.h`:
+
+```cpp
+#undef portUSE_WDTO
+#define portUSE_TIMER0
+#define portTICK_PERIOD_MS 16
+
+/*
+ * When a tick source other than WDT is used, configuring the tick source becomes the user's responsibility.
+ * E.g., when using Timer0 for the tick source, you can use the following snippet:
+ */
+
+// Formula for the frequency is:
+//      f = F_CPU / (PRESCALER * (1 + COUNTER_TOP)
+//
+// Assuming the MCU clock of 16MHz, prescaler 1024 and counter top 249, the resulting tick period is 16 ms (62.5 Hz).
+//
+
+#define TICK_PERIOD_16MS     249
+#define PRESCALER            1024
+
+#if (portTICK_PERIOD_MS != (PRESCALER * (1 + TICK_PERIOD_16MS) * 1000 / F_CPU))
+    #warning portTICK_PERIOD_MS defined in FreeRTOSVariant.h differs from your timer configuration
+#endif
+ *
+// For register TCCR0A:
+#define NO_PWM              (0 << COM0A1) | (0 << COM0A0) | (0 << COM0B1) | (0 << COM0B0)
+#define MODE_CTC_TCCR0A     (1 << WGM01) | (0 << WGM00)
+
+// For register TCCR0B:
+#define MODE_CTC_TCCR0B     (0 << WGM02)
+#define PRESCALER_1024      (1 << CS02) | (0 << CS01) | (1 << CS00)
+
+// For register TIMSK0:
+#define INTERRUPT_AT_TOP    (1 << OCIE0A)
+
+extern "C"
+void prvSetupTimerInterrupt( void )
+{
+    // In case Arduino platform has pre-configured the timer,
+    // disable it before re-configuring here to avoid unpredicted results:
+    TIMSK0 = 0;
+ 
+    // Now configure the timer:
+    TCCR0A = NO_PWM | MODE_CTC_TCCR0A;
+    TCCR0B = MODE_CTC_TCCR0B | PRESCALER_1024;
+    OCR0A = TICK_PERIOD_16MS;
+ 
+    // Prevent missing the top and going into a possibly long wait until wrapping around:
+    TCNT0 = 0;
+ 
+    // At this point the global interrupt flag is NOT YET enabled,
+    // so you're NOT starting to get the ISR calls until FreeRTOS enables it just before launching the scheduler.
+    TIMSK0 = INTERRUPT_AT_TOP;
+}
+```
+
 Though Timer0 is given as example here, any timer can be used. A 16-bit timer (e.g., Timer1) is needed for time slices longer than ~20 milliseconds.
 
-### ISR hook
-For **preemptive** scheduler use `naked` attribute to reduce the call overhead:
+### Hardware timer ISR hook
+For **preemptive** scheduler use `ISR_NAKED` attribute to reduce the call overhead:
 
 ```cpp
 ISR(TIMER0_COMPA_vect, ISR_NAKED) __attribute__ ((hot, flatten));
 ISR(TIMER0_COMPA_vect) {
-    portSchedulerTick();
+    vPortYieldFromTick();
     __asm__ __volatile__ ( "reti" );
 }
 ```
 
-The context is saved at the start of `portSchedulerTick()`, then the tick count is incremented, finally the new context is loaded - so no dirtying occurs.
+The register context is saved at the start of `vPortYieldFromTick()`, then the tick count is incremented, finally the new context is loaded - so no dirtying occurs.
 
 
-For **cooperative** scheduler, the context is not saved because no switching is intended; therefore `naked` attribute cannot be applied because cooperative `portSchedulerTick()` dirties the context.
+For **cooperative** scheduler, the register context is not saved because no switching is intended; therefore `naked` attribute cannot be applied because cooperative `xTaskIncrementTick()` dirties the context.
 
 ```cpp
 ISR(TIMER0_COMPA_vect) __attribute__ ((hot, flatten));
 ISR(TIMER0_COMPA_vect) {
-    portSchedulerTick();
+    xTaskIncrementTick();
 }
 ```
 
-Use ISR_NOBLOCK where there is an important timer running, that should preempt the scheduler:
+Use `ISR_NOBLOCK` where there is an important timer running, that should preempt the scheduler:
 ```cpp
 ISR(portSCHEDULER_ISR, ISR_NAKED ISR_NOBLOCK) __attribute__ ((hot, flatten));
 ```
 
-Attributes `hot` and `flatten` help inlining all the code found inside your ISR thus reducing the call overhead.
+The attributes `hot` and `flatten` help inlining all the code found inside your ISR thus reducing the call overhead.
+Note: NO comma before `ISR_NOBLOCK`.
 
 
-## External clock
-### Input configuration function
-_NOTE: This code snippet was not verified on actual MCU._
+### External clock
+_NOTE: This code snippet example has not been verified to work._
 
-Assuming the external clock is connected to data pin 21 (function INT0):
+Assuming the external clock is connected to data pin 21 (external interrupt `INT0`):
 
 ```cpp
 // For register EICRA:
@@ -150,13 +208,13 @@ void prvSetupTimerInterrupt( void )
 ```
 
 
-### ISR hook
+### External clock ISR hook
 Similar to Timer0 ISR, for **preemptive** scheduler:
 
 ```cpp
 ISR(INT0_vect, ISR_NAKED) __attribute__ ((hot, flatten));
 ISR(INT0_vect) {
-    portSchedulerTick();
+    vPortYieldFromTick();
     __asm__ __volatile__ ( "reti" );
 }
 ```
@@ -165,7 +223,7 @@ For **cooperative** scheduler:
 ```cpp
 ISR(INT0_vect) __attribute__ ((hot, flatten));
 ISR(INT0_vect) {
-    portSchedulerTick();
+    xTaskIncrementTick();
 }
 ```
 
