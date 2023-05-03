@@ -38,8 +38,8 @@
 #ifndef ATOMIC_H
 #define ATOMIC_H
 
-#ifndef INC_FREERTOS_H
-    #error "include FreeRTOS.h must appear in source files before include atomic.h"
+#ifndef INC_ARDUINO_FREERTOS_H
+    #error "Arduino_FreeRTOS.h must be included before atomic.h"
 #endif
 
 /* Standard includes. */
