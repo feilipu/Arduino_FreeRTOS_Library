@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.5.0
+ * FreeRTOS Kernel V10.5.1+
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -29,9 +29,11 @@
 #ifndef PORTMACRO_H
 #define PORTMACRO_H
 
+/* *INDENT-OFF* */
 #ifdef __cplusplus
-extern "C" {
+    extern "C" {
 #endif
+/* *INDENT-ON* */
 
 /*-----------------------------------------------------------
  * Port specific definitions.
@@ -49,12 +51,14 @@ typedef uint8_t                     StackType_t;
 typedef int8_t                      BaseType_t;
 typedef uint8_t                     UBaseType_t;
 
-#if configUSE_16_BIT_TICKS == 1
+#if configTICK_TYPE_WIDTH_IN_BITS == TICK_TYPE_WIDTH_16_BITS
     typedef uint16_t                TickType_t;
     #define portMAX_DELAY           ( TickType_t ) 0xffff
-#else
+#elif ( configTICK_TYPE_WIDTH_IN_BITS  == TICK_TYPE_WIDTH_32_BITS )
     typedef uint32_t                TickType_t;
     #define portMAX_DELAY           ( TickType_t ) 0xffffffffUL
+#else
+    #error configTICK_TYPE_WIDTH_IN_BITS set to unsupported tick type width.
 #endif
 /*-----------------------------------------------------------*/
 
@@ -113,8 +117,10 @@ extern void vPortYieldFromISR( void ) __attribute__ ((naked));
 
 #define portTASK_FUNCTION( vFunction, pvParameters ) void vFunction( void *pvParameters )
 
+/* *INDENT-OFF* */
 #ifdef __cplusplus
-}
+    }
 #endif
+/* *INDENT-ON* */
 
 #endif /* PORTMACRO_H */

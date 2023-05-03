@@ -1,6 +1,10 @@
-Changes between FreeRTOS V10.4.6 and FreeRTOS V10.5.0 released September 16 2022
-
 Documentation and download available at https://www.FreeRTOS.org/
+
+Changes between FreeRTOS V10.5.0 and FreeRTOS V10.5.1 released May 3 2023
+	+ Updated the kernel version in manifest and SBOM
+	+ Updates from repo, mainly typos and minor additions
+
+Changes between FreeRTOS V10.4.6 and FreeRTOS V10.5.0 released September 16 2022
 
 	+ Heap improvements:
 	  - Add a check to heap_2 to track if a memory block is allocated to
@@ -23,11 +27,11 @@ Documentation and download available at https://www.FreeRTOS.org/
 	  The feature can be controlled by setting  the configuration option
 	  configUSE_SB_COMPLETED_CALLBACK in FreeRTOSConfig.h. When the option is set to 1,
 	  APIs xStreamBufferCreateWithCallback() or xStreamBufferCreateStaticWithCallback()
-	  (and likewise APIs for message buffer) can be used to create a stream buffer 
+	  (and likewise APIs for message buffer) can be used to create a stream buffer
 	  or message buffer instance with application provided callback overrides. When
 	  the option is set to 0, then the default callbacks as defined by
-	  sbSEND_COMPLETED() and sbRECEIVE_COMPLETED() macros are invoked. To maintain 
-	  backwards compatibility, configUSE_SB_COMPLETED_CALLBACK defaults to 0. The 
+	  sbSEND_COMPLETED() and sbRECEIVE_COMPLETED() macros are invoked. To maintain
+	  backwards compatibility, configUSE_SB_COMPLETED_CALLBACK defaults to 0. The
 	  functionality is currently not supported for MPU enabled ports.
 	+ Generalize the FreeRTOS's Thread Local Storage (TLS) support so that it
 	  is not tied to newlib and can be used with other c-runtime libraries also.

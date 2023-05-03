@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.5.0
+ * FreeRTOS Kernel V10.5.1+
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -154,7 +154,7 @@
  * task.  Other tasks communicate with the timer service task using the
  * xTimerQueue queue.
  */
-    static portTASK_FUNCTION_PROTO( prvTimerTask, pvParameters ) PRIVILEGED_FUNCTION;
+    static portTASK_FUNCTION_PROTO( prvTimerTask, pvParameters ) portNORETURN PRIVILEGED_FUNCTION;
 
 /*
  * Called by the timer service task to interpret and process a command it
@@ -506,6 +506,30 @@
     }
 /*-----------------------------------------------------------*/
 
+    #if ( configSUPPORT_STATIC_ALLOCATION == 1 )
+        BaseType_t xTimerGetStaticBuffer( TimerHandle_t xTimer,
+                                          StaticTimer_t ** ppxTimerBuffer )
+        {
+            BaseType_t xReturn;
+            Timer_t * pxTimer = xTimer;
+
+            configASSERT( ppxTimerBuffer != NULL );
+
+            if( ( pxTimer->ucStatus & tmrSTATUS_IS_STATICALLY_ALLOCATED ) != 0 )
+            {
+                *ppxTimerBuffer = ( StaticTimer_t * ) pxTimer;
+                xReturn = pdTRUE;
+            }
+            else
+            {
+                xReturn = pdFALSE;
+            }
+
+            return xReturn;
+        }
+    #endif /* configSUPPORT_STATIC_ALLOCATION */
+/*-----------------------------------------------------------*/
+
     const char * pcTimerGetName( TimerHandle_t xTimer ) /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
     {
         Timer_t * pxTimer = xTimer;
@@ -537,7 +561,7 @@
     static void prvProcessExpiredTimer( const TickType_t xNextExpireTime,
                                         const TickType_t xTimeNow )
     {
-        Timer_t * const pxTimer = ( Timer_t * ) listGET_OWNER_OF_HEAD_ENTRY( pxCurrentTimerList ); /*lint !e9087 !e9079 void * is used as this macro is used with tasks and co-routines too.  Alignment is known to be fine as the type of the pointer stored and retrieved is the same. */
+        Timer_t * const pxTimer = ( Timer_t * ) listGET_OWNER_OF_HEAD_ENTRY( pxCurrentTimerList ); /*lint !e9087 !e9079 void * is used as this macro is used with tasks too.  Alignment is known to be fine as the type of the pointer stored and retrieved is the same. */
 
         /* Remove the timer from the list of active timers.  A check has already
          * been performed to ensure the list is not empty. */
@@ -571,8 +595,6 @@
 
         #if ( configUSE_DAEMON_TASK_STARTUP_HOOK == 1 )
         {
-            extern void vApplicationDaemonTaskStartupHook( void );
-
             /* Allow the application writer to execute some code in the context of
              * this task at the point the task starts executing.  This is useful if the
              * application includes initialisation code that would benefit from

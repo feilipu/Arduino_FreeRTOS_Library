@@ -13,7 +13,7 @@ My other [AVRfreeRTOS Sourceforge Repository](https://sourceforge.net/projects/a
 
 This library was the genesis of [generalised support for the ATmega platform within FreeRTOS](https://github.com/FreeRTOS/FreeRTOS-Kernel/pull/48).
 
-Over the past few years freeRTOS development has become increasingly 32-bit orientated, with little change or improvement for the 8-bit world. As such I'm treating this 16th September 2022 10.5.0 release as my LTS release.
+Over the past few years freeRTOS development has become increasingly 32-bit orientated, with little change or improvement for the 8-bit world. As such I'm treating this FreeRTOS V10.5.x (released May 1 2023) as my LTS release.
 
 
 ## General

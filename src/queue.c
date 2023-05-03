@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.5.0
+ * FreeRTOS Kernel V10.5.1+
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -260,14 +260,14 @@ static void prvInitialiseNewQueue( const UBaseType_t uxQueueLength,
  * tasks than the number of tasks in the system.
  */
 #define prvIncrementQueueTxLock( pxQueue, cTxLock )                           \
-    {                                                                         \
+    do {                                                                      \
         const UBaseType_t uxNumberOfTasks = uxTaskGetNumberOfTasks();         \
         if( ( UBaseType_t ) ( cTxLock ) < uxNumberOfTasks )                   \
         {                                                                     \
             configASSERT( ( cTxLock ) != queueINT8_MAX );                     \
             ( pxQueue )->cTxLock = ( int8_t ) ( ( cTxLock ) + ( int8_t ) 1 ); \
         }                                                                     \
-    }
+    } while( 0 )
 
 /*
  * Macro to increment cRxLock member of the queue data structure. It is
@@ -275,14 +275,14 @@ static void prvInitialiseNewQueue( const UBaseType_t uxQueueLength,
  * tasks than the number of tasks in the system.
  */
 #define prvIncrementQueueRxLock( pxQueue, cRxLock )                           \
-    {                                                                         \
+    do {                                                                      \
         const UBaseType_t uxNumberOfTasks = uxTaskGetNumberOfTasks();         \
         if( ( UBaseType_t ) ( cRxLock ) < uxNumberOfTasks )                   \
         {                                                                     \
             configASSERT( ( cRxLock ) != queueINT8_MAX );                     \
             ( pxQueue )->cRxLock = ( int8_t ) ( ( cRxLock ) + ( int8_t ) 1 ); \
         }                                                                     \
-    }
+    } while( 0 )
 /*-----------------------------------------------------------*/
 
 BaseType_t xQueueGenericReset( QueueHandle_t xQueue,
@@ -410,6 +410,55 @@ BaseType_t xQueueGenericReset( QueueHandle_t xQueue,
         }
 
         return pxNewQueue;
+    }
+
+#endif /* configSUPPORT_STATIC_ALLOCATION */
+/*-----------------------------------------------------------*/
+
+#if ( configSUPPORT_STATIC_ALLOCATION == 1 )
+
+    BaseType_t xQueueGenericGetStaticBuffers( QueueHandle_t xQueue,
+                                              uint8_t ** ppucQueueStorage,
+                                              StaticQueue_t ** ppxStaticQueue )
+    {
+        BaseType_t xReturn;
+        Queue_t * const pxQueue = xQueue;
+
+        configASSERT( pxQueue );
+        configASSERT( ppxStaticQueue );
+
+        #if ( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
+        {
+            /* Check if the queue was statically allocated. */
+            if( pxQueue->ucStaticallyAllocated == ( uint8_t ) pdTRUE )
+            {
+                if( ppucQueueStorage != NULL )
+                {
+                    *ppucQueueStorage = ( uint8_t * ) pxQueue->pcHead;
+                }
+
+                *ppxStaticQueue = ( StaticQueue_t * ) pxQueue;
+                xReturn = pdTRUE;
+            }
+            else
+            {
+                xReturn = pdFALSE;
+            }
+        }
+        #else /* configSUPPORT_DYNAMIC_ALLOCATION */
+        {
+            /* Queue must have been statically allocated. */
+            if( ppucQueueStorage != NULL )
+            {
+                *ppucQueueStorage = ( uint8_t * ) pxQueue->pcHead;
+            }
+
+            *ppxStaticQueue = ( StaticQueue_t * ) pxQueue;
+            xReturn = pdTRUE;
+        }
+        #endif /* configSUPPORT_DYNAMIC_ALLOCATION */
+
+        return xReturn;
     }
 
 #endif /* configSUPPORT_STATIC_ALLOCATION */
@@ -1042,7 +1091,7 @@ BaseType_t xQueueGenericSendFromISR( QueueHandle_t xQueue,
                                      const BaseType_t xCopyPosition )
 {
     BaseType_t xReturn;
-    UBaseType_t uxSavedInterruptStatus;
+    BaseType_t xSavedInterruptStatus;
     Queue_t * const pxQueue = xQueue;
 
     configASSERT( pxQueue );
@@ -1070,7 +1119,7 @@ BaseType_t xQueueGenericSendFromISR( QueueHandle_t xQueue,
      * read, instead return a flag to say whether a context switch is required or
      * not (i.e. has a task with a higher priority than us been woken by this
      * post). */
-    uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
+    xSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
     {
         if( ( pxQueue->uxMessagesWaiting < pxQueue->uxLength ) || ( xCopyPosition == queueOVERWRITE ) )
         {
@@ -1195,7 +1244,7 @@ BaseType_t xQueueGenericSendFromISR( QueueHandle_t xQueue,
             xReturn = errQUEUE_FULL;
         }
     }
-    portCLEAR_INTERRUPT_MASK_FROM_ISR( uxSavedInterruptStatus );
+    portCLEAR_INTERRUPT_MASK_FROM_ISR( xSavedInterruptStatus );
 
     return xReturn;
 }
@@ -1205,7 +1254,7 @@ BaseType_t xQueueGiveFromISR( QueueHandle_t xQueue,
                               BaseType_t * const pxHigherPriorityTaskWoken )
 {
     BaseType_t xReturn;
-    UBaseType_t uxSavedInterruptStatus;
+    BaseType_t xSavedInterruptStatus;
     Queue_t * const pxQueue = xQueue;
 
     /* Similar to xQueueGenericSendFromISR() but used with semaphores where the
@@ -1241,7 +1290,7 @@ BaseType_t xQueueGiveFromISR( QueueHandle_t xQueue,
      * link: https://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html */
     portASSERT_IF_INTERRUPT_PRIORITY_INVALID();
 
-    uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
+    xSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
     {
         const UBaseType_t uxMessagesWaiting = pxQueue->uxMessagesWaiting;
 
@@ -1361,7 +1410,7 @@ BaseType_t xQueueGiveFromISR( QueueHandle_t xQueue,
             xReturn = errQUEUE_FULL;
         }
     }
-    portCLEAR_INTERRUPT_MASK_FROM_ISR( uxSavedInterruptStatus );
+    portCLEAR_INTERRUPT_MASK_FROM_ISR( xSavedInterruptStatus );
 
     return xReturn;
 }
@@ -1596,15 +1645,6 @@ BaseType_t xQueueSemaphoreTake( QueueHandle_t xQueue,
             {
                 if( xTicksToWait == ( TickType_t ) 0 )
                 {
-                    /* For inheritance to have occurred there must have been an
-                     * initial timeout, and an adjusted timeout cannot become 0, as
-                     * if it were 0 the function would have exited. */
-                    #if ( configUSE_MUTEXES == 1 )
-                    {
-                        configASSERT( xInheritanceOccurred == pdFALSE );
-                    }
-                    #endif /* configUSE_MUTEXES */
-
                     /* The semaphore count was 0 and no block time is specified
                      * (or the block time has expired) so exit now. */
                     taskEXIT_CRITICAL();
@@ -1885,7 +1925,7 @@ BaseType_t xQueueReceiveFromISR( QueueHandle_t xQueue,
                                  BaseType_t * const pxHigherPriorityTaskWoken )
 {
     BaseType_t xReturn;
-    UBaseType_t uxSavedInterruptStatus;
+    BaseType_t xSavedInterruptStatus;
     Queue_t * const pxQueue = xQueue;
 
     configASSERT( pxQueue );
@@ -1907,7 +1947,7 @@ BaseType_t xQueueReceiveFromISR( QueueHandle_t xQueue,
      * link: https://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html */
     portASSERT_IF_INTERRUPT_PRIORITY_INVALID();
 
-    uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
+    xSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
     {
         const UBaseType_t uxMessagesWaiting = pxQueue->uxMessagesWaiting;
 
@@ -1967,7 +2007,7 @@ BaseType_t xQueueReceiveFromISR( QueueHandle_t xQueue,
             traceQUEUE_RECEIVE_FROM_ISR_FAILED( pxQueue );
         }
     }
-    portCLEAR_INTERRUPT_MASK_FROM_ISR( uxSavedInterruptStatus );
+    portCLEAR_INTERRUPT_MASK_FROM_ISR( xSavedInterruptStatus );
 
     return xReturn;
 }
@@ -1977,7 +2017,7 @@ BaseType_t xQueuePeekFromISR( QueueHandle_t xQueue,
                               void * const pvBuffer )
 {
     BaseType_t xReturn;
-    UBaseType_t uxSavedInterruptStatus;
+    BaseType_t xSavedInterruptStatus;
     int8_t * pcOriginalReadPosition;
     Queue_t * const pxQueue = xQueue;
 
@@ -2001,7 +2041,7 @@ BaseType_t xQueuePeekFromISR( QueueHandle_t xQueue,
      * link: https://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html */
     portASSERT_IF_INTERRUPT_PRIORITY_INVALID();
 
-    uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
+    xSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
     {
         /* Cannot block in an ISR, so check there is data available. */
         if( pxQueue->uxMessagesWaiting > ( UBaseType_t ) 0 )
@@ -2022,7 +2062,7 @@ BaseType_t xQueuePeekFromISR( QueueHandle_t xQueue,
             traceQUEUE_PEEK_FROM_ISR_FAILED( pxQueue );
         }
     }
-    portCLEAR_INTERRUPT_MASK_FROM_ISR( uxSavedInterruptStatus );
+    portCLEAR_INTERRUPT_MASK_FROM_ISR( xSavedInterruptStatus );
 
     return xReturn;
 }
