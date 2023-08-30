@@ -1,2 +1,5 @@
 # Ignore .development file, https://arduino.github.io/arduino-cli/library-specification/#development-flag-file
 .development
+
+.DS_Store
+Icon
