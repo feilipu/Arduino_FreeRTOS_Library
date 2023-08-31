@@ -6,6 +6,7 @@
  *
  */
 
+#include <lgtx8p.h>    // lgt8f328p spec
 #include <FreeRTOSVariant.h>
 
 /*
