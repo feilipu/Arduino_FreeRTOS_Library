@@ -51,13 +51,25 @@
 #define portFLAGS_INT_ENABLED           ( (StackType_t) 0x80 )
 
 #if defined( portUSE_WDTO )
+
     #define portSCHEDULER_ISR           WDT_vect
 
 #elif defined( portUSE_LGT_TIMER3 )
 
+    #define portSCHEDULER_ISR           TIMER3_vect
 
 #else
+
     #warning "The user must define a Timer to be used for the Scheduler."
+
+#endif
+
+/*-----------------------------------------------------------*/
+
+#if defined( portUSE_WDTO )
+#warning "Note: You are compiling Arduino_FreeRTOS library for an AVR MCU using WDT."
+#elif defined( portUSE_LGT_TIMER3 )
+#warning "Note: You are compiling Arduino_FreeRTOS library for LGT8F328 MCU using Timer 3."
 #endif
 
 /*-----------------------------------------------------------*/
@@ -815,13 +827,13 @@ extern void prvSetupTimerInterrupt( void );
         vPortYieldFromTick();
         __asm__ __volatile__ ( "reti" );
     }
-	 	 
-	 #elif defined( portUSE_LGT_TIMER3 )
-	 	 
-    ISR(TIMER3_vect, ISR_NAKED) __attribute__ ((hot, flatten));
+         
+     #elif defined( portUSE_LGT_TIMER3 )
+         
+    ISR(portSCHEDULER_ISR, ISR_NAKED) __attribute__ ((hot, flatten));
 /*  ISR(portSCHEDULER_ISR, ISR_NAKED ISR_NOBLOCK) __attribute__ ((hot, flatten));
  */
-    ISR(TIMER3_vect)
+    ISR(portSCHEDULER_ISR)
     {
         if (TIFR3 & (1 << OCF3A)) {
             TIFR3 = 1 << OCF3A;
@@ -830,11 +842,11 @@ extern void prvSetupTimerInterrupt( void );
             __asm__ __volatile__ ( "reti" );
         }
     }
-	  
-	 #else
+      
+     #else
          #warning "The user is responsible to provide the corrcet statements for the ISR"
-	 #endif 
-	 
+     #endif 
+     
 #else
 
     /*
@@ -844,9 +856,9 @@ extern void prvSetupTimerInterrupt( void );
      *
      * use ISR_NOBLOCK where there is an important timer running, that should preempt the scheduler.
      */
-	 
-	 #if defined( portUSE_WDTO )
-	 
+     
+     #if defined( portUSE_WDTO )
+     
     ISR(portSCHEDULER_ISR) __attribute__ ((hot, flatten));
 /*  ISR(portSCHEDULER_ISR, ISR_NOBLOCK) __attribute__ ((hot, flatten));
  */
@@ -854,23 +866,23 @@ extern void prvSetupTimerInterrupt( void );
     {
         xTaskIncrementTick();
     }
-	 
-	 #elif defined( portUSE_LGT_TIMER3 )
-	 
-    ISR(TIMER3_vect) __attribute__ ((hot, flatten));
+     
+     #elif defined( portUSE_LGT_TIMER3 )
+     
+    ISR(portSCHEDULER_ISR) __attribute__ ((hot, flatten));
 /*  ISR(portSCHEDULER_ISR, ISR_NOBLOCK) __attribute__ ((hot, flatten));
  */
-    ISR(TIMER3_vect)
-	 {
+    ISR(portSCHEDULER_ISR)
+     {
         if (TIFR3 & (1 << OCF3A)) {
             TIFR3 = 1 << OCF3A;
             /* on OCR3A match */
             xTaskIncrementTick();
         }
-	 }
-	 
+     }
+     
     #else
         #warning "The user is responsible to provide the corrcet statements for the ISR"
     #endif
-	 
+     
 #endif

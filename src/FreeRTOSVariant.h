@@ -54,15 +54,17 @@ extern "C" {
                                 WDTO_1S
                                 WDTO_2S
 */
-	
+
+   
 // #define portUSE_LGT_TIMER3                  // portUSE_LGT_TIMER3 uncomment to use the 16 bit Timer 3 (on LGT8F328 MCU) for xTaskIncrementTick
 
+
 #if defined( portUSE_LGT_TIMER3 )
-	
+   
     #if defined( portUSE_WDTO )
         #undef portUSE_WDTO
     #endif
-	
+   
     // Formula for the frequency is: f = F_CPU / (PRESCALER * (1 + COUNTER_TOP))
     #define PRESCALER           8
 
@@ -75,24 +77,24 @@ extern "C" {
     #elif ( F_CPU == 8000000UL )
         // Assuming the MCU clock of  8MHz, Timer 3 is 16 bits, prescaler 8 and counter top 15001, the resulting tick period is 15 ms (66.66 Hz).
         #define TICK_PERIOD_15MS    15001UL
-    #else	
+    #else   
         #error "Unsupported MCU frequency."
     #endif // F_CPU options
 
     #define configTICK_RATE_HZ  ( (TickType_t) ( F_CPU / (uint32_t) ( PRESCALER * ( 1 + TICK_PERIOD_15MS ) ) ) )
-    #define portTICK_PERIOD_MS  ( (TickType_t) ( 1000 / configTICK_RATE_HZ ) )	
+    #define portTICK_PERIOD_MS  ( (TickType_t) ( 1000 / configTICK_RATE_HZ ) )   
 
 #elif defined( portUSE_WDTO )
 
     #define configTICK_RATE_HZ  ( (TickType_t)( (uint32_t)128000 >> (portUSE_WDTO + 11) ) )  // 2^11 = 2048 WDT scaler for 128kHz Timer
     #define portTICK_PERIOD_MS  ( (TickType_t) _BV( portUSE_WDTO + 4 ) )
-	
+   
 #else
-	
+   
     #warning "Variant configuration must define `configTICK_RATE_HZ` and `portTICK_PERIOD_MS` as either a macro or a constant"
     #define configTICK_RATE_HZ  1
     #define portTICK_PERIOD_MS  ( (TickType_t) 1000 / configTICK_RATE_HZ )
-	
+   
 #endif
 
 /*-----------------------------------------------------------*/
