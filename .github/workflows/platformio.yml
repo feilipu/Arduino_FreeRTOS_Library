@@ -15,6 +15,17 @@ jobs:
       matrix:
         example:
           - examples/AnalogRead_DigitalRead/AnalogRead_DigitalRead.ino
+          - examples/ArrayQueue/ArrayQueue.ino
+          - examples/Assert/Assert.ino
+          - examples/Blink_AnalogRead/Blink_AnalogRead.ino
+          - examples/IntegerQueue/IntegerQueue.ino
+          - examples/Interrupts/Interrupts.ino
+          - examples/Mutex/Mutex.ino
+          - examples/Notifications/Notifications.ino
+          - examples/StructArray/StructArray.ino
+          - examples/StructQueue/StructQueue.ino
+          - examples/TaskStatus/TaskStatus.ino
+          - examples/TaskUtilities/TaskUtilities.ino
 
     steps:
       - name: Checkout
@@ -37,4 +48,4 @@ jobs:
         run: pip install --upgrade platformio
 
       - name: Build PlatformIO examples
-        run: PIO ci --lib="." --board=uno --board=leonardo --board=sanguino_atmega1284p --board=megaatmega2560 ${{ matrix.example }}
+        run: pio ci --lib="." --board=uno --board=leonardo --board=sanguino_atmega1284p --board=megaatmega2560 ${{ matrix.example }}
