@@ -3,7 +3,7 @@ This is a fork of Richard Barry's freeRTOS, optimised for the Arduino AVR device
 It has been created to provide access to FreeRTOS capabilities, with full compatibility to the Arduino environment.
 It does this by keeping hands off almost everything, and only touching the minimum of hardware to be successful.
 
-If you want to use on family of renesas Arduino like Arduino Uno R4, it is [already included](https://github.com/arduino/ArduinoCore-renesas/tree/main/libraries/Arduino_FreeRTOS).
+If you want to use FreeRTOS on the Renesas family of Arduino like the Arduino Uno R4, it is [already included](https://github.com/arduino/ArduinoCore-renesas/tree/main/libraries/Arduino_FreeRTOS). All that is required is to include the header file `Arduino_FreeRTOS.h` as noted below.
 
 ## Usage & Further Reading
 
@@ -62,8 +62,10 @@ Testing with the Software Serial library shows some incompatibilities at low bau
   * ATmega1284p @ 24.576MHz : Seeed Studio Goldilocks, Seeed Studio Goldilocks Analogue
   * ATmega2560 @ 16MHz : Arduino Mega, Arduino ADK
   * ATmega2560 @ 16MHz : Seeed Studio ADK
-  
+
 The new megaAVR 0-Series devices (eg. ATmega4809) are not fully compatible with this library. Their Timer configuration is substantially different from previous devices, and forms part of a new __avr8x__ architecture. It may be a while until avr-libc is updated to include support for megaAVR devices, but when that happens further work will be added here.
+
+The Arduino IDE supporting the Arduino UNO R4 already includes FreeRTOS as standard.
 
 ## Files & Configuration
 
