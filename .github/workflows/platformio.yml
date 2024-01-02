@@ -1,0 +1,51 @@
+name: Test PlatformIO support
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        example:
+          - examples/AnalogRead_DigitalRead/AnalogRead_DigitalRead.ino
+          - examples/ArrayQueue/ArrayQueue.ino
+          - examples/Assert/Assert.ino
+          - examples/Blink_AnalogRead/Blink_AnalogRead.ino
+          - examples/IntegerQueue/IntegerQueue.ino
+          - examples/Interrupts/Interrupts.ino
+          - examples/Mutex/Mutex.ino
+          - examples/Notifications/Notifications.ino
+          - examples/StructArray/StructArray.ino
+          - examples/StructQueue/StructQueue.ino
+          - examples/TaskStatus/TaskStatus.ino
+          - examples/TaskUtilities/TaskUtilities.ino
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.platformio/.cache
+          key: ${{ runner.os }}-pio
+
+      - name: Install python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install PlatformIO Core
+        run: pip install --upgrade platformio
+
+      - name: Build PlatformIO examples
+        run: pio ci --lib="." --board=uno --board=leonardo --board=sanguino_atmega1284p --board=megaatmega2560 ${{ matrix.example }}
