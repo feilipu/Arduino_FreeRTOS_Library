@@ -648,8 +648,8 @@ void vPortDelay( const uint32_t ms )
     }
     else
     {
-        vTaskDelay( (TickType_t) (ms) / portTICK_PERIOD_MS );
-        delay( (unsigned long) (ms - portTICK_PERIOD_MS) % portTICK_PERIOD_MS );
+        vTaskDelay( (TickType_t) (ms / portTICK_PERIOD_MS) );
+        delay( (unsigned long) ( (ms - portTICK_PERIOD_MS) % portTICK_PERIOD_MS ) );
     }
 }
 #else
