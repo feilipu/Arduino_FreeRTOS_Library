@@ -1,9 +1,9 @@
 This is a fork of Richard Barry's freeRTOS, optimised for the Arduino AVR devices.
 
-It has been created to provide access to FreeRTOS capabilities, with full compatibility to the Arduino environment.
+It has been created to provide access to FreeRTOS capabilities, with full compatibility to the Arduino IDE environment.
 It does this by keeping hands off almost everything, and only touching the minimum of hardware to be successful.
 
-If you want to use FreeRTOS on the Renesas family of Arduino like the Arduino Uno R4, it is [already included](https://github.com/arduino/ArduinoCore-renesas/tree/main/libraries/Arduino_FreeRTOS). All that is required is to include the header file `Arduino_FreeRTOS.h` as noted below.
+If you want to use FreeRTOS on the Renesas family of Arduino like the Arduino UNO R4, it is [already included](https://github.com/arduino/ArduinoCore-renesas/tree/main/libraries/Arduino_FreeRTOS). All that is required is to include the header file `Arduino_FreeRTOS.h` provided by the Arduino IDE, as noted below.
 
 ## Usage & Further Reading
 
@@ -15,8 +15,7 @@ My other [AVRfreeRTOS Sourceforge Repository](https://sourceforge.net/projects/a
 
 This library was the genesis of [generalised support for the ATmega platform within FreeRTOS](https://github.com/FreeRTOS/FreeRTOS-Kernel/pull/48).
 
-Over the past few years freeRTOS development has become increasingly 32-bit orientated, with little change or improvement for the 8-bit world. As such I'm treating this FreeRTOS V10.5.x (released May 1 2023) as my LTS release.
-
+Over the past few years freeRTOS development has become increasingly 32-bit orientated, now including symmetric multiprocessing, with little change or improvement for the 8-bit world. As such I'm treating this FreeRTOS V11.0.1 (released January 1 2024) as my LTS release.
 
 ## General
 
@@ -29,7 +28,7 @@ Tasks that finish before their allocated time will hand execution back to the Sc
 
 The Arduino `delay()` function has been redefined to automatically use the FreeRTOS `vTaskDelay()` function when the delay required is one Tick or longer, by setting `configUSE_PORT_DELAY` to `1`, so that simple Arduino example sketches and tutorials work as expected. If you would like to measure a short millisecond delay of less than one Tick, then preferably use [`millis()`](https://www.arduino.cc/reference/en/language/functions/time/millis/) (or with greater granularity use [`micros()`](https://www.arduino.cc/reference/en/language/functions/time/micros/)) to achieve this outcome (for example see [BlinkWithoutDelay](https://docs.arduino.cc/built-in-examples/digital/BlinkWithoutDelay)). However, when the delay requested is less than one Tick then the original Arduino `delay()` function will be automatically selected.
 
-The 8-bit AVR Timer0 has been added as an option for the experienced user. Please examine the source code to figure out how to use it. Reconfiguring Timer0 for FreeRTOS will break Arduino `millis()` and `micros()` though, as these functions rely on Timer0.
+The 8-bit AVR Timer0 has been added as an option for the experienced user. Please examine the Timer0 source code to figure out how to use it. Reconfiguring Timer0 for FreeRTOS will break Arduino `millis()` and `micros()` though, as these functions rely on Timer0. Example support for the Logic Green is provided via an open PR.
 
 Stack for the `loop()` function has been set at 192 Bytes. This can be configured by adjusting the `configMINIMAL_STACK_SIZE` parameter. If you have stack overflow issues, just increase it. Users should prefer to allocate larger structures, arrays, or buffers using `pvPortMalloc()`, rather than defining them locally on the stack. Ideally you should not use `loop()` for your sketches, and then the stack size can be reduced down to 85 Bytes, saving some valuable memory.
 
@@ -39,6 +38,7 @@ Memory for the heap is allocated by the normal `malloc()` function, wrapped by `
 
 * [Upgrading to FreeRTOS-9](https://www.freertos.org/FreeRTOS-V9.html)
 * [Upgrading to FreeRTOS-10](https://www.freertos.org/FreeRTOS-V10.html)
+* [Symmetric Multiprocessing with FreeRTOS-11](https://www.freertos.org/2023/12/introducing-freertos-kernel-version-11-0-0-a-major-release-with-symmetric-multiprocessing-smp-support.html)
 
 ## Errors
 
@@ -51,7 +51,7 @@ Testing with the Software Serial library shows some incompatibilities at low bau
 
 ## Compatibility
 
-  * ATmega328 @ 16MHz : Arduino UNO, Arduino Duemilanove, Arduino Diecimila, etc.
+  * ATmega328 @ 16MHz : Arduino UNO R3, Arduino Duemilanove, Arduino Diecimila, etc.
   * ATmega328 @ 16MHz : Adafruit Pro Trinket 5V, Adafruit Metro 328, Adafruit Metro Mini
   * ATmega328 @ 16MHz : Seeed Studio Stalker
   * ATmega328 @ 16MHz : Freetronics Eleven
@@ -91,7 +91,7 @@ See the [Code of conduct](https://github.com/feilipu/Arduino_FreeRTOS_Library/bl
 ## Contributors ✨
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-6-green.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-7-green.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
@@ -107,6 +107,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/Derekduke"><img src="https://avatars.githubusercontent.com/u/30068270" width="100px;" alt=""/><br /><sub><b>Derekduke</b></sub></a><br /><a title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/balaji"><img src="https://avatars.githubusercontent.com/u/29356302" width="100px;" alt=""/><br /><sub><b>Balaji.V</b></sub></a><br /><a title="Code">💻</a><a title=Documentation">📖</a></td>
     <td align="center"><a href="https://github.com/neboskreb"><img src="https://avatars.githubusercontent.com/u/35344069" width="100px;" alt=""/><br /><sub><b>John Y. Pazekha</b></sub></a><br /><a title="Code">💻</a><a title=Documentation">📖</a></td>
+    <td align="center"><a href="https://github.com/gpb01"><img src="https://avatars.githubusercontent.com/u/4134059" width="100px;" alt=""/><br /><sub><b>Guglielmo Braguglia</b></sub></a><br /><a title="Code">💻</a><a title=Documentation">📖</a></td>
   </tr>
 </table>
 

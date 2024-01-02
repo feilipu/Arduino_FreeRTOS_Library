@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.5.1+
+ * FreeRTOS Kernel V11.0.1
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -700,9 +700,6 @@ void vPortYieldFromTick( void )
 {
     portSAVE_CONTEXT();
     sleep_reset();        /* reset the sleep_mode() faster than sleep_disable(); */
-#if defined(__LGT8FX8P__) || defined(__LGT8FX8E__) || defined(__LGT8FX8P48__)
-    wdt_reset();        /* Logic Green requires the WDT be reset when it expires */
-#endif
     if( xTaskIncrementTick() != pdFALSE )
     {
         vTaskSwitchContext();
@@ -723,11 +720,7 @@ void prvSetupTimerInterrupt( void )
     wdt_reset();
 
     /* set up WDT Interrupt (rather than the WDT Reset). */
-#if defined(__LGT8FX8P__) || defined(__LGT8FX8E__) || defined(__LGT8FX8P48__)
-    wdt_ienable( portUSE_WDTO );
-#else
     wdt_interrupt_enable( portUSE_WDTO );
-#endif
 }
 
 #else

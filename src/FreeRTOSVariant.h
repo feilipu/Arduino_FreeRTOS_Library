@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Phillip Stevens  All Rights Reserved.
+ * Copyright (C) 2024 Phillip Stevens  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -78,10 +78,10 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask, char * pcTaskName );
 
 void vApplicationGetIdleTaskMemory( StaticTask_t ** ppxIdleTaskTCBBuffer,
                                     StackType_t ** ppxIdleTaskStackBuffer,
-                                    configSTACK_DEPTH_TYPE * pulIdleTaskStackSize );
+                                    configSTACK_DEPTH_TYPE * puxIdleTaskStackSize );
 void vApplicationGetTimerTaskMemory( StaticTask_t ** ppxTimerTaskTCBBuffer,
                                      StackType_t ** ppxTimerTaskStackBuffer,
-                                     configSTACK_DEPTH_TYPE * pulTimerTaskStackSize );
+                                     configSTACK_DEPTH_TYPE * puxTimerTaskStackSize );
 
 #ifdef __cplusplus
 }

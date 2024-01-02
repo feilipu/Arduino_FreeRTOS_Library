@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.5.1+
+ * FreeRTOS Kernel V1.0.1
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -47,16 +47,16 @@
 
 /* Type definitions. */
 
-typedef uint8_t                     StackType_t;
-typedef int8_t                      BaseType_t;
-typedef uint8_t                     UBaseType_t;
+typedef uint8_t             StackType_t;
+typedef int8_t              BaseType_t;
+typedef uint8_t             UBaseType_t;
 
-#if configTICK_TYPE_WIDTH_IN_BITS == TICK_TYPE_WIDTH_16_BITS
-    typedef uint16_t                TickType_t;
-    #define portMAX_DELAY           ( TickType_t ) 0xffff
+#if ( configTICK_TYPE_WIDTH_IN_BITS == TICK_TYPE_WIDTH_16_BITS )
+    typedef uint16_t        TickType_t;
+    #define portMAX_DELAY    ( TickType_t ) ( 0xffff )
 #elif ( configTICK_TYPE_WIDTH_IN_BITS  == TICK_TYPE_WIDTH_32_BITS )
-    typedef uint32_t                TickType_t;
-    #define portMAX_DELAY           ( TickType_t ) 0xffffffffUL
+    typedef uint32_t        TickType_t;
+    #define portMAX_DELAY   ( TickType_t ) ( 0xffffffffUL )
 #else
     #error configTICK_TYPE_WIDTH_IN_BITS set to unsupported tick type width.
 #endif
@@ -110,12 +110,12 @@ extern void vPortYieldFromISR( void ) __attribute__ ((naked));
 /* Add .lowtext tag from the avr linker script avr6.x for ATmega2560 and ATmega2561
  * to make sure functions are loaded in low memory.
  */
-#define portTASK_FUNCTION_PROTO( vFunction, pvParameters ) void vFunction( void *pvParameters ) __attribute__ ((section (".lowtext")))
+#define portTASK_FUNCTION_PROTO( vFunction, pvParameters ) void vFunction( void * pvParameters ) __attribute__ ((section (".lowtext")))
 #else
-#define portTASK_FUNCTION_PROTO( vFunction, pvParameters ) void vFunction( void *pvParameters )
+#define portTASK_FUNCTION_PROTO( vFunction, pvParameters ) void vFunction( void * pvParameters )
 #endif
 
-#define portTASK_FUNCTION( vFunction, pvParameters ) void vFunction( void *pvParameters )
+#define portTASK_FUNCTION( vFunction, pvParameters )       void vFunction( void * pvParameters )
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus

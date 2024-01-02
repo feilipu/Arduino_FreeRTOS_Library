@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.5.1+
+ * FreeRTOS Kernel V11.0.1
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -54,23 +54,23 @@
 #endif
 
 #if portBYTE_ALIGNMENT == 32
-    #define portBYTE_ALIGNMENT_MASK     ( 0x001f )
+    #define portBYTE_ALIGNMENT_MASK    ( 0x001f )
 #elif portBYTE_ALIGNMENT == 16
-    #define portBYTE_ALIGNMENT_MASK     ( 0x000f )
+    #define portBYTE_ALIGNMENT_MASK    ( 0x000f )
 #elif portBYTE_ALIGNMENT == 8
-    #define portBYTE_ALIGNMENT_MASK     ( 0x0007 )
+    #define portBYTE_ALIGNMENT_MASK    ( 0x0007 )
 #elif portBYTE_ALIGNMENT == 4
-    #define portBYTE_ALIGNMENT_MASK     ( 0x0003 )
+    #define portBYTE_ALIGNMENT_MASK    ( 0x0003 )
 #elif portBYTE_ALIGNMENT == 2
-    #define portBYTE_ALIGNMENT_MASK     ( 0x0001 )
+    #define portBYTE_ALIGNMENT_MASK    ( 0x0001 )
 #elif portBYTE_ALIGNMENT == 1
-    #define portBYTE_ALIGNMENT_MASK     ( 0x0000 )
+    #define portBYTE_ALIGNMENT_MASK    ( 0x0000 )
 #else /* if portBYTE_ALIGNMENT == 32 */
     #error "Invalid portBYTE_ALIGNMENT definition"
 #endif /* if portBYTE_ALIGNMENT == 32 */
 
 #ifndef portUSING_MPU_WRAPPERS
-    #define portUSING_MPU_WRAPPERS      0
+    #define portUSING_MPU_WRAPPERS    0
 #endif
 
 #ifndef portNUM_CONFIGURABLE_REGIONS
@@ -82,7 +82,7 @@
 #endif
 
 #ifndef portARCH_NAME
-    #define portARCH_NAME               NULL
+    #define portARCH_NAME    NULL
 #endif
 
 #if configUSE_PORT_DELAY == 1
@@ -124,13 +124,15 @@
                                              StackType_t * pxEndOfStack,
                                              TaskFunction_t pxCode,
                                              void * pvParameters,
-                                             BaseType_t xRunPrivileged ) PRIVILEGED_FUNCTION;
+                                             BaseType_t xRunPrivileged,
+                                             xMPU_SETTINGS * xMPUSettings ) PRIVILEGED_FUNCTION;
     #else
         StackType_t * pxPortInitialiseStack( StackType_t * pxTopOfStack,
                                              TaskFunction_t pxCode,
                                              void * pvParameters,
-                                             BaseType_t xRunPrivileged ) PRIVILEGED_FUNCTION;
-    #endif
+                                             BaseType_t xRunPrivileged,
+                                             xMPU_SETTINGS * xMPUSettings ) PRIVILEGED_FUNCTION;
+    #endif /* if ( portHAS_STACK_OVERFLOW_CHECKING == 1 ) */
 #else /* if ( portUSING_MPU_WRAPPERS == 1 ) */
     #if ( portHAS_STACK_OVERFLOW_CHECKING == 1 )
         StackType_t * pxPortInitialiseStack( StackType_t * pxTopOfStack,
@@ -212,7 +214,7 @@ size_t xPortGetMinimumEverFreeHeapSize( void ) PRIVILEGED_FUNCTION;
  *
  * This hook function is called when allocation failed.
  */
-    void vApplicationMallocFailedHook( void ); /*lint !e526 Symbol not defined as it is an application callback. */
+    void vApplicationMallocFailedHook( void );
 #endif
 
 /*
@@ -241,6 +243,37 @@ void vPortEndScheduler( void ) PRIVILEGED_FUNCTION;
                                     const struct xMEMORY_REGION * const xRegions,
                                     StackType_t * pxBottomOfStack,
                                     configSTACK_DEPTH_TYPE uxStackDepth ) PRIVILEGED_FUNCTION;
+#endif
+
+/**
+ * @brief Checks if the calling task is authorized to access the given buffer.
+ *
+ * @param pvBuffer The buffer which the calling task wants to access.
+ * @param ulBufferLength The length of the pvBuffer.
+ * @param ulAccessRequested The permissions that the calling task wants.
+ *
+ * @return pdTRUE if the calling task is authorized to access the buffer,
+ *         pdFALSE otherwise.
+ */
+#if ( portUSING_MPU_WRAPPERS == 1 )
+    BaseType_t xPortIsAuthorizedToAccessBuffer( const void * pvBuffer,
+                                                uint32_t ulBufferLength,
+                                                uint32_t ulAccessRequested ) PRIVILEGED_FUNCTION;
+#endif
+
+/**
+ * @brief Checks if the calling task is authorized to access the given kernel object.
+ *
+ * @param lInternalIndexOfKernelObject The index of the kernel object in the kernel
+ *                                     object handle pool.
+ *
+ * @return pdTRUE if the calling task is authorized to access the kernel object,
+ *         pdFALSE otherwise.
+ */
+#if ( ( portUSING_MPU_WRAPPERS == 1 ) && ( configUSE_MPU_WRAPPERS_V1 == 0 ) )
+
+    BaseType_t xPortIsAuthorizedToAccessKernelObject( int32_t lInternalIndexOfKernelObject ) PRIVILEGED_FUNCTION;
+
 #endif
 
 /* *INDENT-OFF* */
