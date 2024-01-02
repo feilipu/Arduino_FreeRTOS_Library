@@ -24,8 +24,10 @@
  * https://www.FreeRTOS.org
  * https://github.com/FreeRTOS
  *
+ * Updated on Aug 2023 by gpb01 to add the capability to use the 16 bit Timer 3
+ * on LGT8F328 MCU for xTaskIncrementTick.
+ *
  */
-
 
 #include <stdlib.h>
 
@@ -37,6 +39,10 @@
 #include "Arduino_FreeRTOS.h"
 #include "task.h"
 
+#if defined( portUSE_LGT_TIMER3 )
+#include <lgtx8p.h>    // lgt8f328p spec
+#endif
+
 /*-----------------------------------------------------------
  * Implementation of functions defined in portable.h for the AVR port.
  *----------------------------------------------------------*/
@@ -45,10 +51,25 @@
 #define portFLAGS_INT_ENABLED           ( (StackType_t) 0x80 )
 
 #if defined( portUSE_WDTO )
+
     #define portSCHEDULER_ISR           WDT_vect
 
+#elif defined( portUSE_LGT_TIMER3 )
+
+    #define portSCHEDULER_ISR           TIMER3_vect
+
 #else
+
     #warning "The user must define a Timer to be used for the Scheduler."
+
+#endif
+
+/*-----------------------------------------------------------*/
+
+#if defined( portUSE_WDTO )
+#warning "Note: You are compiling Arduino_FreeRTOS library for an AVR MCU using WDT."
+#elif defined( portUSE_LGT_TIMER3 )
+#warning "Note: You are compiling Arduino_FreeRTOS library for LGT8F328 MCU using Timer 3."
 #endif
 
 /*-----------------------------------------------------------*/
@@ -617,8 +638,18 @@ void vPortEndScheduler( void )
 {
     /* It is unlikely that the ATmega port will get stopped.  If required simply
      * disable the tick interrupt here. */
-
+   
+#if defined( portUSE_WDTO )
+   
     wdt_disable();      /* disable Watchdog Timer */
+    
+#elif defined( portUSE_LGT_TIMER3 )
+    
+    cli();              /* disable interrupts */
+    TIMSK3 &= ~(1 << OCIE3A);
+    sei();              /* enable interrupts  */
+    
+#endif
 }
 /*-----------------------------------------------------------*/
 
@@ -638,7 +669,7 @@ void vPortEndScheduler( void )
 
 extern void delay ( unsigned long ms );
 
-#if defined( portUSE_WDTO )
+#if defined( portUSE_WDTO ) || defined( portUSE_LGT_TIMER3 )
 void vPortDelay( const uint32_t ms ) __attribute__ ((hot, flatten));
 void vPortDelay( const uint32_t ms )
 {
@@ -700,9 +731,15 @@ void vPortYieldFromTick( void )
 {
     portSAVE_CONTEXT();
     sleep_reset();        /* reset the sleep_mode() faster than sleep_disable(); */
+    
+/*
+       
 #if defined(__LGT8FX8P__) || defined(__LGT8FX8E__) || defined(__LGT8FX8P48__)
-    wdt_reset();        /* Logic Green requires the WDT be reset when it expires */
+    wdt_reset();        // Logic Green requires the WDT be reset when it expires
 #endif
+    
+*/
+    
     if( xTaskIncrementTick() != pdFALSE )
     {
         vTaskSwitchContext();
@@ -714,6 +751,7 @@ void vPortYieldFromTick( void )
 /*-----------------------------------------------------------*/
 
 #if defined( portUSE_WDTO )
+
 /*
  * Setup WDT to generate a tick interrupt.
  */
@@ -721,8 +759,9 @@ void prvSetupTimerInterrupt( void )
 {
     /* reset watchdog */
     wdt_reset();
+    
+/*
 
-    /* set up WDT Interrupt (rather than the WDT Reset). */
 #if defined(__LGT8FX8P__) || defined(__LGT8FX8E__) || defined(__LGT8FX8P48__)
     wdt_ienable( portUSE_WDTO );
 #else
@@ -730,9 +769,40 @@ void prvSetupTimerInterrupt( void )
 #endif
 }
 
+*/
+    wdt_interrupt_enable( portUSE_WDTO );
+}
+
+#elif defined( portUSE_LGT_TIMER3 )
+
+/*
+ * Setup 16 bit Timer 3 (on LGT8F328 MCU) to generate a tick interrupt.
+ */
+void prvSetupTimerInterrupt( void )
+{
+    cli();
+    TCCR3A = 0;
+    TCCR3B = 0;
+    TCNT3  = 0;
+    // Now configure the timer:
+    OCR3A = TICK_PERIOD_15MS;
+    // CTC
+    TCCR3B |= (1 << WGM32);
+    // Prescaler 8
+    TCCR3B |= (1 << CS31);
+    // Output Compare Match A Interrupt Enable
+    TIMSK3 |= (1 << OCIE3A);
+    // Prevent missing the top and going into a possibly long wait until wrapping around:
+    TCNT3 = 0;
+    // At this point the global interrupt flag is NOT YET enabled,
+    // so you're NOT starting to get the ISR calls until FreeRTOS enables it just before launching the scheduler.
+}
+
 #else
+
 #warning "The user is responsible to provide function `prvSetupTimerInterrupt()`"
 extern void prvSetupTimerInterrupt( void );
+
 #endif
 
 /*-----------------------------------------------------------*/
@@ -747,6 +817,8 @@ extern void prvSetupTimerInterrupt( void );
      * use ISR_NOBLOCK where there is an important timer running, that should preempt the scheduler.
      *
      */
+    #if defined( portUSE_WDTO )
+
     ISR(portSCHEDULER_ISR, ISR_NAKED) __attribute__ ((hot, flatten));
 /*  ISR(portSCHEDULER_ISR, ISR_NAKED ISR_NOBLOCK) __attribute__ ((hot, flatten));
  */
@@ -755,6 +827,26 @@ extern void prvSetupTimerInterrupt( void );
         vPortYieldFromTick();
         __asm__ __volatile__ ( "reti" );
     }
+         
+     #elif defined( portUSE_LGT_TIMER3 )
+         
+    ISR(portSCHEDULER_ISR, ISR_NAKED) __attribute__ ((hot, flatten));
+/*  ISR(portSCHEDULER_ISR, ISR_NAKED ISR_NOBLOCK) __attribute__ ((hot, flatten));
+ */
+    ISR(portSCHEDULER_ISR)
+    {
+        if (TIFR3 & (1 << OCF3A)) {
+            TIFR3 = 1 << OCF3A;
+            /* on OCR3A match */
+            vPortYieldFromTick();
+            __asm__ __volatile__ ( "reti" );
+        }
+    }
+      
+     #else
+         #warning "The user is responsible to provide the corrcet statements for the ISR"
+     #endif 
+     
 #else
 
     /*
@@ -764,6 +856,9 @@ extern void prvSetupTimerInterrupt( void );
      *
      * use ISR_NOBLOCK where there is an important timer running, that should preempt the scheduler.
      */
+     
+     #if defined( portUSE_WDTO )
+     
     ISR(portSCHEDULER_ISR) __attribute__ ((hot, flatten));
 /*  ISR(portSCHEDULER_ISR, ISR_NOBLOCK) __attribute__ ((hot, flatten));
  */
@@ -771,4 +866,23 @@ extern void prvSetupTimerInterrupt( void );
     {
         xTaskIncrementTick();
     }
+     
+     #elif defined( portUSE_LGT_TIMER3 )
+     
+    ISR(portSCHEDULER_ISR) __attribute__ ((hot, flatten));
+/*  ISR(portSCHEDULER_ISR, ISR_NOBLOCK) __attribute__ ((hot, flatten));
+ */
+    ISR(portSCHEDULER_ISR)
+     {
+        if (TIFR3 & (1 << OCF3A)) {
+            TIFR3 = 1 << OCF3A;
+            /* on OCR3A match */
+            xTaskIncrementTick();
+        }
+     }
+     
+    #else
+        #warning "The user is responsible to provide the corrcet statements for the ISR"
+    #endif
+     
 #endif
