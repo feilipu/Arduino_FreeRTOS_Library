@@ -743,10 +743,10 @@ void vPortYieldFromTick( void )
      * use ISR_NOBLOCK where there is an important timer running, that should preempt the scheduler.
      *
      */
-    ISR( portSCHEDULER_ISR, ISR_NAKED ) __attribute__( ( hot, flatten ) );
+    ISR( portSCHEDULER_ISR, ISR_NAKED ) __attribute__ ( ( hot, flatten ) );
 
-    /*  ISR(portSCHEDULER_ISR, ISR_NAKED ISR_NOBLOCK) __attribute__ ((hot, flatten));
-     */
+/*  ISR( portSCHEDULER_ISR, ISR_NAKED ISR_NOBLOCK ) __attribute__ ( ( hot, flatten ) );
+ */
     ISR( portSCHEDULER_ISR )
     {
         vPortYieldFromTick();
@@ -761,10 +761,10 @@ void vPortYieldFromTick( void )
      *
      * use ISR_NOBLOCK where there is an important timer running, that should preempt the scheduler.
      */
-    ISR( portSCHEDULER_ISR ) __attribute__( ( hot, flatten ) );
+    ISR( portSCHEDULER_ISR ) __attribute__ ( ( hot, flatten ) );
 
-    /*  ISR(portSCHEDULER_ISR, ISR_NOBLOCK) __attribute__ ((hot, flatten));
-     */
+/*  ISR( portSCHEDULER_ISR, ISR_NOBLOCK ) __attribute__ ( ( hot, flatten ) );
+ */
     ISR( portSCHEDULER_ISR )
     {
         xTaskIncrementTick();
