@@ -6350,7 +6350,7 @@ static void prvCheckTasksWaitingTermination( void )
 
         uxCount /= ( configSTACK_DEPTH_TYPE ) sizeof( StackType_t );
 
-        return ( configSTACK_DEPTH_TYPE ) uxCount;
+        return uxCount;
     }
 
 #endif /* ( ( configUSE_TRACE_FACILITY == 1 ) || ( INCLUDE_uxTaskGetStackHighWaterMark == 1 ) ) */
