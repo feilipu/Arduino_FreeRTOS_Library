@@ -6340,17 +6340,17 @@ static void prvCheckTasksWaitingTermination( void )
 
     static configSTACK_DEPTH_TYPE prvTaskCheckFreeStackSpace( const uint8_t * pucStackByte )
     {
-        configSTACK_DEPTH_TYPE ulCount = 0U;
+        configSTACK_DEPTH_TYPE uxCount = 0U;
 
         while( *pucStackByte == ( uint8_t ) tskSTACK_FILL_BYTE )
         {
             pucStackByte -= portSTACK_GROWTH;
-            ulCount++;
+            uxCount++;
         }
 
-        ulCount /= ( configSTACK_DEPTH_TYPE ) sizeof( StackType_t );
+        uxCount /= ( configSTACK_DEPTH_TYPE ) sizeof( StackType_t );
 
-        return ( configSTACK_DEPTH_TYPE ) ulCount;
+        return ( configSTACK_DEPTH_TYPE ) uxCount;
     }
 
 #endif /* ( ( configUSE_TRACE_FACILITY == 1 ) || ( INCLUDE_uxTaskGetStackHighWaterMark == 1 ) ) */
@@ -6421,7 +6421,7 @@ static void prvCheckTasksWaitingTermination( void )
         }
         #endif
 
-        uxReturn = ( configSTACK_DEPTH_TYPE) prvTaskCheckFreeStackSpace( pucEndOfStack );
+        uxReturn = prvTaskCheckFreeStackSpace( pucEndOfStack );
 
         traceRETURN_uxTaskGetStackHighWaterMark( uxReturn );
 

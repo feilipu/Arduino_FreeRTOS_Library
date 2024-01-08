@@ -24,7 +24,7 @@
  * https://www.FreeRTOS.org
  * https://github.com/FreeRTOS
  *
-*/
+ */
 
 #ifndef PORTMACRO_H
 #define PORTMACRO_H
@@ -46,6 +46,8 @@
  */
 
 /* Type definitions. */
+
+#define portPOINTER_SIZE_TYPE    uint16_t
 
 typedef uint8_t             StackType_t;
 typedef int8_t              BaseType_t;
@@ -79,8 +81,8 @@ typedef uint8_t             UBaseType_t;
                                         )
 
 
-#define portDISABLE_INTERRUPTS()    __asm__ __volatile__ ( "cli" ::: "memory")
-#define portENABLE_INTERRUPTS()     __asm__ __volatile__ ( "sei" ::: "memory")
+#define portDISABLE_INTERRUPTS()    __asm__ __volatile__ ( "cli" ::: "memory" )
+#define portENABLE_INTERRUPTS()     __asm__ __volatile__ ( "sei" ::: "memory" )
 /*-----------------------------------------------------------*/
 
 /* Architecture specifics. */
@@ -97,25 +99,25 @@ typedef uint8_t             UBaseType_t;
 extern void vPortDelay( const uint32_t ms );
 #define portDELAY( ms )             vPortDelay( ms )
 
-extern void vPortYield( void ) __attribute__ ((naked));
-#define portYIELD()                 vPortYield()
+extern void vPortYield( void )      __attribute__( ( naked ) );
+#define portYIELD()             vPortYield()
 
-extern void vPortYieldFromISR( void ) __attribute__ ((naked));
-#define portYIELD_FROM_ISR()        vPortYieldFromISR()
+extern void vPortYieldFromISR( void )   __attribute__( ( naked ) );
+#define portYIELD_FROM_ISR()    vPortYieldFromISR()
 /*-----------------------------------------------------------*/
 
-#if defined(__AVR_3_BYTE_PC__)
+#if defined( __AVR_3_BYTE_PC__ )
 /* Task function macros as described on the FreeRTOS.org WEB site. */
 
 /* Add .lowtext tag from the avr linker script avr6.x for ATmega2560 and ATmega2561
  * to make sure functions are loaded in low memory.
  */
-#define portTASK_FUNCTION_PROTO( vFunction, pvParameters ) void vFunction( void * pvParameters ) __attribute__ ((section (".lowtext")))
+    #define portTASK_FUNCTION_PROTO( vFunction, pvParameters )    void vFunction( void * pvParameters ) __attribute__( ( section( ".lowtext" ) ) )
 #else
-#define portTASK_FUNCTION_PROTO( vFunction, pvParameters ) void vFunction( void * pvParameters )
+    #define portTASK_FUNCTION_PROTO( vFunction, pvParameters )    void vFunction( void * pvParameters )
 #endif
 
-#define portTASK_FUNCTION( vFunction, pvParameters )       void vFunction( void * pvParameters )
+#define portTASK_FUNCTION( vFunction, pvParameters )              void vFunction( void * pvParameters )
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus
