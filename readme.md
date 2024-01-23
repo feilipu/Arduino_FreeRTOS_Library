@@ -15,7 +15,7 @@ My other [AVRfreeRTOS Sourceforge Repository](https://sourceforge.net/projects/a
 
 This library was the genesis of [generalised support for the ATmega platform within FreeRTOS](https://github.com/FreeRTOS/FreeRTOS-Kernel/pull/48).
 
-Over the past few years freeRTOS development has become increasingly 32-bit orientated, now including symmetric multiprocessing, with little change or improvement for the 8-bit world. As such I'm treating this FreeRTOS V11.0.1 (updated January 20 2024) as my LTS release.
+Over the past few years freeRTOS development has become increasingly 32-bit orientated, now including symmetric multiprocessing, with little change or improvement for the 8-bit world. As such I'm treating this FreeRTOS V11.0.1 (updated January 23 2024) as my LTS release.
 
 ## General
 
