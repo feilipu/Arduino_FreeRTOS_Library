@@ -3,7 +3,7 @@ This is a fork of Richard Barry's freeRTOS, optimised for the Arduino AVR device
 It has been created to provide access to FreeRTOS capabilities, with full compatibility to the Arduino IDE environment.
 It does this by keeping hands off almost everything, and only touching the minimum of hardware to be successful.
 
-If you want to use FreeRTOS on the Renesas family of Arduino like the Arduino UNO R4, it is [already included](https://github.com/arduino/ArduinoCore-renesas/tree/main/libraries/Arduino_FreeRTOS). All that is required is to include the header file `Arduino_FreeRTOS.h` provided by the Arduino IDE, as noted below.
+If you want to use FreeRTOS on the Renesas family of Arduino like the Arduino UNO R4, it is [already included](https://github.com/arduino/ArduinoCore-renesas/tree/main/libraries/Arduino_FreeRTOS). All that is required is to include the header file `Arduino_FreeRTOS.h` provided by the Arduino IDE, as follow the information noted below.
 
 ## Usage & Further Reading
 
@@ -13,7 +13,7 @@ The canonical source for information is the [FreeRTOS Web Site](https://www.free
 
 My other [AVRfreeRTOS Sourceforge Repository](https://sourceforge.net/projects/avrfreertos/) or [AVRfreeRTOS Github](https://github.com/feilipu/avrfreertos) has plenty of examples, ranging from [blink](https://sourceforge.net/projects/avrfreertos/files/MegaBlink/) through to a [synthesiser](https://sourceforge.net/projects/avrfreertos/files/GA_Synth/).
 
-This library was the genesis of [generalised support for the ATmega platform within FreeRTOS](https://github.com/FreeRTOS/FreeRTOS-Kernel/pull/48).
+This library was the genesis of [generalised support for the ATmega platform within FreeRTOS](https://github.com/FreeRTOS/FreeRTOS-Kernel/pull/48), and improvement of the [stack depth type management](https://github.com/FreeRTOS/FreeRTOS-Kernel/pull/942).
 
 Over the past few years freeRTOS development has become increasingly 32-bit orientated, now including symmetric multiprocessing, with little change or improvement for the 8-bit world. As such I'm treating this FreeRTOS V11.0.1 (updated January 23 2024) as my LTS release.
 

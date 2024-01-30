@@ -1,5 +1,8 @@
 Documentation and download available at https://www.FreeRTOS.org/
 
+	+ Update all the APIs to use configSTACK_DEPTH_TYPE for stack type. If left
+	  undefined, configSTACK_DEPTH_TYPE defaults to StackType_t.
+
 Changes between FreeRTOS V11.0.0 and FreeRTOS V11.0.1 released December 21, 2023
 
     + Updated the SBOM file.
@@ -234,6 +237,44 @@ Changes between FreeRTOS V10.5.0 and FreeRTOS V10.5.1 released November 16 2022
 
 Changes between FreeRTOS V10.4.6 and FreeRTOS V10.5.0 released September 16 2022
 
+	+ ARMv7-M and ARMv8-M MPU ports: It was possible for a third party that
+	  already independently gained the ability to execute injected code to
+	  read from or write to arbitrary addresses by passing a negative argument
+	  as the xIndex parameter to pvTaskGetThreadLocalStoragePointer() or
+	  vTaskSetThreadLocalStoragePointer respectively. A check has been added to
+	  ensure that passing a negative argument as the xIndex parameter does not
+	  cause arbitrary read or write.
+	  We thank Certibit Consulting, LLC for reporting this issue.
+	+ ARMv7-M and ARMv8-M MPU ports: It was possible for an unprivileged task
+	  to invoke any function with privilege by passing it as a parameter to
+	  MPU_xTaskCreate, MPU_xTaskCreateStatic, MPU_xTimerCreate,
+	  MPU_xTimerCreateStatic, or MPU_xTimerPendFunctionCall. MPU_xTaskCreate
+	  and MPU_xTaskCreateStatic have been updated to only allow creation of
+	  unprivileged tasks. MPU_xTimerCreate, MPU_xTimerCreateStatic and
+	  MPU_xTimerPendFunctionCall APIs have been removed.
+	  We thank Huazhong University of Science and Technology for reporting
+	  this issue.
+	+ ARMv7-M and ARMv8-M MPU ports: It was possible for a third party that
+	  already independently gained the ability to execute injected code to
+	  achieve further privilege escalation by branching directly inside a
+	  FreeRTOS MPU API wrapper function with a manually crafted stack frame.
+	  The local stack variable `xRunningPrivileged` has been removed so that
+	  a manually crafted stack frame cannot be used for privilege escalation
+	  by branching directly inside a FreeRTOS MPU API wrapper.
+	  We thank Certibit Consulting, LLC, Huazhong University of Science and
+	  Technology and the SecLab team at Northeastern University for reporting
+	  this issue.
+	+ ARMv7-M MPU ports: It was possible to configure overlapping memory
+	  protection unit (MPU) regions such that an unprivileged task could access
+	  privileged data. The kernel now uses highest numbered MPU regions for
+	  kernel protections to prevent such MPU configurations.
+	  We thank the SecLab team at Northeastern University for reporting this
+	  issue.
+	+ Add support for ARM Cortex-M55.
+	+ Add support for ARM Cortex-M85. Contributed by @gbrtth.
+	+ Add vectored mode interrupt support to the RISC-V port.
+	+ Add support for RV32E extension (Embedded Profile) in RISC-V GCC port.
+	  Contributed by @Limoto.
 	+ Heap improvements:
 	  - Add a check to heap_2 to track if a memory block is allocated to
 	    the application or not. The MSB of the size field is used for this
@@ -268,6 +309,15 @@ Changes between FreeRTOS V10.4.6 and FreeRTOS V10.5.0 released September 16 2022
 	+ Add support to build and link FreeRTOS using CMake build system. Contributed
 	  by @yhsb2k.
 	+ Add support to generate Software Bill of Materials (SBOM) for every release.
+	+ Add support for 16 MPU regions to the GCC Cortex-M33 ports.
+	+ Add ARM Cortex-M7 r0p0/r0p1 Errata 837070 workaround to ARM CM4 MPU ports.
+	  The application writer needs to define configENABLE_ERRATA_837070_WORKAROUND
+	  when using CM4 MPU ports on a Cortex-M7 r0p0/r0p1 core.
+	+ Add configSYSTICK_CLOCK_HZ to Cortex-M0 ports. This is needed to support
+	  the case when the SysTick timer is not clocked from the same source as the CPU.
+	+ Add hardware stack protection support to MicroBlazeV9 port. This ensures that
+	  the CPU immediately raises Stack Protection Violation exception as soon as any
+	  task violates its stack limits. Contributed by @uecasm.
 	+ Introduce the configUSE_MINI_LIST_ITEM configuration option. When this
 	  option is set to 1, ListItem_t and MiniLitItem_t remain separate types.
 	  However, when configUSE_MINI_LIST_ITEM == 0, MiniLitItem_t and ListItem_t
@@ -323,6 +373,9 @@ Changes between FreeRTOS V10.4.6 and FreeRTOS V10.5.0 released September 16 2022
 	  by @Atomar25.
 	+ Fix  Interrupt Handler Register Function and Exception Process in NiosII
 	  Port. Contributed by @ghost.
+	+ Change FreeRTOS IRQ Handler for Cortex-A53 SRE port to store and restore
+	  interrupt acknowledge register. This ensures that the SRE port behavior
+	  matches the Memory Mapped IO port. Contributed by @sviaunxp.
 	+ Update the uncrustify config file to match the version of the uncrustify
 	  used in the CI Action. Also, pin the version of uncrustify in CI. Contributed
 	  by @swaldhoer.
@@ -334,6 +387,9 @@ Changes between FreeRTOS V10.4.5 and FreeRTOS V10.4.6 released November 12 2021
 	  for backward compatibility. #define configSTACK_DEPTH_TYPE to a type
 	  (for example, uint32_t) in FreeRTOSConfig.h to override the default.
 	+ Deleted all references to Coroutines.
+	+ ARMv7-M and ARMv8-M MPU ports – prevent non-kernel code from calling the
+	  internal functions xPortRaisePrivilege and vPortResetPrivilege by changing
+	  them to macros.
 	+ Introduce a new config configALLOW_UNPRIVILEGED_CRITICAL_SECTIONS which
 	  enables developers to prevent critical sections from unprivileged tasks.
 	  It defaults to 1 for backward compatibility. Application should set it to
@@ -354,6 +410,18 @@ Changes between FreeRTOS V10.4.4 and FreeRTOS V10.4.5 released September 10 2021
 	  time is only a good measure of the slack time in a system if there are no
 	  other tasks executing at the idle priority, tickless idle is not used, and
 	  configIDLE_SHOULD_YIELD is set to 0.
+	+ ARMv8-M secure-side port:  Tasks that call secure functions from the
+	  non-secure side of an ARMv8-M MCU (ARM Cortex-M23 and Cortex-M33) have two
+	  contexts - one on the non-secure side and one on the secure-side. Previous
+	  versions of the FreeRTOS ARMv8-M secure-side ports allocated the structures
+	  that reference secure-side contexts at run time.  Now the structures are
+	  allocated statically at compile time.  The change necessitates the
+	  introduction of the secureconfigMAX_SECURE_CONTEXTS configuration constant,
+	  which sets the number of statically allocated secure contexts.
+	  secureconfigMAX_SECURE_CONTEXTS defaults to 8 if left undefined.
+	  Applications that only use FreeRTOS code on the non-secure side, such as
+	  those running third-party code on the secure side, are not affected by
+	  this change.
 
 Changes between FreeRTOS V10.4.3 and FreeRTOS V10.4.4 released May 28 2021
 	+ Minor performance improvements to xTaskIncrementTick() achieved by providing
@@ -624,6 +692,8 @@ Changes between FreeRTOS V10.0.1 and FreeRTOS V10.1.0 released 22 August 2018
 	+ Added Xtensa port and demo application for the XCC compiler.
 	+ Changed the implementation of vPortEndScheduler() for the Win32 port to
 	  simply call exit( 0 ).
+	+ Bug fix in vPortEnableInterrupt() for the GCC Microblaze port to protect
+	  the read modify write access to an internal Microblaze register.
 	+ Fix minor niggles when the MPU is used with regards to prototype
 	  differences, static struct size differences, etc.
 	+ The uxStackHighWaterMark member of the TaskStatus_t structure now has type
@@ -647,6 +717,16 @@ Changes between FreeRTOS V10.0.1 and FreeRTOS V10.1.0 released 22 August 2018
 	  FreeRTOS+TCP, which was brought into the main download in FreeRTOS
 	  V10.0.0.  FreeRTOS+TCP can be configured as a UDP only stack, and
 	  FreeRTOS+UDP does not contain the patches applied to FreeRTOS+TCP.
+
+	FreeRTOS+TCP Changes:
+
+	+ Multiple security improvements and fixes in packet parsing routines, DNS
+	  caching, and TCP sequence number and ID generation.
+	+ Disable NBNS and LLMNR by default.
+	+ Add TCP hang protection by default.
+
+	We thank Ori Karliner of Zimperium zLabs Team for reporting these issues.
+
 
 Changes between FreeRTOS V10.0.0 and FreeRTOS V10.0.1, released December 20 2017
 

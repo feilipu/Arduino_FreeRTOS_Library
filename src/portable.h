@@ -85,6 +85,10 @@
     #define portARCH_NAME    NULL
 #endif
 
+#ifndef configSTACK_DEPTH_TYPE
+    #define configSTACK_DEPTH_TYPE    StackType_t
+#endif
+
 #if configUSE_PORT_DELAY == 1
 /*
  * If configUSE_PORT_DELAY is defined,
