@@ -59,7 +59,7 @@ extern "C" {
 #else
     #warning "Variant configuration must define `configTICK_RATE_HZ` and `portTICK_PERIOD_MS` as either a macro or a constant"
     #define configTICK_RATE_HZ  1
-    #define portTICK_PERIOD_MS  ( (TickType_t) 1000 / configTICK_RATE_HZ )
+    #define portTICK_PERIOD_MS  ( (TickType_t) ( 1000 / configTICK_RATE_HZ ) )
 #endif
 
 /*-----------------------------------------------------------*/

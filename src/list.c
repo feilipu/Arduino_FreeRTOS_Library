@@ -1,6 +1,6 @@
 /*
- * FreeRTOS Kernel V11.0.1
- * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V11.1.0
+ * Copyright (C) 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -130,7 +130,7 @@ void vListInsertEnd( List_t * const pxList,
     /* Remember which list the item is in. */
     pxNewListItem->pxContainer = pxList;
 
-    ( pxList->uxNumberOfItems )++;
+    ( pxList->uxNumberOfItems ) = ( UBaseType_t ) ( pxList->uxNumberOfItems + 1U );
 
     traceRETURN_vListInsertEnd();
 }
@@ -205,7 +205,7 @@ void vListInsert( List_t * const pxList,
      * item later. */
     pxNewListItem->pxContainer = pxList;
 
-    ( pxList->uxNumberOfItems )++;
+    ( pxList->uxNumberOfItems ) = ( UBaseType_t ) ( pxList->uxNumberOfItems + 1U );
 
     traceRETURN_vListInsert();
 }
@@ -218,8 +218,6 @@ UBaseType_t uxListRemove( ListItem_t * const pxItemToRemove )
     List_t * const pxList = pxItemToRemove->pxContainer;
 
     traceENTER_uxListRemove( pxItemToRemove );
-
-
 
     pxItemToRemove->pxNext->pxPrevious = pxItemToRemove->pxPrevious;
     pxItemToRemove->pxPrevious->pxNext = pxItemToRemove->pxNext;
@@ -238,7 +236,7 @@ UBaseType_t uxListRemove( ListItem_t * const pxItemToRemove )
     }
 
     pxItemToRemove->pxContainer = NULL;
-    ( pxList->uxNumberOfItems )--;
+    ( pxList->uxNumberOfItems ) = ( UBaseType_t ) ( pxList->uxNumberOfItems - 1U );
 
     traceRETURN_uxListRemove( pxList->uxNumberOfItems );
 

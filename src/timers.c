@@ -1,6 +1,6 @@
 /*
- * FreeRTOS Kernel V11.0.1
- * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V11.1.0
+ * Copyright (C) 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -1316,6 +1316,18 @@
         }
 
     #endif /* configUSE_TRACE_FACILITY */
+/*-----------------------------------------------------------*/
+
+/*
+ * Reset the state in this file. This state is normally initialized at start up.
+ * This function must be called by the application before restarting the
+ * scheduler.
+ */
+    void vTimerResetState( void )
+    {
+        xTimerQueue = NULL;
+        xTimerTaskHandle = NULL;
+    }
 /*-----------------------------------------------------------*/
 
 /* This entire source file will be skipped if the application is not configured

@@ -1,9 +1,9 @@
-This is a fork of Richard Barry's freeRTOS, optimised for the Arduino AVR devices.
+This is a fork of Richard Barry's FreeRTOS, optimised for the Arduino Microchip ATmega devices.
 
 It has been created to provide access to FreeRTOS capabilities, with full compatibility to the Arduino IDE environment.
 It does this by keeping hands off almost everything, and only touching the minimum of hardware to be successful.
 
-If you want to use FreeRTOS on the Renesas family of Arduino like the Arduino UNO R4, it is [already included](https://github.com/arduino/ArduinoCore-renesas/tree/main/libraries/Arduino_FreeRTOS). All that is required is to include the header file `Arduino_FreeRTOS.h` provided by the Arduino IDE, as follow the information noted below.
+If you want to use FreeRTOS on the Renesas family of Arduino like the Arduino UNO R4, it is [already included](https://github.com/arduino/ArduinoCore-renesas/tree/main/libraries/Arduino_FreeRTOS) in the default Arduino IDE. All that is required is to include the header file `Arduino_FreeRTOS.h` provided by the Arduino IDE, as follow the information noted below.
 
 ## Usage & Further Reading
 
@@ -15,22 +15,22 @@ My other [AVRfreeRTOS Sourceforge Repository](https://sourceforge.net/projects/a
 
 This library was the genesis of [generalised support for the ATmega platform within FreeRTOS](https://github.com/FreeRTOS/FreeRTOS-Kernel/pull/48), and improvement of the [stack depth type management](https://github.com/FreeRTOS/FreeRTOS-Kernel/pull/942).
 
-Over the past few years freeRTOS development has become increasingly 32-bit orientated, now including symmetric multiprocessing, with little change or improvement for the 8-bit world. As such I'm treating this FreeRTOS V11.0.1 (updated January 23 2024) as my LTS release.
+Over the past few years FreeRTOS development has become increasingly 32-bit orientated, now including symmetric multiprocessing, with little change or improvement for the 8-bit world. As such I'm treating this FreeRTOS V11.1.0 (updated April 22 2024) as my LTS release.
 
 ## General
 
 FreeRTOS has a multitude of configuration options, which can be specified from within the FreeRTOSConfig.h file.
 To keep commonality with all of the Arduino hardware options, some sensible defaults have been selected. Feel free to change these defaults as you gain experience with FreeRTOS.
 
-Normally, the AVR Watchdog Timer is used to generate 15ms time slices (Ticks). For applications requiring high precision timing, the Ticks can be sourced from a hardware timer or external clock. See chapter [Scheduler Tick Sources](./doc/tick_sources.md) for the configuration details.
+Normally, the ATmega Watchdog Timer is used to generate 15ms time slices (Ticks). For applications requiring high precision timing, the Ticks can be sourced from a hardware timer or external clock. See chapter [Scheduler Tick Sources](./doc/tick_sources.md) for the configuration details.
 
 Tasks that suspend or delay before their allocated time slice completes will revert execution back to the Scheduler.
 
 The Arduino `delay()` function has been redefined to automatically use the FreeRTOS `vTaskDelay()` function when the delay required is one Tick or longer, by setting `configUSE_PORT_DELAY` to `1`, so that simple Arduino example sketches and tutorials work as expected. If you would like to measure a short millisecond delay of less than one Tick, then preferably use [`millis()`](https://www.arduino.cc/reference/en/language/functions/time/millis/) (or with greater granularity use [`micros()`](https://www.arduino.cc/reference/en/language/functions/time/micros/)) to achieve this outcome (for example see [BlinkWithoutDelay](https://docs.arduino.cc/built-in-examples/digital/BlinkWithoutDelay)). However, when the delay requested is less than one Tick then the original Arduino `delay()` function will be automatically selected.
 
-The 8-bit AVR Timer0 has been added as an option for the experienced user. Please examine the Timer0 source code example to figure out how to use it. Reconfiguring Timer0 for the FreeRTOS Tick will break Arduino `millis()` and `micros()` though, as these functions rely on Timer0. Example support for the Logic Green hardware using Timer 3 is provided via an open PR.
+The 8-bit ATmega Timer0 has been added as an option for the experienced user. Please examine the Timer0 source code example to figure out how to use it. Reconfiguring Timer0 for the FreeRTOS Tick will break Arduino `millis()` and `micros()` though, as these functions rely on the Arduino IDE configuring Timer0. Example support for the Logic Green hardware using Timer 3 is provided via an open PR.
 
-Stack for the `loop()` function has been set at 192 Bytes. This can be configured by adjusting the `configMINIMAL_STACK_SIZE` parameter. If you have stack overflow issues just increase it (within the SRAM limitations of your hardware). Users should prefer to allocate larger structures, arrays, or buffers using `pvPortMalloc()`, rather than defining them locally on the stack. Ideally you should __not__ use `loop()` for your sketches, and then the Idle Task stack size can be reduced down to 85 Bytes which will save some valuable memory.
+Stack for the `loop()` function has been set at 192 Bytes. This can be configured by adjusting the `configMINIMAL_STACK_SIZE` parameter. If you have stack overflow issues just increase it (within the SRAM limitations of your hardware). Users should prefer to allocate larger structures, arrays, or buffers on the heap using `pvPortMalloc()`, rather than defining them locally on the stack. Ideally you should __not__ use `loop()` for your sketches, and then the Idle Task stack size can be reduced down to 92 Bytes which will save some valuable memory.
 
 Memory for the heap is allocated by the normal C `malloc()` function, wrapped by the FreeRTOS `pvPortMalloc()` function. This option has been selected because it is automatically adjusted to use the capabilities of each device. Other heap allocation schemes are supported by FreeRTOS, and they can used with some additional configuration.
 
@@ -73,7 +73,7 @@ The Arduino IDE supporting the Arduino UNO R4 already includes FreeRTOS as stand
 
 * `Arduino_FreeRTOS.h` : Must always be `#include` first. It references other configuration files, and sets defaults where necessary.
 * `FreeRTOSConfig.h` : Contains a multitude of API and environment configurations.
-* `FreeRTOSVariant.h` : Contains the AVR specific configurations for this port of freeRTOS.
+* `FreeRTOSVariant.h` : Contains the ATmega specific configurations for this port of FreeRTOS.
 * `heap_3.c` : Contains the heap allocation scheme based on `malloc()`. Other schemes are available, but depend on user configuration for specific MCU choice.
 
 ### PlatformIO

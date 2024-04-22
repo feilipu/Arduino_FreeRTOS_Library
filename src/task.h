@@ -1,6 +1,6 @@
 /*
- * FreeRTOS Kernel V11.0.1
- * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V11.1.0
+ * Copyright (C) 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -53,23 +53,23 @@
  * The tskKERNEL_VERSION_MAJOR, tskKERNEL_VERSION_MINOR, tskKERNEL_VERSION_BUILD
  * values will reflect the last released version number.
  */
-#define tskKERNEL_VERSION_NUMBER       "V11.0.1"
+#define tskKERNEL_VERSION_NUMBER       "V11.1.0"
 #define tskKERNEL_VERSION_MAJOR        11
-#define tskKERNEL_VERSION_MINOR        0
-#define tskKERNEL_VERSION_BUILD        1
+#define tskKERNEL_VERSION_MINOR        1
+#define tskKERNEL_VERSION_BUILD        0
 
 /* MPU region parameters passed in ulParameters
  * of MemoryRegion_t struct. */
-#define tskMPU_REGION_READ_ONLY        ( 1UL << 0UL )
-#define tskMPU_REGION_READ_WRITE       ( 1UL << 1UL )
-#define tskMPU_REGION_EXECUTE_NEVER    ( 1UL << 2UL )
-#define tskMPU_REGION_NORMAL_MEMORY    ( 1UL << 3UL )
-#define tskMPU_REGION_DEVICE_MEMORY    ( 1UL << 4UL )
+#define tskMPU_REGION_READ_ONLY        ( 1U << 0U )
+#define tskMPU_REGION_READ_WRITE       ( 1U << 1U )
+#define tskMPU_REGION_EXECUTE_NEVER    ( 1U << 2U )
+#define tskMPU_REGION_NORMAL_MEMORY    ( 1U << 3U )
+#define tskMPU_REGION_DEVICE_MEMORY    ( 1U << 4U )
 
 /* MPU region permissions stored in MPU settings to
  * authorize access requests. */
-#define tskMPU_READ_PERMISSION         ( 1UL << 0UL )
-#define tskMPU_WRITE_PERMISSION        ( 1UL << 1UL )
+#define tskMPU_READ_PERMISSION         ( 1U << 0U )
+#define tskMPU_WRITE_PERMISSION        ( 1U << 1U )
 
 /* The direct to task notification feature used to have only a single notification
  * per task.  Now there is an array of notifications per task that is dimensioned by
@@ -180,9 +180,10 @@ typedef struct xTASK_STATUS
 /* Possible return values for eTaskConfirmSleepModeStatus(). */
 typedef enum
 {
-    eAbortSleep = 0,           /* A task has been made ready or a context switch pended since portSUPPRESS_TICKS_AND_SLEEP() was called - abort entering a sleep mode. */
-    eStandardSleep,            /* Enter a sleep mode that will not last any longer than the expected idle time. */
+    eAbortSleep = 0, /* A task has been made ready or a context switch pended since portSUPPRESS_TICKS_AND_SLEEP() was called - abort entering a sleep mode. */
+    eStandardSleep   /* Enter a sleep mode that will not last any longer than the expected idle time. */
     #if ( INCLUDE_vTaskSuspend == 1 )
+        ,
         eNoTasksWaitingTimeout /* No tasks are waiting for a timeout so it is safe to enter a sleep mode that can only be exited by an external interrupt. */
     #endif /* INCLUDE_vTaskSuspend */
 } eSleepModeStatus;
@@ -472,7 +473,7 @@ typedef enum
  *  {
  *      // The parameter value is expected to be 1 as 1 is passed in the
  *      // pvParameters value in the call to xTaskCreateStatic().
- *      configASSERT( ( uint32_t ) pvParameters == 1UL );
+ *      configASSERT( ( uint32_t ) pvParameters == 1U );
  *
  *      for( ;; )
  *      {
@@ -563,7 +564,7 @@ typedef enum
  *  "ATask",    // pcName - just a text name for the task to assist debugging.
  *  100,        // uxStackDepth - the stack size DEFINED IN WORDS.
  *  NULL,       // pvParameters - passed into the task function as the function parameters.
- *  ( 1UL | portPRIVILEGE_BIT ),// uxPriority - task priority, set the portPRIVILEGE_BIT if the task should run in a privileged state.
+ *  ( 1U | portPRIVILEGE_BIT ),// uxPriority - task priority, set the portPRIVILEGE_BIT if the task should run in a privileged state.
  *  cStackBuffer,// puxStackBuffer - the buffer to be used as the task stack.
  *
  *  // xRegions - Allocate up to three separate memory regions for access by
@@ -657,7 +658,7 @@ typedef enum
  *  "ATask",    // pcName - just a text name for the task to assist debugging.
  *  100,        // uxStackDepth - the stack size DEFINED IN WORDS.
  *  NULL,       // pvParameters - passed into the task function as the function parameters.
- *  ( 1UL | portPRIVILEGE_BIT ),// uxPriority - task priority, set the portPRIVILEGE_BIT if the task should run in a privileged state.
+ *  ( 1U | portPRIVILEGE_BIT ),// uxPriority - task priority, set the portPRIVILEGE_BIT if the task should run in a privileged state.
  *  cStackBuffer,// puxStackBuffer - the buffer to be used as the task stack.
  *
  *  // xRegions - Allocate up to three separate memory regions for access by
@@ -2109,7 +2110,7 @@ configSTACK_DEPTH_TYPE uxTaskGetStackHighWaterMark( TaskHandle_t xTask ) PRIVILE
  *          uxArraySize = uxTaskGetSystemState( pxTaskStatusArray, uxArraySize, &ulTotalRunTime );
  *
  *          // For percentage calculations.
- *          ulTotalRunTime /= 100UL;
+ *          ulTotalRunTime /= 100U;
  *
  *          // Avoid divide by zero errors.
  *          if( ulTotalRunTime > 0 )
@@ -2123,7 +2124,7 @@ configSTACK_DEPTH_TYPE uxTaskGetStackHighWaterMark( TaskHandle_t xTask ) PRIVILE
  *                  // ulTotalRunTimeDiv100 has already been divided by 100.
  *                  ulStatsAsPercentage = pxTaskStatusArray[ x ].ulRunTimeCounter / ulTotalRunTime;
  *
- *                  if( ulStatsAsPercentage > 0UL )
+ *                  if( ulStatsAsPercentage > 0U )
  *                  {
  *                      sprintf( pcWriteBuffer, "%s\t\t%lu\t\t%lu%%\r\n", pxTaskStatusArray[ x ].pcTaskName, pxTaskStatusArray[ x ].ulRunTimeCounter, ulStatsAsPercentage );
  *                  }
@@ -2260,7 +2261,7 @@ configSTACK_DEPTH_TYPE uxTaskGetStackHighWaterMark( TaskHandle_t xTask ) PRIVILE
  * \defgroup vTaskList vTaskList
  * \ingroup TaskUtils
  */
-#define vTaskList( pcWriteBuffer )    vTaskListTasks( pcWriteBuffer, configSTATS_BUFFER_MAX_LENGTH )
+#define vTaskList( pcWriteBuffer )    vTaskListTasks( ( pcWriteBuffer ), configSTATS_BUFFER_MAX_LENGTH )
 
 /**
  * task. h
@@ -2383,7 +2384,7 @@ configSTACK_DEPTH_TYPE uxTaskGetStackHighWaterMark( TaskHandle_t xTask ) PRIVILE
  * \defgroup vTaskGetRunTimeStats vTaskGetRunTimeStats
  * \ingroup TaskUtils
  */
-#define vTaskGetRunTimeStats( pcWriteBuffer )    vTaskGetRunTimeStatistics( pcWriteBuffer, configSTATS_BUFFER_MAX_LENGTH )
+#define vTaskGetRunTimeStats( pcWriteBuffer )    vTaskGetRunTimeStatistics( ( pcWriteBuffer ), configSTATS_BUFFER_MAX_LENGTH )
 
 /**
  * task. h
@@ -2833,7 +2834,7 @@ BaseType_t xTaskGenericNotifyFromISR( TaskHandle_t xTaskToNotify,
  * will be cleared in the calling task's notification value before the task
  * checks to see if any notifications are pending, and optionally blocks if no
  * notifications are pending.  Setting ulBitsToClearOnEntry to ULONG_MAX (if
- * limits.h is included) or 0xffffffffUL (if limits.h is not included) will have
+ * limits.h is included) or 0xffffffffU (if limits.h is not included) will have
  * the effect of resetting the task's notification value to 0.  Setting
  * ulBitsToClearOnEntry to 0 will leave the task's notification value unchanged.
  *
@@ -3409,6 +3410,20 @@ BaseType_t xTaskCheckForTimeOut( TimeOut_t * const pxTimeOut,
  */
 BaseType_t xTaskCatchUpTicks( TickType_t xTicksToCatchUp ) PRIVILEGED_FUNCTION;
 
+/**
+ * task.h
+ * @code{c}
+ * void vTaskResetState( void );
+ * @endcode
+ *
+ * This function resets the internal state of the task. It must be called by the
+ * application before restarting the scheduler.
+ *
+ * \defgroup vTaskResetState vTaskResetState
+ * \ingroup SchedulerControl
+ */
+void vTaskResetState( void ) PRIVILEGED_FUNCTION;
+
 
 /*-----------------------------------------------------------
 * SCHEDULER INTERNALS AVAILABLE FOR PORTING PURPOSES
@@ -3545,9 +3560,7 @@ TaskHandle_t xTaskGetCurrentTaskHandle( void ) PRIVILEGED_FUNCTION;
 /*
  * Return the handle of the task running on specified core.
  */
-#if ( configNUMBER_OF_CORES > 1 )
-    TaskHandle_t xTaskGetCurrentTaskHandleForCore( BaseType_t xCoreID ) PRIVILEGED_FUNCTION;
-#endif
+TaskHandle_t xTaskGetCurrentTaskHandleForCore( BaseType_t xCoreID ) PRIVILEGED_FUNCTION;
 
 /*
  * Shortcut used by the queue implementation to prevent unnecessary call to

@@ -1,6 +1,6 @@
 /*
- * FreeRTOS Kernel V11.0.1
- * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V11.1.0
+ * Copyright (C) 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -45,6 +45,8 @@
  *-----------------------------------------------------------
  */
 
+#include <avr/wdt.h>
+
 /* Type definitions. */
 
 #define portPOINTER_SIZE_TYPE    uint16_t
@@ -55,7 +57,7 @@ typedef uint8_t             UBaseType_t;
 
 #if ( configTICK_TYPE_WIDTH_IN_BITS == TICK_TYPE_WIDTH_16_BITS )
     typedef uint16_t        TickType_t;
-    #define portMAX_DELAY    ( TickType_t ) ( 0xffff )
+    #define portMAX_DELAY    ( TickType_t ) ( 0xffffU )
 #elif ( configTICK_TYPE_WIDTH_IN_BITS  == TICK_TYPE_WIDTH_32_BITS )
     typedef uint32_t        TickType_t;
     #define portMAX_DELAY   ( TickType_t ) ( 0xffffffffUL )
@@ -66,19 +68,21 @@ typedef uint8_t             UBaseType_t;
 
 /* Critical section management. */
 
-#define portENTER_CRITICAL()        __asm__ __volatile__ (                          \
-                                        "in __tmp_reg__, __SREG__"        "\n\t"    \
-                                        "cli"                             "\n\t"    \
-                                        "push __tmp_reg__"                "\n\t"    \
-                                        ::: "memory"                                \
-                                        )
+#define portENTER_CRITICAL()                        \
+    __asm__ __volatile__ (                          \
+        "in __tmp_reg__, __SREG__"        "\n\t"    \
+        "cli"                             "\n\t"    \
+        "push __tmp_reg__"                "\n\t"    \
+        ::: "memory"                                \
+        )
 
 
-#define portEXIT_CRITICAL()         __asm__ __volatile__ (                          \
-                                        "pop __tmp_reg__"                 "\n\t"    \
-                                        "out __SREG__, __tmp_reg__"       "\n\t"    \
-                                        ::: "memory"                                \
-                                        )
+#define portEXIT_CRITICAL()                         \
+    __asm__ __volatile__ (                          \
+        "pop __tmp_reg__"                 "\n\t"    \
+        "out __SREG__, __tmp_reg__"       "\n\t"    \
+        ::: "memory"                                \
+        )
 
 
 #define portDISABLE_INTERRUPTS()    __asm__ __volatile__ ( "cli" ::: "memory" )
@@ -97,7 +101,7 @@ typedef uint8_t             UBaseType_t;
 /* Kernel utilities. */
 
 extern void vPortDelay( const uint32_t ms );
-#define portDELAY( ms )             vPortDelay( ms )
+#define portDELAY( ms )         vPortDelay( ms )
 
 extern void vPortYield( void )      __attribute__( ( naked ) );
 #define portYIELD()             vPortYield()
