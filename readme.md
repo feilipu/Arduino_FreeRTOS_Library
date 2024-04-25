@@ -3,7 +3,7 @@ This is a fork of Richard Barry's FreeRTOS, optimised for the Arduino Microchip 
 It has been created to provide access to FreeRTOS capabilities, with full compatibility to the Arduino IDE environment.
 It does this by keeping hands off almost everything, and only touching the minimum of hardware to be successful.
 
-If you want to use FreeRTOS on the Renesas family of Arduino like the Arduino UNO R4, it is [already included](https://github.com/arduino/ArduinoCore-renesas/tree/main/libraries/Arduino_FreeRTOS) in the default Arduino IDE. All that is required is to include the header file `Arduino_FreeRTOS.h` provided by the Arduino IDE, as follow the information noted below.
+If you want to use FreeRTOS on the Renesas family of Arduino like the Arduino UNO R4, it is [already included](https://github.com/arduino/ArduinoCore-renesas/tree/main/libraries/Arduino_FreeRTOS) in the default Arduino IDE. All that is required is to include the header file `Arduino_FreeRTOS.h` provided by the Arduino IDE, and follow the information noted below.
 
 ## Usage & Further Reading
 
@@ -34,7 +34,7 @@ Stack for the `loop()` function has been set at 192 Bytes. This can be configure
 
 Memory for the heap is allocated by the normal C `malloc()` function, wrapped by the FreeRTOS `pvPortMalloc()` function. This option has been selected because it is automatically adjusted to use the capabilities of each device. Other heap allocation schemes are supported by FreeRTOS, and they can used with some additional configuration.
 
-If you do not need to use FreeRTOS Timer API functions, then they can be disabled. This will remove the need for the Timer Task Stack, saving 85 Bytes of RAM.
+If you do not need to use FreeRTOS Timer API functions, then they can be disabled. This will remove the need for the Timer Task Stack, saving 92 Bytes of RAM.
 
 ## Upgrading
 
