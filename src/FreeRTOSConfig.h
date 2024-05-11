@@ -61,7 +61,7 @@
 #define configSTACK_DEPTH_TYPE              uint16_t
 
 #define configMINIMAL_STACK_SIZE            192
-#define configCHECK_FOR_STACK_OVERFLOW      0
+#define configCHECK_FOR_STACK_OVERFLOW      1
 #define configUSE_TRACE_FACILITY            0
 
 #define configUSE_MUTEXES                   1
@@ -71,7 +71,7 @@
 
 #define configUSE_QUEUE_SETS                0
 #define configUSE_APPLICATION_TASK_TAG      0
-#define configUSE_MALLOC_FAILED_HOOK        0
+#define configUSE_MALLOC_FAILED_HOOK        1
 #define configQUEUE_REGISTRY_SIZE           0
 #define configSUPPORT_DYNAMIC_ALLOCATION    1
 #define configSUPPORT_STATIC_ALLOCATION     0
