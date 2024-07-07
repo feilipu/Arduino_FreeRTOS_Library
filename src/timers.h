@@ -36,7 +36,6 @@
 
 #include "task.h"
 
-
 /* *INDENT-OFF* */
 #ifdef __cplusplus
     extern "C" {
