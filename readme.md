@@ -94,7 +94,7 @@ See the [Code of conduct](https://github.com/feilipu/Arduino_FreeRTOS_Library/bl
 ## Contributors ✨
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-7-green.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-10-green.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
@@ -109,8 +109,13 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/Floessie"><img src="https://avatars.githubusercontent.com/u/10133457" width="100px;" alt=""/><br /><sub><b>Floessie</b></sub></a><br /><a title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/Derekduke"><img src="https://avatars.githubusercontent.com/u/30068270" width="100px;" alt=""/><br /><sub><b>Derekduke</b></sub></a><br /><a title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/balaji"><img src="https://avatars.githubusercontent.com/u/29356302" width="100px;" alt=""/><br /><sub><b>Balaji.V</b></sub></a><br /><a title="Code">💻</a><a title=Documentation">📖</a></td>
+  </tr>
+  <tr>
     <td align="center"><a href="https://github.com/neboskreb"><img src="https://avatars.githubusercontent.com/u/35344069" width="100px;" alt=""/><br /><sub><b>John Y. Pazekha</b></sub></a><br /><a title="Code">💻</a><a title=Documentation">📖</a></td>
     <td align="center"><a href="https://github.com/gpb01"><img src="https://avatars.githubusercontent.com/u/4134059" width="100px;" alt=""/><br /><sub><b>Guglielmo Braguglia</b></sub></a><br /><a title="Code">💻</a><a title=Documentation">📖</a></td>
+    <td align="center"><a href="https://github.com/ShortArrow"><img src="https://avatars.githubusercontent.com/u/16986253" width="100px;" alt=""/><br /><sub><b>ShortArrow</b></sub></a><br /><a title=Documentation">📖</a></td>
+    <td align="center"><a href="https://github.com/altugbakan"><img src="https://avatars.githubusercontent.com/u/43248015" width="100px;" alt=""/><br /><sub><b>Altuğ Bakan</b></sub></a><br /><a title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/ikatz-drizly"><img src="https://avatars.githubusercontent.com/u/87482555" width="100px;" alt=""/><br /><sub><b>Ian Katz</b></sub></a><br /><a title="Code">💻</a></td>
   </tr>
 </table>
 
