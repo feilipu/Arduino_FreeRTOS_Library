@@ -31,7 +31,7 @@ void setup() {
    * https://www.freertos.org/a00116.html
    */
 arrayQueue=xQueueCreate(10, //Queue length
-                        sizeof(int)); //Queue item size
+                        sizeof(pinReadArray)); //Queue item size
 if(arrayQueue!=NULL){
 
   // Create task that consumes the queue if it was created.
