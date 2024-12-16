@@ -9,7 +9,7 @@ If you want to use FreeRTOS on the Renesas family of Arduino like the Arduino UN
 
 Read the short blog post on [Arduino FreeRTOS](https://feilipu.me/2015/11/24/arduino_freertos/) to get started. And there is another much older post on using [FreeRTOS with AVR](https://feilipu.me/2011/09/22/freertos-and-libraries-for-avr-atmega/), which may be useful to read too. There are some further posts I've written on [Hackster.IO](https://www.hackster.io/feilipu), but they're essentially the same content.
 
-The canonical source for information is the [FreeRTOS Web Site](https://www.freertos.org/). Within this site, the [Getting Started](https://www.freertos.org/FreeRTOS-quick-start-guide.html) page is very useful. This is the source for FreeRTOS usage (as distinct from installing and using this Arduino Library).
+The canonical source for information is the [FreeRTOS Web Site](https://www.freertos.org/). Within this site, the [Beginner's Guide](https://www.freertos.org/Documentation/01-FreeRTOS-quick-start/01-Beginners-guide/00-Overview) is very useful. This is the source for FreeRTOS usage (as distinct from installing and using this Arduino Library).
 
 My other [AVRfreeRTOS Sourceforge Repository](https://sourceforge.net/projects/avrfreertos/) or [AVRfreeRTOS Github](https://github.com/feilipu/avrfreertos) has plenty of examples, ranging from [blink](https://sourceforge.net/projects/avrfreertos/files/MegaBlink/) through to a [synthesiser](https://sourceforge.net/projects/avrfreertos/files/GA_Synth/).
 
