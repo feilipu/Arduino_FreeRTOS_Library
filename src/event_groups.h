@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V11.1.0
+ * FreeRTOS Kernel V11.3.3
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -452,13 +452,10 @@ EventBits_t xEventGroupClearBits( EventGroupHandle_t xEventGroup,
  * \defgroup xEventGroupClearBitsFromISR xEventGroupClearBitsFromISR
  * \ingroup EventGroup
  */
-#if ( configUSE_TRACE_FACILITY == 1 )
+#if ( ( INCLUDE_xTimerPendFunctionCall == 1 ) && ( configUSE_TIMERS == 1 ) )
     BaseType_t xEventGroupClearBitsFromISR( EventGroupHandle_t xEventGroup,
                                             const EventBits_t uxBitsToClear ) PRIVILEGED_FUNCTION;
-#else
-    #define xEventGroupClearBitsFromISR( xEventGroup, uxBitsToClear ) \
-    xTimerPendFunctionCallFromISR( vEventGroupClearBitsCallback, ( void * ) ( xEventGroup ), ( uint32_t ) ( uxBitsToClear ), NULL )
-#endif
+#endif /* if ( ( INCLUDE_xTimerPendFunctionCall == 1 ) && ( configUSE_TIMERS == 1 ) ) */
 
 /**
  * event_groups.h
@@ -483,14 +480,11 @@ EventBits_t xEventGroupClearBits( EventGroupHandle_t xEventGroup,
  * and bit 0 set uxBitsToSet to 0x09.
  *
  * @return The value of the event group at the time the call to
- * xEventGroupSetBits() returns.  There are two reasons why the returned value
- * might have the bits specified by the uxBitsToSet parameter cleared.  First,
- * if setting a bit results in a task that was waiting for the bit leaving the
- * blocked state then it is possible the bit will be cleared automatically
- * (see the xClearBitOnExit parameter of xEventGroupWaitBits()).  Second, any
- * unblocked (or otherwise Ready state) task that has a priority above that of
- * the task that called xEventGroupSetBits() will execute and may change the
- * event group value before the call to xEventGroupSetBits() returns.
+ * xEventGroupSetBits() returns.  Returned value might have the bits specified
+ * by the uxBitsToSet parameter cleared if setting a bit results in a task
+ * that was waiting for the bit leaving the blocked state then it is possible
+ * the bit will be cleared automatically (see the xClearBitOnExit parameter
+ * of xEventGroupWaitBits()).
  *
  * Example usage:
  * @code{c}
@@ -610,14 +604,11 @@ EventBits_t xEventGroupSetBits( EventGroupHandle_t xEventGroup,
  * \defgroup xEventGroupSetBitsFromISR xEventGroupSetBitsFromISR
  * \ingroup EventGroup
  */
-#if ( configUSE_TRACE_FACILITY == 1 )
+#if ( ( INCLUDE_xTimerPendFunctionCall == 1 ) && ( configUSE_TIMERS == 1 ) )
     BaseType_t xEventGroupSetBitsFromISR( EventGroupHandle_t xEventGroup,
                                           const EventBits_t uxBitsToSet,
                                           BaseType_t * pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
-#else
-    #define xEventGroupSetBitsFromISR( xEventGroup, uxBitsToSet, pxHigherPriorityTaskWoken ) \
-    xTimerPendFunctionCallFromISR( vEventGroupSetBitsCallback, ( void * ) ( xEventGroup ), ( uint32_t ) ( uxBitsToSet ), ( pxHigherPriorityTaskWoken ) )
-#endif
+#endif /* if ( ( INCLUDE_xTimerPendFunctionCall == 1 ) && ( configUSE_TIMERS == 1 ) ) */
 
 /**
  * event_groups.h

@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V11.1.0
+ * FreeRTOS Kernel V11.3.3
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -40,14 +40,6 @@
 #include "task.h"
 #include "stream_buffer.h"
 
-#if ( configUSE_TASK_NOTIFICATIONS != 1 )
-    #error configUSE_TASK_NOTIFICATIONS must be set to 1 to build stream_buffer.c
-#endif
-
-#if ( INCLUDE_xTaskGetCurrentTaskHandle != 1 )
-    #error INCLUDE_xTaskGetCurrentTaskHandle must be set to 1 to build stream_buffer.c
-#endif
-
 /* The MPU ports require MPU_WRAPPERS_INCLUDED_FROM_API_FILE to be defined
  * for the header files above, but not in this file, in order to generate the
  * correct privileged Vs unprivileged linkage and placement. */
@@ -58,6 +50,14 @@
  * of this file. If you want to include stream buffers then ensure
  * configUSE_STREAM_BUFFERS is set to 1 in FreeRTOSConfig.h. */
 #if ( configUSE_STREAM_BUFFERS == 1 )
+
+    #if ( configUSE_TASK_NOTIFICATIONS != 1 )
+        #error configUSE_TASK_NOTIFICATIONS must be set to 1 to build stream_buffer.c
+    #endif
+
+    #if ( INCLUDE_xTaskGetCurrentTaskHandle != 1 )
+        #error INCLUDE_xTaskGetCurrentTaskHandle must be set to 1 to build stream_buffer.c
+    #endif
 
 /* If the user has not provided application specific Rx notification macros,
  * or #defined the notification macros away, then provide default implementations
@@ -258,13 +258,22 @@ typedef struct StreamBufferDef_t
 static size_t prvBytesInBuffer( const StreamBuffer_t * const pxStreamBuffer ) PRIVILEGED_FUNCTION;
 
 /*
+ * Returns pdTRUE when the amount of buffered data should unblock a task that
+ * is waiting to receive data. Stream batching buffers require the buffered
+ * data to exceed the trigger level, whereas stream and message buffers unblock
+ * when the trigger level is reached.
+ */
+static BaseType_t prvBytesInBufferMeetTriggerLevel( const StreamBuffer_t * const pxStreamBuffer,
+                                                    size_t xBytesInBuffer ) PRIVILEGED_FUNCTION;
+
+/*
  * Add xCount bytes from pucData into the pxStreamBuffer's data storage area.
  * This function does not update the buffer's xHead pointer, so multiple writes
  * may be chained together "atomically". This is useful for Message Buffers where
  * the length and data bytes are written in two separate chunks, and we don't want
  * the reader to see the buffer as having grown until after all data is copied over.
  * This function takes a custom xHead value to indicate where to write to (necessary
- * for chaining) and returns the the resulting xHead position.
+ * for chaining) and returns the resulting xHead position.
  * To mark the write as complete, manually set the buffer's xHead field with the
  * returned xHead from this function.
  */
@@ -306,7 +315,7 @@ static size_t prvWriteMessageToBuffer( StreamBuffer_t * const pxStreamBuffer,
  * the writer to see the buffer as having more free space until after all data is
  * copied over, especially if we have to abort the read due to insufficient receiving space.
  * This function takes a custom xTail value to indicate where to read from (necessary
- * for chaining) and returns the the resulting xTail position.
+ * for chaining) and returns the resulting xTail position.
  * To mark the read as complete, manually set the buffer's xTail field with the
  * returned xTail from this function.
  */
@@ -920,7 +929,7 @@ size_t xStreamBufferSend( StreamBufferHandle_t xStreamBuffer,
         traceSTREAM_BUFFER_SEND( xStreamBuffer, xReturn );
 
         /* Was a task waiting for the data? */
-        if( prvBytesInBuffer( pxStreamBuffer ) >= pxStreamBuffer->xTriggerLevelBytes )
+        if( prvBytesInBufferMeetTriggerLevel( pxStreamBuffer, prvBytesInBuffer( pxStreamBuffer ) ) != pdFALSE )
         {
             prvSEND_COMPLETED( pxStreamBuffer );
         }
@@ -962,6 +971,9 @@ size_t xStreamBufferSendFromISR( StreamBufferHandle_t xStreamBuffer,
     if( ( pxStreamBuffer->ucFlags & sbFLAGS_IS_MESSAGE_BUFFER ) != ( uint8_t ) 0 )
     {
         xRequiredSpace += sbBYTES_TO_STORE_MESSAGE_LENGTH;
+
+        /* Overflow? */
+        configASSERT( xRequiredSpace > xDataLengthBytes );
     }
     else
     {
@@ -974,7 +986,7 @@ size_t xStreamBufferSendFromISR( StreamBufferHandle_t xStreamBuffer,
     if( xReturn > ( size_t ) 0 )
     {
         /* Was a task waiting for the data? */
-        if( prvBytesInBuffer( pxStreamBuffer ) >= pxStreamBuffer->xTriggerLevelBytes )
+        if( prvBytesInBufferMeetTriggerLevel( pxStreamBuffer, prvBytesInBuffer( pxStreamBuffer ) ) != pdFALSE )
         {
             /* MISRA Ref 4.7.1 [Return value shall be checked] */
             /* More details at: https://github.com/FreeRTOS/FreeRTOS-Kernel/blob/main/MISRA.md#dir-47 */
@@ -1585,6 +1597,35 @@ static size_t prvBytesInBuffer( const StreamBuffer_t * const pxStreamBuffer )
 }
 /*-----------------------------------------------------------*/
 
+static BaseType_t prvBytesInBufferMeetTriggerLevel( const StreamBuffer_t * const pxStreamBuffer,
+                                                    size_t xBytesInBuffer )
+{
+    BaseType_t xReturn = pdFALSE;
+
+    if( ( pxStreamBuffer->ucFlags & sbFLAGS_IS_BATCHING_BUFFER ) != ( uint8_t ) 0 )
+    {
+        if( xBytesInBuffer > pxStreamBuffer->xTriggerLevelBytes )
+        {
+            xReturn = pdTRUE;
+        }
+        else
+        {
+            mtCOVERAGE_TEST_MARKER();
+        }
+    }
+    else if( xBytesInBuffer >= pxStreamBuffer->xTriggerLevelBytes )
+    {
+        xReturn = pdTRUE;
+    }
+    else
+    {
+        mtCOVERAGE_TEST_MARKER();
+    }
+
+    return xReturn;
+}
+/*-----------------------------------------------------------*/
+
 static void prvInitialiseNewStreamBuffer( StreamBuffer_t * const pxStreamBuffer,
                                           uint8_t * const pucBuffer,
                                           size_t xBufferSizeBytes,
@@ -1654,11 +1695,9 @@ void vStreamBufferSetStreamBufferNotificationIndex( StreamBufferHandle_t xStream
 
     traceENTER_vStreamBufferSetStreamBufferNotificationIndex( xStreamBuffer, uxNotificationIndex );
 
-    configASSERT( pxStreamBuffer );
-
     /* There should be no task waiting otherwise we'd never resume them. */
-    configASSERT( pxStreamBuffer->xTaskWaitingToReceive == NULL );
-    configASSERT( pxStreamBuffer->xTaskWaitingToSend == NULL );
+    configASSERT( ( pxStreamBuffer != NULL ) && ( pxStreamBuffer->xTaskWaitingToReceive == NULL ) );
+    configASSERT( ( pxStreamBuffer != NULL ) && ( pxStreamBuffer->xTaskWaitingToSend == NULL ) );
 
     /* Check that the task notification index is valid. */
     configASSERT( uxNotificationIndex < configTASK_NOTIFICATION_ARRAY_ENTRIES );

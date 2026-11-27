@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V11.1.0
+ * FreeRTOS Kernel V11.3.3
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -83,6 +83,14 @@
 
 #ifndef portARCH_NAME
     #define portARCH_NAME    NULL
+#endif
+
+#ifndef portBASE_TYPE_ENTER_CRITICAL
+    #define portBASE_TYPE_ENTER_CRITICAL()    taskENTER_CRITICAL()
+#endif
+
+#ifndef portBASE_TYPE_EXIT_CRITICAL
+    #define portBASE_TYPE_EXIT_CRITICAL()    taskEXIT_CRITICAL()
 #endif
 
 #ifndef configSTACK_DEPTH_TYPE
@@ -199,6 +207,7 @@ void vPortFree( void * pv ) PRIVILEGED_FUNCTION;
 void vPortInitialiseBlocks( void ) PRIVILEGED_FUNCTION;
 size_t xPortGetFreeHeapSize( void ) PRIVILEGED_FUNCTION;
 size_t xPortGetMinimumEverFreeHeapSize( void ) PRIVILEGED_FUNCTION;
+void xPortResetHeapMinimumEverFreeHeapSize( void ) PRIVILEGED_FUNCTION;
 
 #if ( configSTACK_ALLOCATION_FROM_SEPARATE_HEAP == 1 )
     void * pvPortMallocStack( size_t xSize ) PRIVILEGED_FUNCTION;
@@ -259,7 +268,7 @@ void vPortEndScheduler( void ) PRIVILEGED_FUNCTION;
  * @brief Checks if the calling task is authorized to access the given buffer.
  *
  * @param pvBuffer The buffer which the calling task wants to access.
- * @param ulBufferLength The length of the pvBuffer.
+ * @param xBufferLength The length of the pvBuffer.
  * @param ulAccessRequested The permissions that the calling task wants.
  *
  * @return pdTRUE if the calling task is authorized to access the buffer,
@@ -267,7 +276,7 @@ void vPortEndScheduler( void ) PRIVILEGED_FUNCTION;
  */
 #if ( portUSING_MPU_WRAPPERS == 1 )
     BaseType_t xPortIsAuthorizedToAccessBuffer( const void * pvBuffer,
-                                                uint32_t ulBufferLength,
+                                                size_t xBufferLength,
                                                 uint32_t ulAccessRequested ) PRIVILEGED_FUNCTION;
 #endif
 

@@ -1,5 +1,438 @@
 Documentation and download available at https://www.FreeRTOS.org/
 
+Changes between FreeRTOS V11.3.2 and FreeRTOS V11.3.3 released October 29, 2026
+    + Fix a type confusion in xQueueSelectFromSet by verifying that the object
+      passed as the queue set really is a queue set, that is, that its item
+      size is sizeof( Queue_t * ). We thank Claude and Ada Logics for their
+      help identifying this issue.
+
+Changes between FreeRTOS V11.3.1 and FreeRTOS V11.3.2 released October 16, 2026
+
+    + Add the ability for a port to selectively override the
+      PRIVILEGED_FUNCTION, PRIVILEGED_DATA and FREERTOS_SYSTEM_CALL macros when
+      the MPU wrappers are not in use. This allows kernel functions and data to
+      be placed in port specific link time sections, such as cache coherent
+      memory on SMP systems, without enabling the full MPU wrappers. We thank
+      @ianstcdns for their contribution.
+    + Add an implementation of os_wrapper_is_kernel_started, which is new in
+      TF-M 2.3.0, to the ARM_TFM port. A suspended scheduler is reported as
+      started because the kernel has already been initialized. The
+      implementation is guarded by the same configuration condition as
+      xTaskGetSchedulerState so that configurations without that API continue
+      to build. We thank @ithinuel for their contribution.
+    + Update xPortIsAuthorizedToAccessBuffer to take the buffer length as a
+      size_t instead of a uint32_t so that it uses the natural word size of the
+      architecture, which enables 64-bit systems. Ports maintained outside of
+      this repository that implement this function need to update their
+      function signature to match. We thank Claude and Ada Logics for their
+      help identifying this issue.
+    + Update the ARMv7-M MPU ports to lower the SVCall preemption priority from
+      zero, the highest priority, to one just above
+      configMAX_SYSCALL_INTERRUPT_PRIORITY, which restores the priority used
+      before the ports were updated to raise SVCall to the highest priority. We
+      thank @jefftenney for their contribution.
+    + Update the Partner-Supported-Ports submodule.
+    + Fix the MAX_CONTEXT_SIZE calculation in the ARMv8-M ports to account for
+      the task PAC key as 4 words rather than 16, because the key is 16 bytes
+      long and MAX_CONTEXT_SIZE counts words. This reduces the amount of
+      context memory reserved per task when configENABLE_PAC is 1. We thank
+      @ithinuel for their contribution.
+    + Fix portEXTRACT_LAST_ADDRESS_FROM_PRLAR_EL1 in the ARM_CR82 port to set
+      only the address bits that PRLAR_EL1 implies, rather than every bit
+      outside of the address mask, which corrupted the upper bits of the region
+      end address used in MPU access checks. We thank Claude and Ada Logics for
+      their help identifying this issue.
+    + Fix the IAR TrustZone non-secure ports for ARM_CM33, ARM_CM35P, ARM_CM52,
+      ARM_CM55, ARM_CM85 and ARM_STAR_MC3 by removing a stray installer URL
+      that was left outside of a comment. The assembler parsed the URL as an
+      operand of the preceding instruction, which failed the build of every
+      configuration of these ports. We thank @sekior11 for their contribution.
+
+Changes between FreeRTOS V11.3.0 and FreeRTOS V11.3.1 released August 2026
+
+    + Add Symmetric Multiprocessing (SMP) support to the Armv8-M ports for the
+      GCC, ArmClang and IAR toolchains. This adds per core critical nesting
+      state, spinlocks, inter-core yield and wakeup using SEV/WFE, primary and
+      secondary core bring up synchronization, and a core safe PendSV context
+      switch. Single core builds are unchanged. We thank @AhmedIsmail02 for
+      their contribution.
+    + Add new xTaskPeriodicDelay API for periodic tasks. It supersedes
+      xTaskDelayUntil by preventing run away of pxPreviousWakeTime, catching up
+      skipped periods immediately while returning the number of periods skipped,
+      and returning 0 when not enough ticks have elapsed. We thank @ntd for
+      their contribution.
+    + Add uxTaskCallForEachTask API, which invokes a caller supplied callback
+      for each task in the system, and refactor uxTaskGetSystemState to use it.
+      We thank @DRNadler for their contribution.
+    + Add configIDLE_AFFINITY configuration option, which pins each Idle task to
+      its corresponding core in SMP systems. It defaults to 0, which allows the
+      scheduler to run Idle tasks on any available core. We thank @rus084 for
+      their contribution.
+    + Add validation to SecureContext_AllocateContext in the ARMv8-M secure side
+      ports to ensure that the requested secure stack size plus the stack seal
+      size does not overflow before allocating. We thank Jordan Mecom (Block,
+      Inc.) for reporting this issue.
+    + Add assertions to vQueueDelete to check that no tasks are blocked on the
+      queue being deleted.
+    + Add a link to the FreeRTOS Kernel threat model in SECURITY.md.
+    + Add documentation clarifying that the MemoryRegion_t ulParameters macros
+      are port specific, so applications must use the tskMPU_REGION_* or
+      portMPU_REGION_* values that match their MPU port. We thank @Old-Ding for
+      their contribution.
+    + Add a comment documenting that a privileged task must revoke access
+      permissions before deleting a kernel object when using Access Control
+      Lists.
+    + Update the ARM_CRx_No_GIC port to declare vPortYield as a weak symbol so
+      that devices with a dedicated software interrupt register can substitute
+      their own yield trigger. The default behavior is unchanged. We thank
+      @maximdeclercq for their contribution.
+    + Update the FreeRTOSConfig.h template to use a 32-bit tick type, which
+      avoids compiler warnings on Windows where a 64-bit tick resolves to
+      unsigned long long.
+    + Update the deprecated CMake configuration warning to use INTERFACE rather
+      than PUBLIC for the freertos_config interface library. We thank @Isla-jq
+      for their contribution.
+    + Fix vPortFreeSecureContext in the ARMv8-M ports to read xSecureContext at
+      the correct offset. When the MPU is enabled, the first item in the TCB is
+      the stored context location rather than the top of stack, so
+      xSecureContext is located at a negative offset from that position.
+    + Fix SecureContext_AllocateContext in the ARMv8-M secure side ports to
+      reject a secure stack size smaller than the stack seal size.
+    + Fix SecureContext_FreeContext in the ARMv8-M secure side ports to refuse
+      to free the secure context that is currently loaded, as indicated by
+      PSPLIM. Freeing it left the running task referencing freed secure memory.
+      The task handle supplied by the non-secure side is untrusted, so it is
+      now used only as an additional ownership check.
+    + Fix the ARMv8-M ports to service the portSVC_START_SCHEDULER and
+      portSVC_FREE_SECURE_CONTEXT supervisor calls only when they are raised
+      from privileged code. When the MPU is enabled, both requests are now
+      ignored unless the calling program counter lies within the privileged
+      functions section.
+    + Fix a type confusion in xQueueAddToSet by verifying that the object
+      passed as the queue set really is a queue set, that is, that its item
+      size is sizeof( Queue_t * ). Passing an ordinary queue now returns
+      pdFAIL rather than allowing prvNotifyQueueSetContainer to copy item size
+      bytes from a single pointer on the stack.
+    + Fix xTimerGenericCommandFromTask to validate the lower bound of
+      xCommandID in addition to the existing upper bound, so that only the
+      valid task command range from tmrCOMMAND_START_DONT_TRACE to
+      tmrCOMMAND_DELETE is accepted. Rejected commands return pdFAIL, and
+      behavior for valid commands and for xTimerGenericCommandFromISR is
+      unchanged.
+    + Fix a kernel object pool entry leak by adding an MPU wrapper for the
+      xTimerDelete API, so that the pool index is freed when a timer is deleted
+      with MPU wrappers version 2.
+    + Fix the MPU wrapper macro mapping for the ARMv8-M ports.
+    + Fix silently failing critical sections in unprivileged tasks by
+      disallowing configALLOW_UNPRIVILEGED_CRITICAL_SECTIONS with MPU wrappers
+      version 2 in the ARMv7-M MPU ports. The option now defaults to 0 under
+      version 2, and explicitly setting it to 1 raises a compile time error.
+      Behavior with MPU wrappers version 1 is unchanged.
+    + Fix a time of check to time of use race condition in vTaskListTasks, where
+      reading the volatile task count twice allowed a task to be created between
+      the reads, resulting in an undersized allocation and a possible buffer
+      overflow in uxTaskGetSystemState. We thank @srpatcha for their
+      contribution.
+    + Fix a spurious heap_5 assertion when configENABLE_HEAP_PROTECTOR is 1 and
+      an allocation cannot be satisfied. The free block search reaching the end
+      marker is a normal out of memory condition, so pvPortMalloc now returns
+      NULL and invokes the malloc failed hook instead of asserting.
+    + Fix batching stream buffers to unblock a receiver only after the buffered
+      byte count exceeds, rather than reaches, the trigger level. Previously a
+      receiver could be woken early and xStreamBufferReceive could return 0
+      bytes. Stream buffer and message buffer semantics are unchanged. We thank
+      @officialasishkumar for their contribution.
+    + Fix MISRA C 2012 Rule 20.4 violation by replacing `#define static` with a
+      STATIC macro, which also keeps the static variables in
+      vApplicationGetIdleTaskMemory and vApplicationGetPassiveIdleTaskMemory
+      static when portREMOVE_STATIC_QUALIFIER is defined. We thank @elsonwei for
+      their contribution.
+    + Fix undefined behavior in the MSVC-MingW port caused by left shifting a
+      signed int by 31 or more bits.
+    + Fix a duplicate Doxygen \defgroup identifier by giving
+      uxTaskBasePriorityGet its own group instead of reusing the
+      uxTaskPriorityGet group.
+    + Fix the incorrect #endif comment after vPortSetupTimerInterrupt in the GCC
+      and IAR RISC-V ports, which duplicated configMTIME_BASE_ADDRESS and
+      omitted configMTIMECMP_BASE_ADDRESS. We thank @cuiweixie for their
+      contribution.
+    + Fix incorrect #endif comments in croutine.c and queue.c, which reversed
+      the configUSE_CO_ROUTINES condition and named the wrong configuration
+      option for configSUPPORT_DYNAMIC_ALLOCATION. We thank @Zepp-Hanzj for
+      their contribution.
+    + Fix the configLIST_VOLATILE #endif comment and the documented parameter
+      names for uxListRemove in include/list.h. We thank @rakeshr-source for
+      their contribution.
+    + Fix the type and timeout values used in the xStreamBufferSend and
+      xMessageBufferSend documentation examples. We thank @Isla-jq for their
+      contribution.
+    + Fix copy and paste comment typos in xTaskGetApplicationTaskTag and
+      xTaskGetApplicationTaskTagFromISR, and a typo in the
+      xTaskGenericNotifyWait comment. We thank @wanghengZzz for their
+      contributions.
+    + Fix comment typos in the queue.h, list.h and task.h documentation,
+      including the xQueueReceiveFromISR and xQueueGenericSend examples, the
+      listGET_ITEM_VALUE_OF_HEAD_ENTRY \page tag, and the uxIndexToCLear typo.
+      We thank @zepp-chen for their contribution.
+    + Fix the FreeRTOSConfig.h template path referenced in README.md. We thank
+      @IClementI for their contribution.
+    + Fix the missing V prefix in the release_tag and namespace-prefix inputs of
+      the auto release workflow.
+    + Fix long path failures in the Windows kernel demo builds by enabling
+      Windows long path support in CI.
+    + Remove an unnecessary const variable from the GCC and IAR RISC-V ports. We
+      thank @IClementI for their contribution.
+
+Changes between FreeRTOS V11.2.0 and FreeRTOS V11.3.0 released March 2026
+
+    + Correct minor mistakes in code comments in event_groups.c, include/queue.h,
+      and include/task.h. We thank @wirelinker for their contribution.
+    + Add Arm China STAR-MC3 port support. We thank @cpussw01 for their
+      contribution.
+    + Add Memory Protection Unit (MPU) support to the ARM Cortex-R82 port. We
+      thank @AhmedIsmail02 for their contribution.
+    + Add ARM Cortex-M52 port support for GCC and IAR compilers. We thank
+      @Armchina_JidongMei for their contribution.
+    + Add ARM Cortex-R82 non-MPU port for ARMv8-R AArch64 with SMP support. We
+      thank @AhmedIsmail02 for their contribution.
+    + Add Floating Point Unit (FPU) context save support to the RISC-V port.
+      We thank @cubidesj for their contribution.
+    + Add Vector context save support to the RISC-V port. We thank @cubidesj
+      for their contribution.
+    + Add xPortIsInsideInterrupt API to the RP2040 port to match other ARM
+      ports. We thank @graham-sanderson for their contribution.
+    + Add catch up behavior documentation to xTaskDelayUntil API to explain
+      frequency breaks when catching up for past events.
+    + Add asserts to check for stack overflow at task creation time.
+    + Add assert to check for overflow in xStreamBufferSendFromISR API.
+    + Add assert to check for overflow of recursive mutex counter. We thank
+      @InnerSteff for their contribution.
+    + Add CFI frame unwind information in portable/IAR/RXv2/port_asm.s to
+      enable debugger callstack display beyond __interrupt_27. We thank
+      @bernd-edlinger for their contribution.
+    + Update xTaskDelayUntil to be the preferred delay function in the
+      FreeRTOSConfig.h template.
+    + Update RISC-V port to use saved mstatus for FPU/VPU state determination
+      instead of re-reading after writes, addressing specification-compliant
+      implementations where FS field may change to Dirty.
+    + Update RISC-V port to refine vector context layout on stack for proper
+      register ordering. We thank @Saiiijchan for their contribution.
+    + Update RISC-V port to refine FPU register context offset calculation. We
+      thank @Saiiijchan for their contribution.
+    + Update RISC-V port to use UBaseType_t for ullMachineTimerCompareRegisterBase
+      to resolve warnings on 32-bit platforms.
+    + Update FreeRTOS MPU to remove the assertion and runtime check enforcing
+      matching between configTOTAL_MPU_REGIONS and physical MPU regions,
+      allowing applications to manage a subset of available regions. We thank
+      @ErickReyesR for their contribution.
+    + Update ARM_CRx_No_GIC port to set Data endianness bit in SPSR register
+      for big-endian compilation. We thank @maximdeclercq00 for their
+      contribution.
+    + Update Win32 port to guard timeapi.h include for MinGW compatibility and
+      add compiler-specific headers for cross-compiler support. We thank
+      @nordync for their contribution.
+    + Update Win32 port to move Windows headers to port.c to prevent inclusion
+      of windows.h in all header files and avoid macro conflicts. We thank
+      @creiter64 for their contribution.
+    + Update POSIX port to delete thread key on process exit instead of in
+      xPortStartScheduler to ensure proper cleanup of thread-specific memory.
+    + Update POSIX port to fix race condition in vPortEndScheduler by moving
+      scheduler thread signal after FreeRTOS thread check. We thank
+      @arctic-alpaca for their contribution.
+    + Update RP2040 port to fix use of deprecated volatile semantics for C++20
+      compatibility. We thank @mathiasgredal for their contribution.
+    + Update RP2040 port to propagate PICO_SDK_VERSION_* to parent scope in
+      CMake. We thank @shengtai25 for their contribution.
+    + Update RP2040 port to remove unused code and preprocessor directives. We
+      thank @pascalr for their contribution.
+    + Update RL78 port to fix incorrect register image for pvParameters in FAR
+      data model for IAR compiler. We thank @sauleThsQuin for their
+      contribution.
+    + Update RL78 port to fix compilation failure on portasm.s file due to
+      indentation on ASM macro. We thank @5iBri for their contribution.
+    + Update ARM_CRx_MPU port to add LLVM assembler compatibility by
+      explicitly specifying section flags. We thank @malsyned for their
+      contribution.
+    + Update Cortex-M ports to rename ulStackFrameSize to
+      ulHardwareSavedExceptionFrameSize for improved readability. We thank
+      @AhmedIsmail02 for their contribution.
+    + Update MPLAB PIC32MZ-EF port to add assert to catch register overflow.
+      We thank @mrluzeiro for their contribution.
+    + Update comments related to taskYIELD in queue.h. We thank @Saiiijchan
+      for their contribution.
+    + Fix priority disinheritance in vTaskPriorityDisinheritAfterTimeout to
+      reset the correct priority when the task disinheriting timeout was the
+      only task at that priority.
+    + Fix event groups to remove direct mapping of xEventGroupClearBitsFromISR
+      and xEventGroupSetBitsFromISR to xTimerPendFunctionCallFromISR,
+      resolving redefinition warnings. We thank @AhmedIsmail02 for their
+      contribution.
+    + Fix datatype of queue item length macros from uint8_t to UBaseType_t to
+      match API parameter types.
+    + Fix possible NULL pointer dereference after configASSERT() calls in
+      queue.c and stream_buffer.c. We thank @Florian.LaRoche for their
+      contribution.
+    + Fix Win32 port to prevent SetWaitableTimer() call from being ignored
+      when configASSERT expands to nothing. We thank @kim-schwaner for their
+      contribution.
+    + Fix compiler warnings from gcc -Wconversion. We thank @Florian.LaRoche
+      for their contribution.
+    + Fix compiler warning about gcc -Wwrite-strings in POSIX port. We thank
+      @Florian.LaRoche for their contribution.
+    + Fix set but unused variable warning in pxPortInitialiseStack. We thank
+      @razrbro for their contribution.
+    + Fix missing include to resolve compile error. We thank @mike919192 for
+      their contribution.
+    + Fix missing cast to BaseType_t.
+    + Fix cast in stack allocation for task creation for negative
+      portSTACK_GROWTH. We thank @sidharthseela for their contribution.
+    + Fix missing macro guards in task.h to prevent unintended API access. We
+      thank @SoniHarsh1 for their contribution.
+    + Fix CMake build for GCC_ARM_CRx_MPU by adding to mpu_wrappers patterns.
+      We thank @malsyned for their contribution.
+    + Fix initialization of size_t-type variable by changing macro from
+      portMAX_DELAY to SIZE_MAX. We thank @duyicheng741 for their
+      contribution.
+    + Define configENABLE_PAC and configENABLE_BTI before including portable.h
+      to prevent "used before definition" warnings.
+    + Remove stray semicolon from gcc-ARM_CRx_MPU port.c. We thank
+      @Florian.LaRoche for their contribution.
+
+Changes between FreeRTOS V11.1.0 and FreeRTOS V11.2.0 released March 04, 2025
+
+    + Add CC-RH port for Renesas F1Kx devices. We thank @TrongNguyenR for their
+      contribution.
+    + Add Pointer Authentication (PAC) and Branch Target Identification (BTI)
+      support to the ARMv8-M ports. We thank @AhmedIsmail02 for their
+      contribution.
+    + Add Floating Point Unit (FPU) support to the ARM_AARCH64 port. We thank
+      @StefanBalt for their contribution.
+    + Add FPU Safe Application IRQ Handler suport to the ARM_AARCH64_SRE port.
+      We thank @GhMarwen for their contribution.
+    + Add Privileged eXecute Never MPU attribute support to the ARMv8-M ports.
+      We thank @AhmedIsmail02 for their contribution.
+    + Update XMOS xcore.ai port to be compatible with FreeRTOS Kernel version
+      11. We thank @ACascarino for their contribution.
+    + ARM_CRx_No_GIC port updates:
+      - Remove inline assembly and move assembly code to separate portASM.S
+        file.
+      - Add support for Floating Point Unit (FPU).
+      - Add support to allow the application writer to handle SVC calls raised
+        from the application code.
+      - Add support for vApplicationFPUSafeIRQHandler.
+    + POSIX port updates:
+      - Set PTHREAD_MUTEX_ROBUST attribute on the mutex to prevent application
+        hangs when a thread dies while holding a mutex.
+      - Avoid calling pthread_sigmask on non-FreeROS threads when
+        vPortEndScheduler is called from a non-FreeRTOS thread. We thank
+        @johnboiles for their contribution.
+      - Remove unnecessary call to pthread_attr_setstacksize. We thank
+        @hollinsky for their contribution.
+      - Add an assert to catch if vPortYield is called from a non-FreeRTOS
+        thread. We thank @johnboiles for their contribution.
+      - Fix Posix port compilation on FreeBSD. We thank @tymmej for their
+        contribution.
+    + Update the Xtensa port and move it to the Partner-Supported-Ports
+      repository. We thank @ianstcdns for their contribution.
+    + Add vPortGenerateSimulatedInterruptFromWindowsThread API in the MSVC-MingW
+      port to enable native windows thread to synchronize with FreeRTOS task
+      through simulated interrupt.
+    + Update Windows port to use Waitable Timer instead of Sleep to improve tick
+      accuracy. We thank @bknicholls and @leegeth for their contribution.
+    + Update the value of queueQUEUE_TYPE_SET to a unique value (5) to allow
+      tracers to differentiate between queues and queue sets. We thank @schilkp
+      for their contribution.
+    + Add traceSTARTING_SCHEDULER tracing hook to enable tracers to run code on
+      startup. We thank @schilkp for their contribution.
+    + Define vApplicationGetTimerTaskMemory only when configUSE_TIMERS is set to
+      1. We thank @HazardyKnusperkeks for their contribution.
+    + Reset xNextTaskUnblockTime in task notify FromISR APIs to allow the core
+      to enter sleep mode at the earliest possible time when using tickless
+      idle.
+    + Optimize xTaskIncrementTick for SMP by removing xYieldRequiredForCore. We
+      thank @cymizer for their contribution.
+    + Update the SMP scheduler to re-select a core to yield when the core
+      affinity of a ready task is changed.
+    + Update xEventGroupSetBits to read the event bits value to be returned to
+      the caller while the scheduler is suspended. This fixes dereference after
+      the event group is deleted by higher priority task. We thank @skotopes for
+      their contribution.
+    + Optimize certain getter APIs by removing unnecessary calls to
+      task{ENTER|EXIT}_CRITICAL() when the data access is atomic. We thank
+      @GuilhermeGiacomoSimoes for their contribution.
+    + Optimize xTaskNotifyWait and ulTaskNotifyTake APIs to suspend the
+      scheduler only if the task is not already notified, and the caller is
+      willing to wait for the notification. We thank @jefftenney for
+      their contribution.
+    + Fix error checking of prvCreateIdleTasks. We thank @kakkoko for their
+      contribution.
+    + Update SMP lock macros and critical nesting macros to pass core ID as an
+      argument. This reduces the number of accesses to a peripheral register to
+      query core ID. We thank @felixvanoost for their contribution.
+    + Add stack pointer bounds check when configCHECK_FOR_STACK_OVERFLOW is set
+      to 2 to improve reliability of stack overflow detection. We thank
+      @jiladahe1997 for their contribution.
+    + Update run-time stats to include time elapsed since the last context
+      switch for the currently running task.
+    + Add xQueueCreateSetStatic API for static creation of Queue Sets. We thank
+      @kzorer for their contribution.
+    + Update the traceMALLOC() macro to pass the actual size of the allocated
+      block for secure_heap, heap_2, heap_4 and heap_5. We thank @DazzlingOkami
+      for their contribution.
+    + Update heap_1 to use heapADD_WILL_OVERFLOW macro to improve readability.
+      We thank @wdfk-prog for their contribution.
+    + Add pointer protection to the pxNextFreeBlock member of the allocated
+      block's metadata in heap_4 and heap_5 when configENABLE_HEAP_PROTECTOR is
+      set to 1. We thank @Saiiijchan for their contribution.
+    + Allow the application writer to override pointer validation for heap_5
+      when configENABLE_HEAP_PROTECTOR is used. We thank @Saiiijchan for their
+      contribution.
+    + Add xPortResetHeapMinimumEverFreeHeapSize to heap_4.c and heap_5.c.
+      We thank @TomasGalbickaNXP for their contribution.
+    + Add NULL check in the event_create function in the POSIX port. We thank
+      @laroche for their contribution.
+    + Use _GNU_SOURCE macro instead of __USE_GNU in the Posix port. We thank
+      @maxiaogood for their contribution.
+    + Use the new __ARM_FP macro instead of the deprectred __VFP_FP__ macro in
+      GCC/ARM_CM7, GCC/ARM_CM4_MPU, and GCC/ARM_CM4F ports. We thank @haydenridd
+      for their contribution.
+    + Add portMEMORY_BARRIER definition to the Xtensa port. We thank @superroc
+      for their contribution.
+    + Move the hardware include msp430.h to port.c from portmacro.h. We thank
+      @mayl for their contribution.
+    + Update ARM assembly syntax for Cortex-M ports. We thank @laroche for their
+      contribution.
+    + Update the Windows port to records a pending yield in
+      vPortCloseRunningThread to ensure that the next tick interrupt schedules
+      the next task regardless of the value of configUSE_PREEMPTION.
+    + Fix the context switch issue in the RL78 port. We thank @KeitaKashima for
+      their contribution.
+    + Fix compilation issue in ARM CM0 port when using Keil MDK. We thank
+      @TomasGalbickaNXP for their contribution.
+    + Fix IA32 port compilation when configUSE_COMMON_INTERRUPT_ENTRY_POINT is
+      set to 0. We thank @Ryzee119 for their contribution.
+    + Store configMTIMECMP_BASE_ADDRESS in a 64-bit integer for the RISC-V port.
+      We thank @vishwamartur for their contribution.
+    + Fix nested interrupt handling and optimize FPU related context switching
+      for the F1Kx port. We thank @TrongNguyenR for their contribution.
+    + Update the RP2040 port to add support for Raspberry Pi Pico SDK 2.0.0.
+      We thank @kilograham for their contribution.
+    + Fix the return value of portYIELD_FROM_ISR macro for the MSVC-MingW port.
+      We thank @wwhheerree for their contribution.
+    + Optimize vApplicationFPUSafeIRQHandler for the Coretex-A9 port by
+      removing the unnecessarily preserved callee saved registers. We thank
+      @Saiiijchan for their contribution.
+    + Fix the context array size for MPU ports to ensure the saved context
+      location falls within the reserved context area rather than overlapping
+      with the next MPU_SETTINGS structure member.
+    + Update CMake files for RP2040 port to fetch the port from the
+      Community-Supported-Ports repo. We thank @kilograham for their
+      contribution.
+    + Fix CMake file for the GCC ARM_CM0 port to include MPU files. We thank
+      @0mhu for their contribution.
+    + Add an example of human readable table generated by vTaskListTasks() in
+      the function documentation. We thank @wwhheerree for their contribution.
+
 Changes between FreeRTOS V11.0.1 and FreeRTOS V11.1.0 released April 22, 2024
 
     + Add ARMv7-R port with Memory Protection Unit (MPU) support.
@@ -456,11 +889,6 @@ Changes between FreeRTOS V10.4.6 and FreeRTOS V10.5.0 released September 16 2022
 
 Changes between FreeRTOS V10.4.5 and FreeRTOS V10.4.6 released November 12 2021
 
-	+ Extend use of the configSTACK_DEPTH_TYPE which enables developers to define
-	  the type used to hold stack counter variables. Defaults to uint16_t
-	  for backward compatibility. #define configSTACK_DEPTH_TYPE to a type
-	  (for example, uint32_t) in FreeRTOSConfig.h to override the default.
-	+ Deleted all references to Coroutines.
 	+ ARMv7-M and ARMv8-M MPU ports – prevent non-kernel code from calling the
 	  internal functions xPortRaisePrivilege and vPortResetPrivilege by changing
 	  them to macros.
@@ -533,7 +961,7 @@ Changes between FreeRTOS V10.4.3 and FreeRTOS V10.4.4 released May 28 2021
 	  in more files.
 	+ Other minor updates include adding additional configASSERT() checks and
 	  correcting and improving code comments.
-	+ Go look at the smp branch to see the progress towards the Symetric
+	+ Go look at the smp branch to see the progress towards the Symmetric
 	  Multiprocessing Kernel. https://github.com/FreeRTOS/FreeRTOS-Kernel/tree/smp
 
 Changes between FreeRTOS V10.4.2 and FreeRTOS V10.4.3 released December 14 2020
@@ -2022,7 +2450,7 @@ Changes between V6.1.0 and V6.1.1 released January 14 2011
 	  Embedded Workbench.
 	+ Added a new port for the MSP430X core using the IAR Embedded Workbench.
 	+ Updated all the RX62N demo projects that target the Renesas Demonstration
-	  Kit (RDK) to take into account the revered LED wiring on later hardware
+	  Kit (RDK) to take into account the reversed LED wiring on later hardware
 	  revisions, and the new J-Link debug interface DLL.
 	+ Updated all the RX62N demo projects so the IO page served by the example
 	  embedded web server works with all web browsers.
@@ -3181,7 +3609,7 @@ Changes between V1.2.3 and V1.2.4
 	  xSerialPortInitMinimal() and the function xPortInit() has been renamed
 	  to xSerialPortInit().
 	+ The function sSerialPutChar() has been renamed cSerialPutChar() and
-	  the function return type chaned to portCHAR.
+	  the function return type changed to portCHAR.
 	+ The integer and flop tasks now include calls to tskYIELD(), allowing
 	  them to be used with the cooperative scheduler.
 	+ All the demo applications now use the integer and comtest tasks when the
@@ -3315,7 +3743,7 @@ Changes between V1.01 and V1.2.0
 	  ports to allocate a different maximum number of priorities.
 	+ By default the trace facility is off, previously USE_TRACE_FACILITY
 	  was defined.
-	+ comtest.c now uses a psuedo random delay between sends.  This allows for
+	+ comtest.c now uses a pseudo random delay between sends.  This allows for
 	  better testing as the interrupts do not arrive at regular intervals.
 	+ Minor change to the Flashlite serial port driver.  The driver is written
 	  to demonstrate the scheduler and is not written to be efficient.

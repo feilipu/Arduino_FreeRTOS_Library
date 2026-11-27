@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V11.1.0
+ * FreeRTOS Kernel V11.3.3
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -85,6 +85,18 @@
 /* Privileged only wrappers for Task APIs. These are needed so that
  * the application can use opaque handles maintained in mpu_wrappers.c
  * with all the APIs. */
+        #if ( configUSE_MPU_WRAPPERS_V1 == 1 )
+
+/* These are not needed in v2 because they do not take a task
+ * handle and therefore, no lookup is needed. Needed in v1 because
+ * these are available as system calls in v1. */
+            #define vTaskGetRunTimeStatistics            MPU_vTaskGetRunTimeStatistics
+            #define vTaskListTasks                       MPU_vTaskListTasks
+            #define vTaskSuspendAll                      MPU_vTaskSuspendAll
+            #define xTaskCatchUpTicks                    MPU_xTaskCatchUpTicks
+            #define xTaskResumeAll                       MPU_xTaskResumeAll
+        #endif /* #if ( configUSE_MPU_WRAPPERS_V1 == 1 ) */
+
         #define xTaskCreate                              MPU_xTaskCreate
         #define xTaskCreateStatic                        MPU_xTaskCreateStatic
         #define vTaskDelete                              MPU_vTaskDelete
@@ -138,6 +150,7 @@
         #define xQueueGenericCreateStatic              MPU_xQueueGenericCreateStatic
         #define xQueueGenericReset                     MPU_xQueueGenericReset
         #define xQueueCreateSet                        MPU_xQueueCreateSet
+        #define xQueueCreateSetStatic                  MPU_xQueueCreateSetStatic
         #define xQueueRemoveFromSet                    MPU_xQueueRemoveFromSet
 
         #if ( configUSE_MPU_WRAPPERS_V1 == 0 )
@@ -165,15 +178,19 @@
         #define xTimerGetPeriod                   MPU_xTimerGetPeriod
         #define xTimerGetExpiryTime               MPU_xTimerGetExpiryTime
 
+        #if ( configUSE_MPU_WRAPPERS_V1 == 0 )
+            #define xTimerGetReloadMode           MPU_xTimerGetReloadMode
+        #endif /* #if ( configUSE_MPU_WRAPPERS_V1 == 0 ) */
+
 /* Privileged only wrappers for Timer APIs. These are needed so that
  * the application can use opaque handles maintained in mpu_wrappers.c
  * with all the APIs. */
         #if ( configUSE_MPU_WRAPPERS_V1 == 0 )
-            #define xTimerGetReloadMode            MPU_xTimerGetReloadMode
             #define xTimerCreate                   MPU_xTimerCreate
             #define xTimerCreateStatic             MPU_xTimerCreateStatic
             #define xTimerGetStaticBuffer          MPU_xTimerGetStaticBuffer
             #define xTimerGenericCommandFromISR    MPU_xTimerGenericCommandFromISR
+            #define xTimerDelete                   MPU_xTimerDelete
         #endif /* #if ( configUSE_MPU_WRAPPERS_V1 == 0 ) */
 
 /* Map standard event_group.h API functions to the MPU equivalents. */
@@ -233,6 +250,9 @@
         #if ( ( configUSE_MPU_WRAPPERS_V1 == 0 ) && ( configENABLE_ACCESS_CONTROL_LIST == 1 ) )
 
             #define vGrantAccessToTask( xTask, xTaskToGrantAccess )                        vGrantAccessToKernelObject( ( xTask ), ( int32_t ) ( xTaskToGrantAccess ) )
+
+/* A privileged task must revoke access to the object before deletion,
+ * otherwise index reuse may result in accidental permissions. */
             #define vRevokeAccessToTask( xTask, xTaskToRevokeAccess )                      vRevokeAccessToKernelObject( ( xTask ), ( int32_t ) ( xTaskToRevokeAccess ) )
 
             #define vGrantAccessToSemaphore( xTask, xSemaphoreToGrantAccess )              vGrantAccessToKernelObject( ( xTask ), ( int32_t ) ( xSemaphoreToGrantAccess ) )

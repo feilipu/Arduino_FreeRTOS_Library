@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V11.1.0
+ * FreeRTOS Kernel V11.3.3
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -31,7 +31,7 @@
  * heavily for the schedulers needs, it is also available for use by
  * application code.
  *
- * list_ts can only store pointers to list_item_ts.  Each ListItem_t contains a
+ * List_t can only store pointers to ListItem_t.  Each ListItem_t contains a
  * numeric value (xItemValue).  Most of the time the lists are sorted in
  * ascending item value order.
  *
@@ -42,9 +42,9 @@
  * is because the tail contains a wrap back pointer to the true head of
  * the list.
  *
- * In addition to it's value, each list item contains a pointer to the next
+ * In addition to its value, each list item contains a pointer to the next
  * item in the list (pxNext), a pointer to the list it is in (pxContainer)
- * and a pointer to back to the object that contains it.  These later two
+ * and a pointer back to the object that contains it.  These later two
  * pointers are included for efficiency of list manipulation.  There is
  * effectively a two way link between the object containing the list item and
  * the list item itself.
@@ -74,7 +74,7 @@
  * compiler's options were set for maximum optimisation has been inspected and
  * deemed to be as intended.  That said, as compiler technology advances, and
  * especially if aggressive cross module optimisation is used (a use case that
- * has not been exercised to any great extend) then it is feasible that the
+ * has not been exercised to any great extent) then it is feasible that the
  * volatile qualifier will be needed for correct optimisation.  It is expected
  * that a compiler removing essential code because, without the volatile
  * qualifier on the list structure members and with aggressive cross module
@@ -92,7 +92,7 @@
  */
 #ifndef configLIST_VOLATILE
     #define configLIST_VOLATILE
-#endif /* configSUPPORT_CROSS_MODULE_OPTIMISATION */
+#endif /* configLIST_VOLATILE */
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus
@@ -191,7 +191,7 @@ typedef struct xLIST
  * Access macro to get the owner of a list item.  The owner of a list item
  * is the object (usually a TCB) that contains the list item.
  *
- * \page listGET_LIST_ITEM_OWNER listSET_LIST_ITEM_OWNER
+ * \page listGET_LIST_ITEM_OWNER listGET_LIST_ITEM_OWNER
  * \ingroup LinkedList
  */
 #define listGET_LIST_ITEM_OWNER( pxListItem )             ( ( pxListItem )->pvOwner )
@@ -219,7 +219,7 @@ typedef struct xLIST
  * Access macro to retrieve the value of the list item at the head of a given
  * list.
  *
- * \page listGET_LIST_ITEM_VALUE listGET_LIST_ITEM_VALUE
+ * \page listGET_ITEM_VALUE_OF_HEAD_ENTRY listGET_ITEM_VALUE_OF_HEAD_ENTRY
  * \ingroup LinkedList
  */
 #define listGET_ITEM_VALUE_OF_HEAD_ENTRY( pxList )        ( ( ( pxList )->xListEnd ).pxNext->xItemValue )
@@ -310,7 +310,7 @@ typedef struct xLIST
  * Remove an item from a list.  The list item has a pointer to the list that
  * it is in, so only the list item need be passed into the function.
  *
- * @param uxListRemove The item to be removed.  The item will remove itself from
+ * @param pxItemToRemove The item to be removed.  The item will remove itself from
  * the list pointed to by it's pxContainer parameter.
  *
  * @return The number of items that remain in the list after the list item has
@@ -491,7 +491,7 @@ void vListInsertEnd( List_t * const pxList,
  * Remove an item from a list.  The list item has a pointer to the list that
  * it is in, so only the list item need be passed into the function.
  *
- * @param uxListRemove The item to be removed.  The item will remove itself from
+ * @param pxItemToRemove The item to be removed.  The item will remove itself from
  * the list pointed to by it's pxContainer parameter.
  *
  * @return The number of items that remain in the list after the list item has
